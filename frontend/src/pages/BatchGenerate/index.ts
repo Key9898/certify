@@ -1,0 +1,1 @@
+export { BatchGenerate } from './BatchGenerate';

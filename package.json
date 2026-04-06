@@ -1,0 +1,14 @@
+{
+  "name": "certify-workspace",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:frontend": "npm.cmd --prefix frontend run dev",
+    "dev:backend": "npm.cmd --prefix backend run dev",
+    "readiness": "node scripts/deployment-readiness.mjs",
+    "readiness:strict": "node scripts/deployment-readiness.mjs --strict",
+    "lint": "npm.cmd --prefix backend run lint && npm.cmd --prefix frontend run lint",
+    "build": "npm.cmd --prefix backend run build && npm.cmd --prefix frontend run build",
+    "test": "npm.cmd --prefix backend run test && npm.cmd --prefix frontend run test"
+  }
+}

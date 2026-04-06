@@ -1,0 +1,10 @@
+export { Home } from './Home';
+export { Dashboard } from './Dashboard';
+export { Templates } from './Templates';
+export { CreateCertificate } from './CreateCertificate';
+export { Certificates } from './Certificates';
+export { BatchGenerate } from './BatchGenerate';
+export { Integrations } from './Integrations';
+export { Verify } from './Verify';
+export { TemplateBuilder } from './TemplateBuilder';
+export { Settings } from './Settings';
