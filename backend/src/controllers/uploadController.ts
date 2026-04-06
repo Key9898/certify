@@ -9,12 +9,15 @@ export const getUploadSignature = async (
 ): Promise<void> => {
   try {
     const { folder } = req.query;
-    const allowedFolders = ['logos', 'signatures'];
+    const allowedFolders = ['logos', 'signatures', 'template-backgrounds'];
 
     if (!folder || !allowedFolders.includes(folder as string)) {
       res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'Invalid folder. Use: logos or signatures' },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Invalid folder. Use: logos, signatures, or template-backgrounds',
+        },
       });
       return;
     }

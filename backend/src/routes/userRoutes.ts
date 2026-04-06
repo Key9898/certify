@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { checkJwt, attachUser } from '../middleware/auth';
+import { validateObjectId } from '../middleware/validate';
+import { teamLimiter } from '../middleware/rateLimiter';
 import { updateSettings } from '../controllers/userController';
 import {
   cancelTeamInvitation,
@@ -13,9 +15,9 @@ const router = Router();
 
 router.patch('/settings', checkJwt, attachUser, updateSettings);
 router.get('/team', checkJwt, attachUser, getTeamWorkspace);
-router.post('/team/invitations', checkJwt, attachUser, inviteTeamMember);
-router.patch('/team/members/:userId', checkJwt, attachUser, updateTeamMemberRole);
-router.delete('/team/members/:userId', checkJwt, attachUser, removeTeamMember);
-router.delete('/team/invitations/:invitationId', checkJwt, attachUser, cancelTeamInvitation);
+router.post('/team/invitations', checkJwt, attachUser, teamLimiter, inviteTeamMember);
+router.patch('/team/members/:userId', checkJwt, attachUser, validateObjectId('userId'), teamLimiter, updateTeamMemberRole);
+router.delete('/team/members/:userId', checkJwt, attachUser, validateObjectId('userId'), teamLimiter, removeTeamMember);
+router.delete('/team/invitations/:invitationId', checkJwt, attachUser, validateObjectId('invitationId'), teamLimiter, cancelTeamInvitation);
 
 export default router;

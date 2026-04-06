@@ -43,7 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
       initial={{ opacity: 0, x: -12 }}
       animate={{ opacity: 1, x: 0 }}
       transition={SOFT_SPRING}
-      className="flex h-full flex-col bg-base-100/50 backdrop-blur-xl"
+      className="flex h-full flex-col overflow-y-auto bg-base-100/95 backdrop-blur-xl"
     >
       <Link
         to={ROUTES.HOME}
@@ -159,7 +159,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
 
   return (
     <>
-      <aside className="hidden min-h-screen w-64 flex-col border-r border-base-200 lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden h-screen w-64 flex-col overflow-hidden border-r border-base-200 bg-base-100 lg:flex">
         {sidebarContent}
       </aside>
 

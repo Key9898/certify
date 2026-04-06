@@ -59,7 +59,7 @@ export const BatchGenerate: React.FC = () => {
   };
 
   const STEPS: Array<{ key: Step; label: string }> = [
-    { key: 'upload', label: 'Upload CSV' },
+    { key: 'upload', label: 'Upload CSV/XLSX' },
     { key: 'select-template', label: 'Select Template' },
     { key: 'preview', label: 'Preview' },
     { key: 'generating', label: 'Generating' },

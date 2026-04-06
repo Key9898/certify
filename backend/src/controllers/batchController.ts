@@ -3,6 +3,7 @@ import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../types';
 import { parseCsv, validateBatchData } from '../utils/csvParser';
 import { createBatchJob, processBatchJob, getBatchJob } from '../services/batchService';
+import { logger } from '../utils/logger';
 
 export const uploadBatch = async (
   req: AuthenticatedRequest,
@@ -18,13 +19,20 @@ export const uploadBatch = async (
       return;
     }
 
-    const rows = parseCsv(req.file.buffer);
+    const rows = await parseCsv(req.file.buffer, {
+      filename: req.file.originalname,
+      mimeType: req.file.mimetype,
+    });
     const { valid, errors } = validateBatchData(rows);
 
     if (!valid) {
       res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'CSV validation failed.', details: errors },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Import validation failed. Please check the file format and required columns.',
+          details: errors,
+        },
       });
       return;
     }
@@ -67,9 +75,8 @@ export const startBatch = async (
     const userId = req.user!._id.toString();
     const job = await createBatchJob(templateId, data, userId);
 
-    // Fire and forget - process asynchronously
     processBatchJob((job._id as { toString(): string }).toString()).catch((err: unknown) => {
-      console.error('Batch job processing error:', err);
+      logger.error('BatchController', 'Batch job processing error', err);
     });
 
     res.status(201).json({ success: true, data: job });

@@ -70,7 +70,7 @@ export const useBatchImport = () => {
         setState((prev) => ({
           ...prev,
           isLoading: false,
-          error: 'CSV file is empty or has no valid data rows.',
+          error: 'File is empty or has no valid data rows.',
         }));
         return;
       }
@@ -84,7 +84,7 @@ export const useBatchImport = () => {
       setState((prev) => ({
         ...prev,
         isLoading: false,
-        error: 'Failed to parse CSV file.',
+        error: 'Failed to parse file.',
       }));
     }
   }, []);

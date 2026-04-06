@@ -1,3 +1,5 @@
+import ExcelJS from 'exceljs';
+
 const COLUMN_ALIASES: Record<string, string> = {
   name: 'recipientName',
   recipient: 'recipientName',
@@ -23,6 +25,26 @@ const COLUMN_ALIASES: Record<string, string> = {
 const normalizeHeader = (header: string): string => {
   const key = header.toLowerCase().replace(/[\s_-]/g, '');
   return COLUMN_ALIASES[key] ?? header.trim();
+};
+
+export type ParseCsvOptions = {
+  filename?: string;
+  mimeType?: string;
+};
+
+const isXlsxUpload = (buffer: Buffer, options?: ParseCsvOptions): boolean => {
+  const fileName = options?.filename?.toLowerCase() || '';
+  const mimeType = options?.mimeType?.toLowerCase() || '';
+
+  if (fileName.endsWith('.xlsx')) {
+    return true;
+  }
+
+  if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+    return true;
+  }
+
+  return buffer.length >= 4 && buffer[0] === 0x50 && buffer[1] === 0x4b;
 };
 
 const parseRow = (line: string): string[] => {
@@ -52,7 +74,85 @@ const parseRow = (line: string): string[] => {
   return fields;
 };
 
-export const parseCsv = (buffer: Buffer): Record<string, string>[] => {
+const parseCellValue = (value: ExcelJS.CellValue): string => {
+  if (value === null || value === undefined) {
+    return '';
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (typeof value === 'number') {
+    return String(value);
+  }
+
+  if (typeof value === 'boolean') {
+    return value ? 'true' : 'false';
+  }
+
+  if (typeof value === 'object' && 'result' in value) {
+    return parseCellValue(value.result);
+  }
+
+  if (typeof value === 'object' && 'richText' in value) {
+    return (value as ExcelJS.CellRichTextValue)
+      .richText.map((rt) => rt.text)
+      .join('');
+  }
+
+  return String(value).trim();
+};
+
+const parseXlsxBuffer = async (buffer: Buffer): Promise<Record<string, string>[]> => {
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(buffer as unknown as ArrayBuffer);
+
+  const worksheet = workbook.worksheets[0];
+  if (!worksheet) {
+    return [];
+  }
+
+  const rows: Record<string, string>[] = [];
+  let headers: string[] = [];
+  let headerRowFound = false;
+
+  worksheet.eachRow((row) => {
+    const values = row.values as ExcelJS.CellValue[];
+
+    if (!headerRowFound) {
+      const rawHeaders = values.slice(1).map((value) => parseCellValue(value));
+      headers = rawHeaders.map(normalizeHeader);
+      headerRowFound = true;
+      return;
+    }
+
+    const hasContent = values.slice(1).some((value) => parseCellValue(value).length > 0);
+    if (!hasContent) {
+      return;
+    }
+
+    const record: Record<string, string> = {};
+    const cellValues = values.slice(1);
+
+    headers.forEach((header, i) => {
+      record[header] = parseCellValue(cellValues[i]);
+    });
+
+    rows.push(record);
+  });
+
+  return rows;
+};
+
+export const parseCsv = async (
+  buffer: Buffer,
+  options?: ParseCsvOptions
+): Promise<Record<string, string>[]> => {
+  if (isXlsxUpload(buffer, options)) {
+    return parseXlsxBuffer(buffer);
+  }
+
   const text = buffer.toString('utf-8').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const lines = text.split('\n').filter((l) => l.trim().length > 0);
 

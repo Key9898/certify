@@ -83,6 +83,13 @@ const SetupRequired: React.FC<{ onTryDemo: () => void }> = ({ onTryDemo }) => (
 const Root: React.FC = () => {
   const [isDemoMode, setIsDemoMode] = useState(false);
 
+  const handleRedirectCallback = (appState?: { returnTo?: string }) => {
+    const target = appState?.returnTo || window.location.pathname || '/';
+    const resolvedTarget = target.startsWith('http') ? target : `${window.location.origin}${target}`;
+
+    window.location.replace(resolvedTarget);
+  };
+
   if (isDemoMode) {
     return (
       <MockAuth0Provider>
@@ -101,6 +108,7 @@ const Root: React.FC = () => {
     <Auth0Provider
       domain={domain}
       clientId={clientId}
+      onRedirectCallback={handleRedirectCallback}
       authorizationParams={{
         redirect_uri: window.location.origin,
         audience: audience,

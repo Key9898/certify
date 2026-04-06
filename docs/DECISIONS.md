@@ -387,7 +387,7 @@ Use backend-managed credentials with provider-specific non-secret settings store
 - Keeps service-account keys and LMS API tokens out of frontend payloads and API responses
 - Reuses the existing integration model without introducing a new secret-management subsystem mid-project
 - Supports real provider-specific behavior now while preserving a future path toward encrypted per-workspace secrets or OAuth connectors later
-- Aligns with the project’s current deployment model, where backend env vars are already required for Auth0, MongoDB, and Cloudinary
+- Aligns with the project's current deployment model, where backend env vars are already required for Auth0, MongoDB, and Cloudinary
 
 ### Consequences
 
@@ -431,6 +431,108 @@ Implement a high-fidelity interaction system using Framer Motion combined with g
 
 ---
 
+## ADR-013: Canva-Compatible Background Templates Before Direct Canva Integration
+
+**Date:** 2026-04-06
+
+**Status:** Accepted
+
+### Context
+
+Users need more freedom than the built-in certificate presets provide. The product should allow teams to design certificates in external tools such as Canva, then import those layouts into Certify and batch-fill recipient data from CSV/XLSX. At the same time, direct Canva Connect integration introduces OAuth token exchange, secret handling, MFA requirements for integration setup, and public review or enterprise-plan constraints depending on the integration model.
+
+### Decision
+
+Make imported background templates a first-class Certify capability:
+
+- Users export certificate artwork from Canva or any design tool as a landscape PNG
+- Certify stores that background asset through Cloudinary
+- Template Builder lets users place dynamic fields such as recipient name, title, issue date, expiry date, issuer, certificate ID, logo, and signature directly on top of the imported artwork
+- Backend PDF/PNG generation renders those saved field positions without depending on Canva APIs
+
+Treat direct Canva Connect import/export as a future convenience integration, not a core product dependency.
+
+### Rationale
+
+- Works for all users regardless of Canva plan
+- Keeps Certify's certificate generation reliable even if Canva API access changes
+- Avoids blocking the main template workflow on OAuth, app review, or enterprise-only capabilities such as Autofill
+- Supports designs created in Canva, Figma, Adobe tools, or any other external editor instead of tying the product to a single vendor
+
+### Consequences
+
+- **Positive:** Market-wide reliable workflow, simpler onboarding, and no dependency on Canva-specific account tiers for core batch generation
+- **Negative:** Users must export artwork manually before importing it into Certify
+- **Alternative Considered:** Build direct Canva Connect import/export first (rejected for the core roadmap because it adds OAuth/app-review complexity and does not cover all users)
+
+---
+
+## ADR-014: Auth0-Hosted Entry Points Instead of Custom In-App Credential Forms
+
+**Date:** 2026-04-06
+
+**Status:** Accepted
+
+### Context
+
+Users expected visible Sign in and Sign up entry points on the landing page, including Google login. At the same time, the project rules already require Auth0 as the authentication system and explicitly avoid storing tokens or re-implementing sensitive auth flows on the client. Building custom in-app credential forms would duplicate Auth0 Universal Login responsibilities and increase security and maintenance risk.
+
+### Decision
+
+Keep authentication on Auth0-hosted screens:
+
+- The landing page opens a Certify auth prompt that explains the available sign-in actions
+- Primary actions trigger Auth0-hosted login flows rather than local email/password forms
+- The client attempts popup-based Auth0 login first for a smoother UX, then falls back to redirect-based login when popup/origin constraints block the popup path
+- Successful auth returns users to `/dashboard`
+
+### Rationale
+
+- Preserves Auth0's secure hosted login model and social connection handling
+- Avoids duplicating credential collection logic inside the React app
+- Keeps Google login, sign-up hints, and redirect handling in one provider-managed flow
+- Allows the product to offer clear entry points without taking ownership of password UX/security
+
+### Consequences
+
+- **Positive:** Stronger security posture, simpler frontend auth code, and better alignment with Auth0 best practices
+- **Negative:** Users who expect an embedded email/password form will instead be redirected or popped into Auth0-hosted UI
+- **Alternative Considered:** Build fully custom in-app login/sign-up forms (rejected because it duplicates hosted auth responsibilities and adds avoidable risk)
+
+---
+
+## ADR-015: Dev-Only Dashboard-Shell Preview Routes During Auth0 Localhost Troubleshooting
+
+**Date:** 2026-04-06
+
+**Status:** Accepted
+
+### Context
+
+Localhost UI QA became blocked by an environment-side Auth0 callback/origin mismatch. Even when product routes themselves were functional, the team could not reliably navigate inside the dashboard shell during local debugging because every authenticated route attempted hosted login first.
+
+### Decision
+
+In development mode only:
+
+- Render the authenticated dashboard-shell routes (`/dashboard`, `/templates`, `/create`, `/batch`, `/integrations`, `/certificates`, `/settings`, `/templates/new`) without the Auth0 route gate
+- Keep production builds fully protected with the existing `ProtectedRoute` logic
+- Continue treating hosted Auth0 login verification as a separate environment/configuration task
+
+### Rationale
+
+- Unblocks localhost visual QA and navigation fixes while tenant settings are still being corrected
+- Preserves production security because the bypass is limited to `import.meta.env.DEV`
+- Makes it possible to test header, sidebar, templates, and batch flows without waiting on external tenant changes
+
+### Consequences
+
+- **Positive:** Faster UI iteration and local debugging across the dashboard shell
+- **Negative:** Local DEV navigation no longer proves that hosted Auth0 is configured correctly
+- **Alternative Considered:** Keep all routes hard-blocked behind Auth0 during local troubleshooting (rejected because it slowed down unrelated UI fixes and route QA)
+
+---
+
 ## Template
 
 ```markdown
@@ -458,3 +560,4 @@ Implement a high-fidelity interaction system using Framer Motion combined with g
 - **Negative:** [Drawbacks]
 - **Alternative Considered:** [Other options considered]
 ```
+

@@ -10,13 +10,14 @@ export const listApiKeys = async (
 ): Promise<void> => {
   try {
     const keys = await ApiKey.find({ createdBy: req.user!._id }).sort({ createdAt: -1 });
-    // Never return the actual key value after creation — mask it
     const masked = keys.map((k) => ({
       _id: k._id,
       name: k.name,
       keyPreview: `${k.key.slice(0, 8)}...${k.key.slice(-4)}`,
       isActive: k.isActive,
       lastUsedAt: k.lastUsedAt,
+      expiresAt: k.expiresAt,
+      rateLimit: k.rateLimit,
       createdAt: k.createdAt,
     }));
     res.json({ success: true, data: masked });
@@ -31,7 +32,11 @@ export const createApiKey = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { name } = req.body as { name?: string };
+    const { name, expiresInDays, rateLimit } = req.body as {
+      name?: string;
+      expiresInDays?: number;
+      rateLimit?: number;
+    };
 
     if (!name?.trim()) {
       res.status(400).json({
@@ -50,20 +55,27 @@ export const createApiKey = async (
       return;
     }
 
+    const expiresAt = expiresInDays
+      ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000)
+      : undefined;
+
     const apiKey = new ApiKey({
       name: name.trim(),
       createdBy: new mongoose.Types.ObjectId(req.user!._id.toString()),
+      expiresAt,
+      rateLimit: rateLimit && rateLimit >= 1 && rateLimit <= 1000 ? rateLimit : undefined,
     });
 
     await apiKey.save();
 
-    // Return full key ONLY on creation
     res.status(201).json({
       success: true,
       data: {
         _id: apiKey._id,
         name: apiKey.name,
-        key: apiKey.key, // shown once
+        key: apiKey.key,
+        expiresAt: apiKey.expiresAt,
+        rateLimit: apiKey.rateLimit,
         createdAt: apiKey.createdAt,
       },
     });

@@ -1,4 +1,4 @@
-import type { CreateCertificateDto } from '@/types';
+import type { CreateCertificateDto, Template } from '@/types';
 
 export interface CertificateFormData {
   templateId: string;
@@ -18,6 +18,7 @@ export interface CertificateFormData {
 export interface CertificateFormProps {
   initialData?: Partial<CertificateFormData>;
   templateId: string;
+  template?: Template;
   onSubmit: (data: CreateCertificateDto) => Promise<void>;
   onChange?: (data: Partial<CertificateFormData>) => void;
   isSubmitting?: boolean;

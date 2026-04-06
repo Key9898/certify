@@ -372,23 +372,50 @@ CLOUDINARY_API_SECRET=your-api-secret
 ### Authentication (Auth0)
 
 - Never store tokens in localStorage - use Auth0 SDK memory storage
-- Always validate JWT tokens on backend
+- Always validate JWT tokens on backend using `express-oauth2-jwt-bearer`
 - Use Auth0's `getAccessTokenSilently()` for API calls
 - Implement proper logout flow with Auth0 SDK
+- Workspace-based authorization via `organizationId` and `organizationRole` claims
+
+### API Key Authentication
+
+- API keys have optional expiration dates with MongoDB TTL index auto-cleanup
+- Per-key rate limiting implemented for API key requests
+- Keys are hashed before storage, only shown once on creation
+- Masked key preview returned in API responses (never expose full key)
 
 ### Secrets Management
 
 - **NEVER** commit secrets to repository
 - **NEVER** log API keys, tokens, or passwords
-- Use `.env` files for local development
+- Use `.env` files for local development (not tracked by Git)
 - Use environment variables in production
+- Secure logger with automatic sensitive data redaction (passwords, tokens, API keys, secrets)
 
 ### API Security
 
 - Validate all user inputs on backend
-- Use rate limiting on API endpoints
-- Implement CORS properly
+- Use rate limiting on API endpoints (`express-rate-limit`)
+- Implement CORS properly with allowed origins
 - Sanitize data before database operations
+- MongoDB ObjectId validation with regex pattern
+- Security headers via Helmet middleware
+
+### File Upload Security
+
+- Validate file type via MIME type checking
+- Validate file extension against whitelist
+- **Magic byte signature validation** for file content verification
+- **Filename sanitization** - remove control characters, path traversal sequences, null bytes
+- Maximum file size limits enforced
+- Signed upload URLs for Cloudinary
+
+### SSRF Protection
+
+- DNS resolution checks for webhook URLs
+- Block private IP ranges (10.x, 172.16-31.x, 192.168.x, 127.x, 169.254.x)
+- Block localhost and link-local addresses
+- Validate URL scheme (http/https only)
 
 ### Frontend Security
 
@@ -396,6 +423,13 @@ CLOUDINARY_API_SECRET=your-api-secret
 - Use React's built-in XSS protection
 - Validate file uploads (type, size)
 - Never expose sensitive data in client-side code
+
+### Dependency Security
+
+- Run `npm audit` regularly to check for vulnerabilities
+- Use `overrides` in package.json to force secure versions of transitive dependencies
+- Current overrides: `lodash@^4.18.1` (fixes prototype pollution, code injection)
+- Replace vulnerable packages with secure alternatives (e.g., `xlsx` → `exceljs`)
 
 ---
 

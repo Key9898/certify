@@ -19,7 +19,7 @@ export const Footer: React.FC<FooterProps> = ({ minimal = false }) => {
       >
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 md:px-6">
           <p className="text-sm font-medium text-base-content/40">
-            Copyright {currentYear} Certify Inc. All rights reserved.
+            © {currentYear} Certify Inc. All rights reserved.
           </p>
         </div>
       </motion.footer>
@@ -151,7 +151,7 @@ export const Footer: React.FC<FooterProps> = ({ minimal = false }) => {
           className="flex flex-col items-center justify-between gap-6 border-t border-base-200 pt-8 md:flex-row"
         >
           <p className="text-sm font-bold uppercase tracking-widest text-base-content/30">
-            Copyright {currentYear} Certify Platforms. Developed by Wunna Aung
+            © {currentYear} Certify Platforms. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <p className="text-xs font-medium text-base-content/40">Built for Excellence.</p>

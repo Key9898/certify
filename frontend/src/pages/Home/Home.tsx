@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { ArrowRight, Award, CheckCircle, FileText, Zap } from 'lucide-react';
+import { AuthPromptModal } from '@/components/auth';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ROUTES } from '@/utils/constants';
@@ -280,9 +281,17 @@ const CertificatePreview: React.FC<{
 };
 
 export const Home: React.FC = () => {
-  const { isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
+  const { isAuthenticated, loginWithRedirect, loginWithPopup, isLoading, error: auth0Error } =
+    useAuth0();
+  const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [activeAuthAction, setActiveAuthAction] = useState<'signin' | 'signup' | 'google' | null>(
+    null
+  );
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -293,12 +302,80 @@ export const Home: React.FC = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const handleGetStarted = () => {
-    if (isAuthenticated) {
+  const openAuthModal = (mode: 'signin' | 'signup') => {
+    setAuthModalMode(mode);
+    setAuthError(null);
+    setActiveAuthAction(null);
+    setIsAuthModalOpen(true);
+  };
+
+  const closeAuthModal = () => {
+    setIsAuthModalOpen(false);
+    setAuthError(null);
+    setActiveAuthAction(null);
+  };
+
+  useEffect(() => {
+    if (!auth0Error) {
       return;
     }
 
-    loginWithRedirect();
+    setAuthError(
+      `${auth0Error.message} If you are testing locally, make sure ${window.location.origin} is added to Allowed Callback URLs, Allowed Logout URLs, and Allowed Web Origins in Auth0.`
+    );
+  }, [auth0Error]);
+
+  const authenticate = async (
+    action: 'signin' | 'signup' | 'google',
+    options?: {
+      screenHint?: 'signup';
+      connection?: string;
+    }
+  ) => {
+    setAuthError(null);
+    setActiveAuthAction(action);
+
+    const authOptions = {
+      appState: { returnTo: ROUTES.DASHBOARD },
+      authorizationParams: {
+        ...(options?.screenHint ? { screen_hint: options.screenHint } : {}),
+        ...(options?.connection ? { connection: options.connection } : {}),
+      },
+    };
+
+    try {
+      await loginWithPopup({
+        authorizationParams: authOptions.authorizationParams,
+      });
+      closeAuthModal();
+      navigate(ROUTES.DASHBOARD);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Authentication failed.';
+
+      setAuthError(
+        `${message} If you are testing locally, make sure ${window.location.origin} is added to Allowed Callback URLs, Allowed Logout URLs, and Allowed Web Origins in Auth0.`
+      );
+
+      const normalizedMessage = message.toLowerCase();
+      if (
+        normalizedMessage.includes('popup') ||
+        normalizedMessage.includes('web_message') ||
+        normalizedMessage.includes('origin')
+      ) {
+        await loginWithRedirect(authOptions);
+      }
+    } finally {
+      setActiveAuthAction(null);
+    }
+  };
+
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      navigate(ROUTES.DASHBOARD);
+      return;
+    }
+
+    openAuthModal('signup');
   };
 
   const cardVariants: Variants = {
@@ -342,7 +419,7 @@ export const Home: React.FC = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-base-100">
-      <Header />
+      <Header onOpenAuthModal={openAuthModal} />
 
       <section className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-4 pb-16 pt-32 text-center">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-base-100 to-base-100" />
@@ -434,22 +511,25 @@ export const Home: React.FC = () => {
                       transition={{ duration: 1.2, ease: 'linear', repeat: Infinity }}
                     />
                   ) : (
-                    'Start Creating Free'
+                    'Start Free'
                   )}
                 </motion.button>
               )}
             </motion.div>
 
-            <motion.a
-              href="#features"
+            <motion.div
               variants={REVEAL_ITEM}
               whileHover={{ y: -3, backgroundColor: 'rgba(226,232,240,0.7)' }}
               whileTap={TAP_PRESS}
               transition={QUICK_SPRING}
-              className="btn btn-ghost btn-lg rounded px-8 text-lg font-bold"
             >
-              Explore Templates
-            </motion.a>
+              <Link
+                to={ROUTES.DASHBOARD}
+                className="btn btn-ghost btn-lg rounded px-8 text-lg font-bold"
+              >
+                Explore Templates
+              </Link>
+            </motion.div>
           </motion.div>
 
           <motion.div
@@ -482,7 +562,7 @@ export const Home: React.FC = () => {
 
         <div className="relative mt-20 flex w-full max-w-7xl flex-col items-center px-4">
           <div className="relative flex min-h-[350px] w-full items-center justify-center sm:min-h-[450px] md:min-h-[580px]">
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
               {CERTIFICATE_PREVIEWS.map((cert, index) => {
                 const isFeatured = cert.featured;
                 const isActiveMobile = index === activeIndex;
@@ -759,7 +839,7 @@ export const Home: React.FC = () => {
                   />
                 ) : (
                   <>
-                    Create Free Now
+                    {isAuthenticated ? 'Open Dashboard' : 'Start Free'}
                     <motion.span
                       animate={{ x: [0, 4, 0] }}
                       transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
@@ -775,6 +855,18 @@ export const Home: React.FC = () => {
       </section>
 
       <Footer />
+
+      <AuthPromptModal
+        isOpen={isAuthModalOpen}
+        mode={authModalMode}
+        onClose={closeAuthModal}
+        onSignIn={() => authenticate('signin')}
+        onSignUp={() => authenticate('signup', { screenHint: 'signup' })}
+        onGoogleSignIn={() => authenticate('google', { connection: 'google-oauth2' })}
+        isLoading={activeAuthAction !== null}
+        activeAction={activeAuthAction}
+        error={authError}
+      />
     </div>
   );
 };

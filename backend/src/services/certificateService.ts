@@ -1,6 +1,6 @@
 import { Certificate, ICertificateDocument } from '../models/Certificate';
 import { Template } from '../models/Template';
-import { generatePdf } from './pdfService';
+import { generatePdf, type TemplateRenderSource } from './pdfService';
 import { uploadPdf } from './cloudinaryService';
 import { triggerWebhooks } from './webhookService';
 import mongoose from 'mongoose';
@@ -71,6 +71,7 @@ export const generateAndUploadPdf = async (
     throw error;
   }
 
+  const template = certificate.templateId as unknown as TemplateRenderSource;
   const pdfData = {
     recipientName: certificate.recipientName,
     certificateTitle: certificate.certificateTitle,
@@ -80,6 +81,13 @@ export const generateAndUploadPdf = async (
       month: 'long',
       day: 'numeric',
     }),
+    expiryDate: certificate.expiryDate
+      ? certificate.expiryDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      : undefined,
     issuerName: certificate.issuerName,
     issuerSignature: certificate.issuerSignature,
     organizationLogo: certificate.organizationLogo,
@@ -88,7 +96,7 @@ export const generateAndUploadPdf = async (
     certificateId: certificate.certificateId,
   };
 
-  const pdfBuffer = await generatePdf('certificate-modern', pdfData);
+  const pdfBuffer = await generatePdf(template, pdfData);
   const uploadResult = await uploadPdf(pdfBuffer, `certificate-${certificate.certificateId}`);
 
   certificate.pdfUrl = uploadResult.secure_url;

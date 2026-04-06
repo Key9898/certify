@@ -11,6 +11,12 @@ export const LoginButton: React.FC<LoginButtonProps> = ({
 }) => {
   const { loginWithRedirect, isLoading } = useAuth0();
 
+  const handleLogin = () => {
+    void loginWithRedirect({
+      appState: { returnTo: '/dashboard' },
+    });
+  };
+
   return (
     <button
       className={[
@@ -21,7 +27,7 @@ export const LoginButton: React.FC<LoginButtonProps> = ({
       ]
         .filter(Boolean)
         .join(' ')}
-      onClick={() => loginWithRedirect()}
+      onClick={handleLogin}
       disabled={isLoading}
     >
       {!isLoading && label}

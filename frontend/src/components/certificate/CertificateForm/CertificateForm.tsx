@@ -27,6 +27,7 @@ const getInitialState = (templateId: string, initial?: Partial<CertificateFormDa
 export const CertificateForm: React.FC<CertificateFormProps> = ({
   initialData,
   templateId,
+  template,
   onSubmit,
   onChange,
   isSubmitting = false,
@@ -34,6 +35,8 @@ export const CertificateForm: React.FC<CertificateFormProps> = ({
   const [form, setForm] = useState<CertificateFormData>(getInitialState(templateId, initialData));
   const [errors, setErrors] = useState<Partial<Record<keyof CertificateFormData, string>>>({});
   const { upload, isUploading } = useCloudinary();
+  const isBackgroundTemplate =
+    template?.mode === 'background' || template?.htmlContent === 'custom-background';
 
   const set = useCallback((key: keyof CertificateFormData, value: string) => {
     setForm((prev) => {
@@ -205,41 +208,53 @@ export const CertificateForm: React.FC<CertificateFormProps> = ({
             />
           </div>
           
-          <div className="p-4 bg-base-200/50 rounded">
-            <p className="text-xs font-black uppercase tracking-widest text-base-content/40 mb-4">Template Colors</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex items-center justify-between p-3 bg-base-100 rounded border border-base-200">
-                <div className="flex items-center gap-3">
-                  <input
-                    id="primaryColor"
-                    type="color"
-                    value={form.primaryColor}
-                    onChange={(e) => set('primaryColor', e.target.value)}
-                    className="w-10 h-10 rounded cursor-pointer border-none p-0 bg-transparent overflow-hidden"
-                  />
-                  <div>
-                    <label htmlFor="primaryColor" className="text-sm font-bold text-base-content block">Primary Color</label>
-                    <span className="text-xs font-mono text-base-content/50 uppercase">{form.primaryColor}</span>
+          {!isBackgroundTemplate ? (
+            <div className="p-4 bg-base-200/50 rounded">
+              <p className="text-xs font-black uppercase tracking-widest text-base-content/40 mb-4">Template Colors</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex items-center justify-between p-3 bg-base-100 rounded border border-base-200">
+                  <div className="flex items-center gap-3">
+                    <input
+                      id="primaryColor"
+                      type="color"
+                      value={form.primaryColor}
+                      onChange={(e) => set('primaryColor', e.target.value)}
+                      className="w-10 h-10 rounded cursor-pointer border-none p-0 bg-transparent overflow-hidden"
+                    />
+                    <div>
+                      <label htmlFor="primaryColor" className="text-sm font-bold text-base-content block">Primary Color</label>
+                      <span className="text-xs font-mono text-base-content/50 uppercase">{form.primaryColor}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-base-100 rounded border border-base-200">
-                <div className="flex items-center gap-3">
-                  <input
-                    id="secondaryColor"
-                    type="color"
-                    value={form.secondaryColor}
-                    onChange={(e) => set('secondaryColor', e.target.value)}
-                    className="w-10 h-10 rounded cursor-pointer border-none p-0 bg-transparent overflow-hidden"
-                  />
-                  <div>
-                    <label htmlFor="secondaryColor" className="text-sm font-bold text-base-content block">Secondary Color</label>
-                    <span className="text-xs font-mono text-base-content/50 uppercase">{form.secondaryColor}</span>
+                <div className="flex items-center justify-between p-3 bg-base-100 rounded border border-base-200">
+                  <div className="flex items-center gap-3">
+                    <input
+                      id="secondaryColor"
+                      type="color"
+                      value={form.secondaryColor}
+                      onChange={(e) => set('secondaryColor', e.target.value)}
+                      className="w-10 h-10 rounded cursor-pointer border-none p-0 bg-transparent overflow-hidden"
+                    />
+                    <div>
+                      <label htmlFor="secondaryColor" className="text-sm font-bold text-base-content block">Secondary Color</label>
+                      <span className="text-xs font-mono text-base-content/50 uppercase">{form.secondaryColor}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="rounded border border-base-200 bg-base-200/40 p-4">
+              <p className="text-xs font-black uppercase tracking-widest text-base-content/40">
+                Background Template Mode
+              </p>
+              <p className="mt-2 text-sm text-base-content/60">
+                Layout colors and positions come from the imported background template. The form
+                values below will be injected into the fields you configured in Template Builder.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 

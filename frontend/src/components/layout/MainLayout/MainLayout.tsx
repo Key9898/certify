@@ -10,10 +10,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <div className="flex min-h-screen bg-base-100 selection:bg-primary/10">
+    <div className="min-h-screen bg-base-100 selection:bg-primary/10">
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      <div className="relative min-w-0 flex-1 overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))]">
+      <div className="relative min-w-0 overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] lg:ml-64">
         <motion.div
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{ scaleX: 1, opacity: 1 }}

@@ -1036,6 +1036,31 @@ When native provider sync is enabled in production, the backend environment must
 
 ---
 
+## 11. Future Roadmap
+
+### Optional Canva Connect Add-on
+
+Direct Canva Connect import/export should stay a future convenience integration, not a core dependency.
+
+- Requires OAuth token exchange and refresh on the backend
+- Requires MFA for integration setup in Canva Developer Portal
+- Public use may require Canva review/approval, while private/team-only flows can be constrained by higher-tier Canva plans
+- Canva Autofill is not a reliable baseline for all users, so it should not gate the main certificate workflow
+
+### Core Template Workflow (Recommended Baseline)
+
+Certify should treat imported background templates as the default market-wide reliable workflow:
+
+1. User designs a certificate in Canva or any external design tool
+2. User exports the artwork as a landscape PNG in A4 ratio
+3. User imports that PNG into Certify Template Builder
+4. User places dynamic fields such as recipient name, title, dates, issuer, logo, signature, and certificate ID
+5. User uploads CSV/XLSX data and batch-generates PDF certificates from the saved template
+
+This keeps the main product reliable even without any direct Canva API dependency.
+
+---
+
 ## Summary
 
 ```

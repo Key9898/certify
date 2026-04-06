@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { AuthenticatedRequest } from '../types';
 import { Webhook } from '../models/Webhook';
 import type { WebhookEvent } from '../models/Webhook';
+import { validateWebhookUrl } from '../utils/ssrfProtection';
 
 const VALID_EVENTS: WebhookEvent[] = [
   'certificate.created',
@@ -42,12 +43,14 @@ export const createWebhook = async (
       return;
     }
 
-    try {
-      new URL(url);
-    } catch {
+    const urlValidation = await validateWebhookUrl(url.trim());
+    if (!urlValidation.valid) {
       res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'Invalid URL format.' },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: urlValidation.error || 'Invalid or unsafe URL.',
+        },
       });
       return;
     }

@@ -15,9 +15,11 @@ const defaultPreview: PreviewData = {
   certificateTitle: 'Certificate of Achievement',
   description: '',
   issueDate: new Date().toISOString().split('T')[0],
+  expiryDate: '',
   issuerName: '',
   primaryColor: DEFAULT_PRIMARY_COLOR,
   secondaryColor: DEFAULT_SECONDARY_COLOR,
+  certificateId: 'CERT-2026-001',
 };
 
 export const CertificateEditor: React.FC<CertificateEditorProps> = ({
@@ -50,6 +52,7 @@ export const CertificateEditor: React.FC<CertificateEditorProps> = ({
       certificateTitle: formData.certificateTitle ?? prev.certificateTitle,
       description: formData.description ?? prev.description,
       issueDate: formData.issueDate ?? prev.issueDate,
+      expiryDate: formData.expiryDate ?? prev.expiryDate,
       issuerName: formData.issuerName ?? prev.issuerName,
       issuerSignature: formData.issuerSignature ?? prev.issuerSignature,
       organizationLogo: formData.organizationLogo ?? prev.organizationLogo,
@@ -94,6 +97,7 @@ export const CertificateEditor: React.FC<CertificateEditorProps> = ({
         </div>
         <CertificateForm
           templateId={template._id}
+          template={template}
           onSubmit={handleSubmit}
           onChange={handleFormChange}
           isSubmitting={isSubmitting}
@@ -115,7 +119,7 @@ export const CertificateEditor: React.FC<CertificateEditorProps> = ({
         <p className="text-sm font-semibold text-base-content/60 uppercase tracking-wide mb-3">
           Live Preview
         </p>
-        <CertificatePreview data={previewData} templateName={template.htmlContent} />
+        <CertificatePreview data={previewData} template={template} templateName={template.htmlContent} />
         <p className="text-xs text-base-content/40 text-center mt-2">
           Preview updates as you type
         </p>

@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -27,9 +27,30 @@ const Verify = lazy(() => import('@/pages/Verify').then((m) => ({ default: m.Ver
 const TemplateBuilder = lazy(() =>
   import('@/pages/TemplateBuilder').then((m) => ({ default: m.TemplateBuilder }))
 );
+const isDevPreviewEnabled = import.meta.env.DEV;
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (isLoading || isAuthenticated) {
+      return;
+    }
+
+    void loginWithRedirect({
+      appState: {
+        returnTo: `${location.pathname}${location.search}${location.hash}`,
+      },
+    });
+  }, [
+    isAuthenticated,
+    isLoading,
+    location.hash,
+    location.pathname,
+    location.search,
+    loginWithRedirect,
+  ]);
 
   if (isLoading) {
     return (
@@ -40,8 +61,11 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   }
 
   if (!isAuthenticated) {
-    loginWithRedirect();
-    return null;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loading size="lg" />
+      </div>
+    );
   }
 
   return <>{children}</>;
@@ -62,75 +86,24 @@ const RouteScene: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 const AppRoutes: React.FC = () => {
   const location = useLocation();
   const scene = (children: React.ReactNode) => <RouteScene>{children}</RouteScene>;
+  const protectedScene = (children: React.ReactNode) =>
+    scene(isDevPreviewEnabled ? children : <ProtectedRoute>{children}</ProtectedRoute>);
 
   return (
     <AnimatePresence initial={false} mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path={ROUTES.HOME} element={scene(<Home />)} />
-        <Route
-          path={ROUTES.DASHBOARD}
-          element={scene(
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          )}
-        />
-        <Route
-          path={ROUTES.TEMPLATES}
-          element={scene(
-            <ProtectedRoute>
-              <Templates />
-            </ProtectedRoute>
-          )}
-        />
+        <Route path={ROUTES.DASHBOARD} element={protectedScene(<Dashboard />)} />
+        <Route path={ROUTES.TEMPLATES} element={protectedScene(<Templates />)} />
         <Route
           path={ROUTES.CREATE_CERTIFICATE}
-          element={scene(
-            <ProtectedRoute>
-              <CreateCertificate />
-            </ProtectedRoute>
-          )}
+          element={protectedScene(<CreateCertificate />)}
         />
-        <Route
-          path={ROUTES.CERTIFICATES}
-          element={scene(
-            <ProtectedRoute>
-              <Certificates />
-            </ProtectedRoute>
-          )}
-        />
-        <Route
-          path={ROUTES.BATCH_GENERATE}
-          element={scene(
-            <ProtectedRoute>
-              <BatchGenerate />
-            </ProtectedRoute>
-          )}
-        />
-        <Route
-          path={ROUTES.INTEGRATIONS}
-          element={scene(
-            <ProtectedRoute>
-              <Integrations />
-            </ProtectedRoute>
-          )}
-        />
-        <Route
-          path={ROUTES.SETTINGS}
-          element={scene(
-            <ProtectedRoute>
-              <Settings />
-            </ProtectedRoute>
-          )}
-        />
-        <Route
-          path={ROUTES.TEMPLATE_BUILDER}
-          element={scene(
-            <ProtectedRoute>
-              <TemplateBuilder />
-            </ProtectedRoute>
-          )}
-        />
+        <Route path={ROUTES.CERTIFICATES} element={protectedScene(<Certificates />)} />
+        <Route path={ROUTES.BATCH_GENERATE} element={protectedScene(<BatchGenerate />)} />
+        <Route path={ROUTES.INTEGRATIONS} element={protectedScene(<Integrations />)} />
+        <Route path={ROUTES.SETTINGS} element={protectedScene(<Settings />)} />
+        <Route path={ROUTES.TEMPLATE_BUILDER} element={protectedScene(<TemplateBuilder />)} />
         <Route path={ROUTES.VERIFY} element={scene(<Verify />)} />
         <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
       </Routes>

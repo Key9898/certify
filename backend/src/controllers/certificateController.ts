@@ -5,7 +5,7 @@ import {
   generateAndUploadPdf,
   getCertificates,
 } from '../services/certificateService';
-import { generatePng } from '../services/pdfService';
+import { generatePng, type TemplateRenderSource } from '../services/pdfService';
 import { Certificate } from '../models/Certificate';
 import {
   canManageWorkspaceResource,
@@ -99,7 +99,7 @@ export const generatePngHandler = async (
     const certificate = await Certificate.findOne({
       _id: req.params.id,
       createdBy: { $in: workspaceUserIds },
-    });
+    }).populate('templateId');
 
     if (!certificate) {
       res.status(404).json({
@@ -109,6 +109,7 @@ export const generatePngHandler = async (
       return;
     }
 
+    const template = certificate.templateId as unknown as TemplateRenderSource;
     const pngData = {
       recipientName: certificate.recipientName,
       certificateTitle: certificate.certificateTitle,
@@ -118,6 +119,13 @@ export const generatePngHandler = async (
         month: 'long',
         day: 'numeric',
       }),
+      expiryDate: certificate.expiryDate
+        ? certificate.expiryDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })
+        : undefined,
       issuerName: certificate.issuerName,
       issuerSignature: certificate.issuerSignature,
       organizationLogo: certificate.organizationLogo,
@@ -126,7 +134,7 @@ export const generatePngHandler = async (
       certificateId: certificate.certificateId,
     };
 
-    const pngBuffer = await generatePng('certificate-modern', pngData);
+    const pngBuffer = await generatePng(template, pngData);
 
     res.setHeader('Content-Type', 'image/png');
     res.setHeader(

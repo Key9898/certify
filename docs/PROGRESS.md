@@ -8,7 +8,7 @@
 
 **Phase:** Phase 3 - Feature Complete (Polished)
 
-**Status:** All Phase 1, 2, and 3 product features are implemented and have undergone a comprehensive high-fidelity UI/UX overhaul. The application now features a premium corporate aesthetic characterized by glassmorphism, animated glow points, and a unified Framer Motion system. Native Google Sheets write-back, Canvas callbacks, and the Integration Hub are fully functional with new immersive interfaces. The project is "Production Ready" from a code and design perspective; the final step is account provisioning and secrets injection for live deployment.
+**Status:** All Phase 1, 2, and 3 product features are implemented and have undergone a comprehensive high-fidelity UI/UX overhaul. The application now features a premium corporate aesthetic characterized by glassmorphism, animated glow points, and a unified Framer Motion system. Native Google Sheets write-back, Canvas callbacks, and the Integration Hub are fully functional with new immersive interfaces. Production deployments and secrets have been provisioned, `npm run readiness:strict` reports 0 blocking items, the template system now supports both preset layouts and imported background artwork with dynamic field placement, and batch imports now accept both CSV and XLSX files end-to-end. For localhost UI QA, the authenticated dashboard shell routes can render in DEV without Auth0 while hosted Auth0 testing still depends on exact tenant callback/origin settings.
 
 ---
 
@@ -16,6 +16,16 @@
 
 | Date       | Task                                      | Notes |
 | ---------- | ----------------------------------------- | ----- |
+| 2026-04-06 | Document today's auth, template, import, and deployment alignment | Synced CHANGELOG, PROGRESS, DECISIONS, and PROJECT_PLAN with the imported background template workflow, Auth0 hosted entrypoint strategy, localhost dashboard preview behavior, and current deployment state |
+| 2026-04-06 | Remove obsolete local env example files | Deleted `frontend/.env.example` and `backend/.env.example` after production/local environment values were provisioned directly |
+| 2026-04-06 | Enable end-to-end CSV and XLSX batch imports | Replaced the vulnerable `xlsx` package with `exceljs` and aligned frontend upload parsing plus backend ingestion so CSV/XLSX uploads both work cleanly |
+| 2026-04-06 | Restore localhost sidebar navigation across dashboard routes | Expanded the local Auth0 preview bypass from only `/dashboard` to the full authenticated dashboard shell so sidebar links no longer bounce back during localhost testing while production stays protected |
+| 2026-04-06 | Add localhost dashboard preview fallback | Allowed `/dashboard` to render without Auth0 in local development so homepage CTA testing is not blocked by auth troubleshooting, while production remains protected |
+| 2026-04-06 | Redirect Explore Templates CTA to dashboard | Updated the home-page secondary hero action to route to `/dashboard` as a temporary fallback navigation path while auth troubleshooting continues |
+| 2026-04-06 | Restore working hosted Auth0 entrypoints on the home page | Added a shared auth prompt with Sign in, Sign up, and Google actions that open Auth0-hosted popup forms with a redirect fallback, wired return paths back to `/dashboard`, and fixed protected-route redirects so dashboard access is reachable again |
+| 2026-04-06 | Polish home/header/footer navigation and dashboard shell behavior | Added visible dashboard access after sign-in, fixed Start Free CTA routing, cleaned footer legal copy, and locked the desktop sidebar as a fixed rail while content scrolls |
+| 2026-04-06 | Expand Template Builder for imported background workflows | Added Canva-compatible background template authoring with Cloudinary-backed artwork import, drag-and-drop dynamic field placement, and backend PDF/PNG rendering support for custom layouts |
+| 2026-04-06 | Security Deep Scan Remediation | Fixed all identified vulnerabilities: xlsx prototype pollution (replaced with exceljs), SSRF protection, rate limiting, secure logging, API key expiration, file upload validation |
 | 2026-04-06 | Fix Vercel monorepo build configuration | Replaced Windows-only root npm scripts with cross-platform commands and added a root `vercel.json` so Vercel builds the frontend from the monorepo root instead of trying to run backend + frontend with `npm.cmd` |
 | 2026-04-06 | Refine ignore rules for shared project metadata | Narrowed root `.gitignore` so project-shared docs, scripts, deployment config, and AI instruction files remain commit-ready while only local Claude settings and tool skill links stay ignored |
 | 2026-04-06 | Harden repository ignore coverage before Git publishing | Expanded root/frontend/backend `.gitignore` rules to cover local env variants, downloaded cloud credential files, temp artifacts, PID files, and patch conflict leftovers before pushing to GitHub |
@@ -72,9 +82,9 @@
 | Configure ESLint + Prettier    | Done    | Flat config, TypeScript strict |
 | Configure Storybook            | Done    | Stories for all common components |
 | Configure Husky + lint-staged  | Done    | Pre-commit hooks setup |
-| Setup Auth0                    | Done    | Auth0Provider + JWT middleware + user sync |
+| Setup Auth0                    | Done    | Auth0Provider + JWT middleware + user sync with hosted Universal Login flows |
 | Create User model              | Done    | Mongoose schema with settings |
-| Implement login/signup         | Done    | Auth0 loginWithRedirect + AuthContext |
+| Implement login/signup         | Done    | Auth0-hosted sign-in/sign-up with popup-first and redirect fallback through AuthContext |
 
 ### Week 2-3: Templates & Editor
 
@@ -110,9 +120,9 @@
 | ------------------------------ | ----------- | ----- |
 | Write unit tests               | Done        | Frontend utility coverage expanded and backend connector services now ship with automated assertions |
 | Write integration tests        | Done        | Added frontend Integration Hub workflow coverage and backend native connector orchestration tests |
-| Deploy frontend to Vercel      | Blocked     | `frontend/vercel.json` and env examples are ready, but the actual Vercel project and secrets must be supplied from the deployment account |
-| Deploy backend to Render       | Blocked     | `render.yaml` is aligned, but the actual Render service, env secrets, and deploy action need account access |
-| Setup MongoDB Atlas            | Blocked     | Atlas-ready URI examples are documented, but cluster provisioning and credentials must come from the target Atlas account |
+| Deploy frontend to Vercel      | Done        | Deployed production frontend to Vercel and configured production environment variables |
+| Deploy backend to Render       | Done        | Deployed production backend to Render and configured environment variables (including CORS origins + API base URL) |
+| Setup MongoDB Atlas            | Done        | Provisioned Atlas cluster, database user, and network access for cloud deployments |
 
 ---
 
@@ -120,11 +130,11 @@
 
 | Task                     | Status | Notes |
 | ------------------------ | ------ | ----- |
-| CSV/Excel Import         | Done   | Frontend csvParser + backend parseCsv utility |
+| CSV/Excel Import         | Done   | Frontend ExcelJS parser + backend ExcelJS ingestion for CSV/XLSX uploads |
 | Batch Generation         | Done   | Chunked async processing, per-row error isolation |
 | Progress Tracking        | Done   | 3 s polling via useBatchImport hook |
 | Email Delivery           | Done   | Nodemailer, graceful skip if SMTP not configured |
-| Custom Template Builder  | Done   | /templates/new - simplified form + live preview |
+| Custom Template Builder  | Done   | /templates/new now supports preset themes plus imported background templates with drag/drop field placement |
 | Certificate Verification | Done   | Public /verify/:id page + backend endpoint |
 | PNG Download             | Done   | Puppeteer screenshot, A4 landscape at 2x DPR |
 
@@ -146,25 +156,25 @@
 
 ## Next Steps
 
-1. Replace the remaining placeholder or missing values reported by `npm run readiness` in `frontend/.env.local` and `backend/.env`
-2. Provision real Auth0, MongoDB Atlas, Cloudinary, Google service account, and Canvas API credentials in the target deployment accounts
-3. Create the Vercel frontend project and Render backend service, then apply the documented environment variables
-4. Point `MONGODB_URI` at the live Atlas cluster and verify backend startup against the cloud database
-5. Run live end-to-end QA: login -> invite teammate -> save white-label settings -> create certificate -> verify PDF/PNG and analytics refresh
-6. Run live provider QA: Google Sheets Apps Script -> backend write-back -> Canvas callback comment -> verification link flow
+1. Commit and push the latest repository changes, then confirm Vercel + Render have redeployed the newest build
+2. Resolve the environment-side localhost Auth0 callback/origin mismatch against the exact SPA application settings, then re-test hosted Sign in, Sign up, and Google login flows locally
+3. Run production QA for imported background templates: upload PNG -> place fields -> create single certificate -> batch CSV/XLSX export -> verify PDF/PNG output alignment
+4. Run production provider QA: Google Sheets write-back -> Canvas callback comment -> verification link flow
+5. Tighten production security: rotate sensitive keys/tokens periodically and narrow MongoDB Atlas network access when stable
+6. Optional: add monitoring/alerts, review free-tier cold start behavior (Render spin-down), and evaluate Canva Connect as a future convenience integration rather than a core dependency
 
 ---
 
 ## Blockers
 
-Production deployment and native provider validation require user-managed cloud accounts and secrets that are not present in this repository. The latest `npm run readiness` check still reports missing or placeholder Auth0, Cloudinary, Google Sheets, Canvas, and production URL values in the local env files.
+Repository-side deployment readiness passes and production environments have been provisioned. The remaining active blocker is environment-specific: localhost Auth0 hosted login testing can still fail until the exact SPA tenant callback/origin configuration matches the running dev origin.
 
 ---
 
 ## Notes
 
 - All free tier services for $0/month cost
-- Tailwind v4 + DaisyUI compatibility needs testing
+- Tailwind v4 + DaisyUI compatibility validated via lint/test/build in this workspace
 - Storybook excluded from production build (devDependencies)
 - Root `npm run test` is the stable verification entrypoint inside this workspace; folder-level frontend/backend commands were used for the added coverage work
 - Root `npm run readiness` is the repo-side deployment preflight command before attempting Vercel/Render rollout

@@ -31,7 +31,7 @@ export const BatchUpload: React.FC<BatchUploadProps> = ({ onParsed, isLoading, e
       try {
         const rows = await parseCsvFile(file);
         if (rows.length === 0) {
-          setLocalError('CSV file is empty or has no valid data rows.');
+          setLocalError('File is empty or has no valid data rows.');
           return;
         }
         setParsedFile({ name: file.name, rowCount: rows.length });

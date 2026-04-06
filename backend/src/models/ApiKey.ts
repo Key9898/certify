@@ -7,6 +7,8 @@ export interface IApiKey {
   createdBy: mongoose.Types.ObjectId;
   lastUsedAt?: Date;
   isActive: boolean;
+  expiresAt?: Date;
+  rateLimit?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,10 +27,13 @@ const ApiKeySchema = new Schema<IApiKeyDocument>(
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     lastUsedAt: { type: Date },
     isActive: { type: Boolean, default: true },
+    expiresAt: { type: Date },
+    rateLimit: { type: Number, min: 1, max: 1000, default: 100 },
   },
   { timestamps: true }
 );
 
 ApiKeySchema.index({ createdBy: 1 });
+ApiKeySchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export const ApiKey = mongoose.model<IApiKeyDocument>('ApiKey', ApiKeySchema);

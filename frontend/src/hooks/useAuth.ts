@@ -12,7 +12,9 @@ export const useAuth = () => {
   } = useAuth0();
 
   const login = useCallback(() => {
-    loginWithRedirect();
+    void loginWithRedirect({
+      appState: { returnTo: window.location.pathname || '/' },
+    });
   }, [loginWithRedirect]);
 
   const handleLogout = useCallback(() => {
