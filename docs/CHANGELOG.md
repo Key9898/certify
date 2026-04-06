@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Root workspace scripts now use cross-platform `npm --prefix ...` commands, and Vercel can build the frontend correctly even when the monorepo root is imported
 - Git ignore coverage now blocks local env variants, downloaded credential/key files, temp folders, PID files, and patch conflict leftovers before repository publishing
 - Git ignore rules now keep project-shared docs, scripts, deployment config, and AI instruction files trackable while only local tool settings and skill links stay ignored
 - Home, Settings, and Integration Hub now have a deeper polish layer with launch-summary cards, workspace snapshot metrics, and clearer first-glance onboarding context

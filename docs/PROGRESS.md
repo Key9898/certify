@@ -16,6 +16,7 @@
 
 | Date       | Task                                      | Notes |
 | ---------- | ----------------------------------------- | ----- |
+| 2026-04-06 | Fix Vercel monorepo build configuration | Replaced Windows-only root npm scripts with cross-platform commands and added a root `vercel.json` so Vercel builds the frontend from the monorepo root instead of trying to run backend + frontend with `npm.cmd` |
 | 2026-04-06 | Refine ignore rules for shared project metadata | Narrowed root `.gitignore` so project-shared docs, scripts, deployment config, and AI instruction files remain commit-ready while only local Claude settings and tool skill links stay ignored |
 | 2026-04-06 | Harden repository ignore coverage before Git publishing | Expanded root/frontend/backend `.gitignore` rules to cover local env variants, downloaded cloud credential files, temp artifacts, PID files, and patch conflict leftovers before pushing to GitHub |
 | 2026-04-05 | Full Application UI/UX Premium Overhaul   | Upgraded Home, Dashboard, Templates, Certificates, Builder, and Wizard with glassmorphism, animated glows, and staggered motion; consolidated global design tokens for consistent branding |

@@ -71,6 +71,7 @@
 - Ran a second live frontend visual QA pass, tightened Templates/Certificates/Batch interaction surfaces, and added comprehensive `.gitignore` coverage for local QA screenshots, env files, caches, reports, build output, and uploads
 - Hardened `.gitignore` coverage again before Git publishing so local env variants, downloaded key files, temp directories, PID files, and patch conflict leftovers stay out of the repository
 - Refined the root ignore rules so shared docs, scripts, deployment config, and AI instruction files stay trackable while only local Claude settings and tool skill links remain ignored
+- Fixed the Vercel monorepo deployment path by switching root workspace scripts to cross-platform `npm --prefix` commands and adding a root `vercel.json` that builds only the frontend output
 - Added a final premium UI/UX overhaul across all core modules (Home, Dashboard, Templates, Certificates, Builder, Wizard, Batch).
 - Implemented a unified **High-Fidelity Design System** featuring glassmorphism, animated glows, and staggered Framer Motion transitions.
 - Standardized corporate branding in `global.css` with new design tokens for `.glass-card`, `.glow-point`, and `.brand-tag`.
