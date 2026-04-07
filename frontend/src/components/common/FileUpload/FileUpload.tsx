@@ -52,7 +52,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       )}
       <motion.div
         className={[
-          'border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors',
+          'border-2 border-dashed rounded p-4 text-center cursor-pointer transition-colors',
           dragOver ? 'border-primary bg-primary/5' : 'border-base-300 hover:border-primary',
           disabled ? 'opacity-50 cursor-not-allowed' : '',
           displayError ? 'border-error' : '',

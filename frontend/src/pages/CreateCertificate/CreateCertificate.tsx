@@ -166,7 +166,7 @@ export const CreateCertificate: React.FC = () => {
               {step === 'fill-details' && (
                 <motion.button
                   type="button"
-                  className="btn btn-ghost btn-circle border border-base-200 bg-base-100 shadow-sm transition-all hover:border-primary/30"
+                  className="btn btn-ghost rounded border border-base-200 bg-base-100 shadow-sm transition-all hover:border-primary/30"
                   onClick={() => setStep('select-template')}
                   aria-label="Back to selection"
                   whileHover={{ x: -3 }}
@@ -225,7 +225,7 @@ export const CreateCertificate: React.FC = () => {
                     }`}>
                       {currentStep === 'select-template' ? 'Theme Base' : 'Personalize'}
                     </p>
-                    <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-base-200">
+                    <div className="mt-3 h-1 w-full overflow-hidden rounded bg-base-200">
                       <motion.div
                         className={`h-full ${isComplete ? 'bg-success' : 'bg-primary'}`}
                         initial={{ scaleX: 0, transformOrigin: 'left' }}
@@ -308,7 +308,7 @@ export const CreateCertificate: React.FC = () => {
                       <Button 
                         variant="primary" 
                         size="lg" 
-                        className="w-full rounded-sm font-black uppercase tracking-widest shadow-xl shadow-primary/20 sm:w-auto"
+                        className="w-full rounded font-black uppercase tracking-widest shadow-xl shadow-primary/20 sm:w-auto"
                         onClick={handleProceedToEditor}
                       >
                         Next Step
@@ -330,7 +330,7 @@ export const CreateCertificate: React.FC = () => {
                 {isLoadingUser ? (
                   <div className="flex flex-col items-center py-20 text-center">
                     <motion.div
-                      className="mb-4 h-12 w-12 rounded-full border-2 border-primary/20 border-t-primary"
+                      className="mb-4 h-12 w-12 rounded border-2 border-primary/20 border-t-primary"
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                     />
@@ -365,8 +365,8 @@ export const CreateCertificate: React.FC = () => {
                 transition={QUICK_SPRING}
                 className="relative mb-8 inline-flex"
               >
-                <div className="absolute inset-0 animate-ping rounded-full bg-success/20 opacity-40" />
-                <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-success/10 text-success">
+                <div className="absolute inset-0 animate-ping rounded bg-success/20 opacity-40" />
+                <div className="relative flex h-24 w-24 items-center justify-center rounded bg-success/10 text-success">
                   <CheckCircle size={48} />
                 </div>
               </motion.div>
@@ -400,7 +400,7 @@ export const CreateCertificate: React.FC = () => {
                     href={success.pdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn btn-primary h-14 w-full rounded-sm text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20"
+                    className="btn btn-primary h-14 w-full rounded text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20"
                     whileHover={{ y: -3 }}
                     whileTap={TAP_PRESS}
                   >
@@ -412,14 +412,14 @@ export const CreateCertificate: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <Button
                     variant="outline"
-                    className="h-12 rounded-sm font-black uppercase tracking-widest"
+                    className="h-12 rounded font-black uppercase tracking-widest"
                     onClick={() => navigate(ROUTES.CERTIFICATES)}
                   >
                     All Records
                   </Button>
                   <Button
                     variant="ghost"
-                    className="h-12 rounded-sm bg-base-200/50 font-black uppercase tracking-widest hover:bg-base-200"
+                    className="h-12 rounded bg-base-200/50 font-black uppercase tracking-widest hover:bg-base-200"
                     onClick={() => {
                       setStep('select-template');
                       setSelectedTemplate(null);

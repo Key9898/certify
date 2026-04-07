@@ -1,6 +1,6 @@
 import type { ApiResponse } from '@/types/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const API_BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_API_URL || '/api';
 
 let getToken: (() => Promise<string>) | null = null;
 
@@ -13,7 +13,8 @@ const getAuthHeaders = async (): Promise<Record<string, string>> => {
   try {
     const token = await getToken();
     return { Authorization: `Bearer ${token}` };
-  } catch {
+  } catch (err) {
+    console.warn('[Certify Auth] getAccessTokenSilently failed:', err instanceof Error ? err.message : String(err));
     return {};
   }
 };
@@ -54,7 +55,11 @@ export const apiRequest = async <T>(
   const data: ApiResponse<T> = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error?.message || `HTTP error! status: ${response.status}`);
+    const err = Object.assign(
+      new Error(data.error?.message || `HTTP error! status: ${response.status}`),
+      { status: response.status, code: data.error?.code }
+    );
+    throw err;
   }
 
   return data;

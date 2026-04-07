@@ -40,7 +40,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
     <div>
       {/* Category Filter Tabs */}
       <LayoutGroup>
-        <div className="mb-8 flex w-fit flex-wrap gap-2 rounded-2xl bg-base-200/50 p-2">
+        <div className="mb-8 flex w-fit flex-wrap gap-2 rounded bg-base-200/50 p-2">
           {TEMPLATE_CATEGORIES.map(({ value, label }) => {
             const isActive = activeCategory === value;
 
@@ -82,7 +82,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
           transition={{ duration: 0.3 }}
         >
           {filtered.length === 0 ? (
-            <div className="bg-base-100 border-2 border-dashed border-base-300 rounded-[3rem] text-center py-24 text-base-content/20">
+            <div className="bg-base-100 border-2 border-dashed border-base-300 rounded text-center py-24 text-base-content/20">
               <p className="text-xl font-black italic tracking-tight">No Templates Found</p>
               <p className="text-sm font-medium">Try another category</p>
             </div>

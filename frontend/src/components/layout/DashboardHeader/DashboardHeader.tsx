@@ -5,6 +5,7 @@ import { Menu, Bell, Webhook } from 'lucide-react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useAppUser } from '@/context/AuthContext';
 import { ROUTES } from '@/utils/constants';
+import { getAuthProfileDisplayName, getAuthProfileInitial } from '@/utils/formatters';
 import { QUICK_SPRING, SOFT_SPRING, TAP_PRESS } from '@/utils/motion';
 
 interface DashboardHeaderProps {
@@ -16,6 +17,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuToggle }
   const { appUser } = useAppUser();
   const brandName =
     appUser?.organization?.whiteLabel.brandName || appUser?.organization?.name || 'Certify';
+  const displayName = getAuthProfileDisplayName(user);
 
   return (
     <motion.header
@@ -38,7 +40,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuToggle }
         <div className="hidden items-center gap-2 lg:flex">
           <motion.div
             whileHover={{ y: -2, scale: 1.01, transition: SOFT_SPRING }}
-            className="rounded-full border border-base-200 bg-base-100 px-3 py-1.5 shadow-sm"
+            className="rounded border border-base-200 bg-base-100 px-3 py-1.5 shadow-sm"
           >
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
               Workspace
@@ -60,7 +62,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuToggle }
         </motion.div>
 
         <motion.button
-          className="btn btn-ghost btn-circle btn-sm relative text-base-content/60"
+          className="btn btn-ghost rounded btn-sm relative text-base-content/60"
           whileHover={{ y: -2, transition: QUICK_SPRING }}
           whileTap={TAP_PRESS}
         >
@@ -72,21 +74,21 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuToggle }
 
         <div className="flex items-center gap-3 pl-1">
           <div className="hidden flex-col items-end sm:flex">
-            <span className="text-sm font-bold leading-tight text-base-content">{user?.name}</span>
+            <span className="text-sm font-bold leading-tight text-base-content">{displayName}</span>
             <span className="text-[10px] font-black uppercase tracking-widest text-base-content/30">
               Premium User
             </span>
           </div>
           <motion.div
             whileHover={{ y: -2, scale: 1.03, transition: SOFT_SPRING }}
-            className="btn btn-ghost btn-circle avatar p-0.5 ring-1 ring-primary/10 ring-offset-1 hover:ring-primary"
+            className="btn btn-ghost rounded avatar p-0.5 ring-1 ring-primary/10 ring-offset-1 hover:ring-primary"
           >
-            <div className="w-9 overflow-hidden rounded-full">
+            <div className="w-9 overflow-hidden rounded">
               {user?.picture ? (
-                <img src={user.picture} alt={user.name || 'User avatar'} />
+                <img src={user.picture} alt={displayName || 'User avatar'} />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-primary text-sm font-bold text-primary-content">
-                  {user?.name?.charAt(0).toUpperCase() || 'U'}
+                  {getAuthProfileInitial(user)}
                 </div>
               )}
             </div>

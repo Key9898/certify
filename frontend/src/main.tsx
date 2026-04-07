@@ -6,18 +6,27 @@ import { MotionConfig, motion } from 'framer-motion';
 import App from './App';
 import { DemoProvider } from '@/context/DemoContext';
 import { MockAuth0Provider } from '@/demo/MockAuth0Provider';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { MOTION_EASE, SOFT_SPRING } from '@/utils/motion';
+import { ROUTES } from '@/utils/constants';
 import './global.css';
 
 const domain = import.meta.env.VITE_AUTH0_DOMAIN || '';
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID || '';
-const audience = import.meta.env.VITE_AUTH0_AUDIENCE || '';
-
 const isAuth0Configured =
   domain &&
   clientId &&
   domain !== 'your-domain.auth0.com' &&
   clientId !== 'your-client-id';
+
+const getCanonicalLocalhostUrl = () => {
+  if (!import.meta.env.DEV || window.location.hostname !== '127.0.0.1') {
+    return null;
+  }
+
+  const port = window.location.port ? `:${window.location.port}` : '';
+  return `${window.location.protocol}//localhost${port}${window.location.pathname}${window.location.search}${window.location.hash}`;
+};
 
 const SetupRequired: React.FC<{ onTryDemo: () => void }> = ({ onTryDemo }) => (
   <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-base-100 p-6">
@@ -55,7 +64,7 @@ const SetupRequired: React.FC<{ onTryDemo: () => void }> = ({ onTryDemo }) => (
         </p>
         <p>
           2. Set Callback/Logout URL to{' '}
-          <code className="rounded bg-base-200 px-1">http://localhost:5173</code>
+          <code className="rounded bg-base-200 px-1">http://localhost:5174</code>
         </p>
         <p>
           3. Create an API with identifier{' '}
@@ -82,9 +91,35 @@ const SetupRequired: React.FC<{ onTryDemo: () => void }> = ({ onTryDemo }) => (
 
 const Root: React.FC = () => {
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const canonicalLocalhostUrl = getCanonicalLocalhostUrl();
+
+  React.useEffect(() => {
+    if (!canonicalLocalhostUrl) {
+      return;
+    }
+
+    window.location.replace(canonicalLocalhostUrl);
+  }, [canonicalLocalhostUrl]);
+
+  if (canonicalLocalhostUrl) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-base-100 p-6 text-center">
+        <div className="rounded border border-base-200 bg-base-100 px-6 py-5 shadow-sm">
+          <p className="text-sm font-medium text-base-content/60">
+            Redirecting to the canonical localhost origin for Auth0...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const handleRedirectCallback = (appState?: { returnTo?: string }) => {
-    const target = appState?.returnTo || window.location.pathname || '/';
+    const target =
+      appState?.returnTo && appState.returnTo !== '/'
+        ? appState.returnTo
+        : window.location.pathname && window.location.pathname !== '/'
+          ? window.location.pathname
+          : ROUTES.DASHBOARD;
     const resolvedTarget = target.startsWith('http') ? target : `${window.location.origin}${target}`;
 
     window.location.replace(resolvedTarget);
@@ -109,9 +144,10 @@ const Root: React.FC = () => {
       domain={domain}
       clientId={clientId}
       onRedirectCallback={handleRedirectCallback}
+      useRefreshTokens={true}
+      cacheLocation="localstorage"
       authorizationParams={{
         redirect_uri: window.location.origin,
-        audience: audience,
       }}
     >
       <App />
@@ -119,8 +155,27 @@ const Root: React.FC = () => {
   );
 };
 
+const AppCrashFallback = (
+  <div className="flex min-h-screen items-center justify-center bg-base-100 p-6 text-center">
+    <div className="max-w-[440px]">
+      <p className="mb-2 text-lg font-bold text-base-content">Something went wrong</p>
+      <p className="mb-5 text-sm text-base-content/60">
+        The application failed to load. Open the browser console for details, then reload.
+      </p>
+      <button
+        className="btn btn-primary"
+        onClick={() => window.location.reload()}
+      >
+        Reload
+      </button>
+    </div>
+  </div>
+);
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <MotionConfig reducedMotion="user">
-    <Root />
-  </MotionConfig>
+  <ErrorBoundary fallback={AppCrashFallback}>
+    <MotionConfig reducedMotion="user">
+      <Root />
+    </MotionConfig>
+  </ErrorBoundary>
 );

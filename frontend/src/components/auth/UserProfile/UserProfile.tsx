@@ -8,7 +8,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, compact = false 
     return (
       <div className="flex items-center gap-3">
         <div className="avatar">
-          <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-content font-bold text-sm ring ring-primary ring-offset-base-100 ring-offset-1">
+          <div className="w-9 h-9 rounded bg-primary flex items-center justify-center text-primary-content font-bold text-sm ring ring-primary ring-offset-base-100 ring-offset-1">
             {user.avatar ? (
               <img src={user.avatar} alt={user.name} />
             ) : (
@@ -29,9 +29,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, compact = false 
       <div className="card-body">
         <div className="flex items-start gap-4">
           <div className="avatar">
-            <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-primary-content font-bold text-2xl">
+            <div className="w-16 h-16 rounded bg-primary flex items-center justify-center text-primary-content font-bold text-2xl">
               {user.avatar ? (
-                <img src={user.avatar} alt={user.name} className="rounded-full" />
+                <img src={user.avatar} alt={user.name} className="rounded" />
               ) : (
                 user.name.charAt(0).toUpperCase()
               )}

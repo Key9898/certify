@@ -94,7 +94,7 @@ export const Certificates: React.FC = () => {
             <motion.div whileHover={{ y: -3 }} whileTap={TAP_PRESS} transition={QUICK_SPRING}>
               <Link
                 to={ROUTES.TEMPLATES}
-                className="btn btn-primary h-14 rounded-sm px-10 text-[13px] font-black uppercase tracking-widest shadow-xl shadow-primary/20"
+                className="btn btn-primary h-14 rounded px-10 text-[13px] font-black uppercase tracking-widest shadow-xl shadow-primary/20"
               >
                 <Plus size={20} className="mr-2" />
                 New Issuance
@@ -127,7 +127,7 @@ export const Certificates: React.FC = () => {
                   setSearchInput(e.target.value);
                   setPage(1);
                 }}
-                className="input input-bordered h-12 w-full rounded-none border-base-200 bg-base-100 pl-11 pr-11 text-sm font-medium shadow-sm transition-[border-color,box-shadow] focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
+                className="input input-bordered h-12 w-full rounded border-base-200 bg-base-100 pl-11 pr-11 text-sm font-medium shadow-sm transition-[border-color,box-shadow] focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
                 aria-label="Search records"
               />
               <AnimatePresence>
@@ -137,7 +137,7 @@ export const Certificates: React.FC = () => {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 btn btn-ghost btn-circle bg-base-200/50 hover:bg-base-200"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 btn btn-ghost rounded bg-base-200/50 hover:bg-base-200"
                     onClick={handleSearchClear}
                     aria-label="Clear search"
                     whileHover={{ rotate: 90 }}
@@ -188,7 +188,7 @@ export const Certificates: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="alert alert-error mb-8 rounded-none border-none font-bold"
+            className="alert alert-error mb-8 rounded border-none font-bold"
           >
             <span>{error}</span>
             <Button
@@ -223,7 +223,7 @@ export const Certificates: React.FC = () => {
           transition={{ ...SOFT_SPRING, delay: 1 }}
           className="fixed bottom-8 right-8 z-40 lg:hidden"
         >
-          <Link to={ROUTES.TEMPLATES} className="btn btn-primary h-14 w-14 rounded-full p-0 shadow-2xl">
+          <Link to={ROUTES.TEMPLATES} className="btn btn-primary h-14 w-14 rounded p-0 shadow-2xl">
             <Plus size={24} />
           </Link>
         </motion.div>
@@ -253,7 +253,7 @@ export const Certificates: React.FC = () => {
           }
         >
           <div className="py-4">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-error/10 text-error">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded bg-error/10 text-error">
               <FileText size={32} />
             </div>
             <h3 className="text-center text-xl font-black tracking-tight text-base-content">

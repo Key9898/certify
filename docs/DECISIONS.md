@@ -533,6 +533,143 @@ In development mode only:
 
 ---
 
+---
+ 
+ ## ADR-016: Specialized Branding Asset Architecture
+ 
+ **Date:** 2026-04-07
+ 
+ **Status:** Accepted
+ 
+ ### Context
+ 
+ Initial branding relied on the generic Lucide `Award` icon component. This was sufficient for MVP but lacked brand unique properties when used as a favicon or in primary branding locations. Additionally, the `public/` directory lacked organization, with icons and favicons scattered.
+ 
+ ### Decision
+ 
+ Move branding assets to a specialized, file-based architecture:
+ - Reorganize `public/` into subdirectories: `Logo/` for brand logos and `favicon/` for browser/mobile icons.
+ - Replace React component fallback (Lucide `Award`) with a dedicated `logo.svg` derived from the award design for use in core branding containers.
+ - Use a high-fidelity SVG favicon (`favicon/favicon.svg`) instead of the default browser fallback.
+ 
+ ### Rationale
+ 
+ - **Consistency**: Using a dedicated SVG file ensures the brand logo looks identical across Sidebar, Header, Footer, and Public Verification views.
+ - **Organization**: Subdirectories in `public/` prevent clutter and make asset management easier for developers and designers.
+ - **Performance**: Browser favicons load more reliably when stored in a dedicated path and linked correctly from `index.html`.
+ - **Future Proofing**: Allows easier white-labeling or future logo changes by swapping single SVG files rather than updating icon components across the codebase.
+ 
+ ### Consequences
+ 
+ - **Positive**: Professional asset management, improved brand consistency, and better technical SEO via correct favicon implementation.
+ - **Negative**: Requires manual `img` tag handling instead of simple icon component prop-drilling for branding containers.
+ - **Alternative Considered**: Keep using Lucide icons (rejected - lacks brand specialization and breaks favicon consistency).
+ 
+ ---
+ 
+## ADR-017: Auth0 Audience in getAccessTokenSilently Only — Never in loginWithRedirect or Auth0Provider
+
+**Date:** 2026-04-09
+
+**Status:** Accepted
+
+### Context
+
+After migrating to redirect-based Auth0 hosted login, all sign-in and Google login attempts returned "Client not authorized to access resource server https://certify-api" as a URL redirect error parameter. Investigation revealed that when `audience` is included in the initial `/authorize` request (via `loginWithRedirect.authorizationParams.audience` or `Auth0Provider.authorizationParams.audience`), Auth0 requires a Client Grant between the SPA and the API resource server. Even after a Client Grant was confirmed to exist (409 Conflict on POST /api/v2/client-grants), the error persisted intermittently — traced to ESLint's `no-unused-vars` auto-fix re-inserting the `audience` value into `authorizationParams` whenever the variable was declared but not used.
+
+Additionally, all authenticated API calls returned 500 after login because `express-oauth2-jwt-bearer` v1.7.4 throws `Error: An 'audience' is required to validate the 'aud' claim` at runtime even though its TypeScript types declare `audience` as optional.
+
+### Decision
+
+Split the audience concern into two distinct flows:
+
+1. **Login / Authorization (`/authorize` endpoint):** No `audience` in `Auth0Provider.authorizationParams` and no `audience` in any `loginWithRedirect` call. The `auth0Audience` variable is removed from module scope in `main.tsx`, `Home.tsx`, `Header.tsx`, and `App.tsx` to prevent ESLint auto-revert.
+
+2. **Token acquisition (`/oauth/token` endpoint):** `audience` is passed only inside `getAccessTokenSilently({ authorizationParams: { audience } })` in `AuthContext.tsx` and `useAuth.ts`. This call goes through the refresh-token exchange path, which is governed by the Client Grant separately from the `/authorize` flow.
+
+3. **Backend validation:** `audience` is always required in `backend/src/middleware/auth.ts` (`auth({ audience, issuerBaseURL, tokenSigningAlg })`).
+
+### Rationale
+
+- The Auth0 Authorization Code + PKCE flow (`/authorize`) and the refresh-token exchange flow (`/oauth/token`) both check Client Grants but are independent paths — the `/authorize` rejection does not depend on the grant existing; it depends on the SPA being registered correctly. Keeping the audience out of `/authorize` avoids this class of error entirely.
+- `getAccessTokenSilently` with `audience` in `authorizationParams` routes through `/oauth/token` using the stored refresh token — this IS correctly governed by the Client Grant and returns an API-scoped JWT.
+- Eliminating module-scope `auth0Audience` variables from components prevents ESLint from auto-inserting the value back into `authorizationParams` on lint-fix runs.
+
+### Consequences
+
+- **Positive:** Login (password and Google) succeeds without "Client not authorized" errors; API calls receive correctly scoped JWTs; backend validates tokens with correct audience; ESLint auto-fix no longer reverts the fix.
+- **Negative:** Slightly non-obvious split — `loginWithRedirect` has no audience while `getAccessTokenSilently` does; requires a comment in code to prevent future regression.
+- **Alternative Considered:** Keep audience in `loginWithRedirect` and add Client Grant (rejected — 409 Conflict confirmed grant existed yet error persisted, and ESLint re-insertion created an unbreakable loop).
+
+---
+
+## ADR-018: Certificate Revocation via Status Field and HTTP 410
+
+**Date:** 2026-04-09
+
+**Status:** Accepted
+
+### Context
+
+Organizations need the ability to invalidate certificates after issuance — due to errors, misconduct, or policy changes. The public verification endpoint had no way to distinguish between a certificate that never existed and one that was explicitly revoked, returning a generic 404 in both cases. A distinct machine-readable response for revoked certificates is needed so integrating systems and users can understand the difference.
+
+### Decision
+
+- Add a `status: 'active' | 'revoked'` field (default `'active'`) to the `Certificate` model with a Mongoose enum validator.
+- The public verify endpoint (`GET /api/verify/:certificateId`) returns HTTP **410 Gone** with `{ code: 'REVOKED' }` for revoked certificates, distinct from 404 Not Found.
+- A new authenticated endpoint `PATCH /api/certificates/:id/revoke` sets `status = 'revoked'` after verifying the requesting user belongs to the owning workspace.
+- The `api.ts` error helper propagates the HTTP `status` and `code` fields so frontend callers can branch on 410 vs 404.
+- The Verify page shows a dedicated "Certificate Revoked" state with a `ShieldAlert` icon, visually distinct from the Not Found state.
+
+### Rationale
+
+- HTTP 410 Gone is the semantically correct status for a resource that has been permanently removed or invalidated, distinguishing it from 404 which means it was never found.
+- Keeping the revoked record in the database (rather than deleting it) preserves audit history and allows the 410 response to carry issuer context.
+- Workspace permission check on the revoke endpoint prevents unauthorized revocations by users outside the issuing organization.
+
+### Consequences
+
+- **Positive:** Clear distinction between "never existed" and "explicitly revoked"; machine-readable for integrations; audit trail preserved; issuing workspace retains control.
+- **Negative:** Adds a new field to the Certificate schema (backward-compatible default); revoked certificates still occupy database storage.
+- **Alternative Considered:** Delete the certificate on revocation (rejected — loses audit trail and makes it impossible to return a meaningful 410 with context).
+
+---
+
+ ---
+
+## ADR-019: Standardized Corporate Design System (0.25rem Corner Radius)
+
+**Date:** 2026-04-10
+
+**Status:** Accepted
+
+### Context
+
+The application initially featured various corner radius tokens (`rounded-lg`, `rounded-xl`, `rounded-full`, etc.), creating an inconsistent, informal "bubble-like" aesthetic. For a professional B2B SaaS platform like Certify, a more disciplined, modern, and high-end corporate design language is required to build trust and ensure visual cohesion across all modules (Landing, Dashboard, Portals, and Legal).
+
+### Decision
+
+Standardize the entire design system to a strict 0.25rem corner radius (using Tailwind's `rounded` utility).
+
+- **UI Components**: All buttons, cards, tags, inputs, alerts, and navigation items use `rounded` (0.25rem).
+- **Exceptions**: Background decorative blurs (blobs) and small status indicators (dots) maintain `rounded-full` to preserve soft visual rhythm and circular semantic meaning.
+- **Application**: Mass refactor implemented across both `pages/` and `components/` directories.
+
+### Rationale
+
+- **Consistency**: A single corner radius token across all interactive elements creates a unified, professional character.
+- **Corporate Visual Language**: Standardizing on `rounded` (0.25rem) aligns with the "Corporate" DaisyUI theme and avoids the informal, consumer-grade "bubble" style.
+- **Brand Identity**: Square-ish shapes with subtle rounding signal precision, stability, and high-fidelity — core values of a certificate generation platform.
+- **Ease of Maintenance**: Eliminating multiple radius variants simplifies future component development and reduces design debt.
+
+### Consequences
+
+- **Positive**: Cohesive, premium SaaS aesthetic; clearer visual hierarchy; faster UI auditing; 100% alignment with `global.css` tokens.
+- **Negative**: Requires careful preservation of decorative circles/spinners during global refactoring scripts.
+- **Alternative Considered**: Multiple radius levels (rejected — leads to inconsistent grouping and "informal" feel).
+
+---
+
 ## Template
 
 ```markdown

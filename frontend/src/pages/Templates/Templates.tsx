@@ -81,7 +81,7 @@ export const Templates: React.FC = () => {
                 >
                   <Button
                     variant="primary"
-                    className="h-14 rounded-sm px-10 text-[13px] font-black uppercase tracking-widest shadow-xl shadow-primary/20"
+                    className="h-14 rounded px-10 text-[13px] font-black uppercase tracking-widest shadow-xl shadow-primary/20"
                     rightIcon={<ArrowRight size={18} />}
                     onClick={handleProceed}
                   >
@@ -100,7 +100,7 @@ export const Templates: React.FC = () => {
           className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between"
         >
           <LayoutGroup id="templates-page-filters">
-            <div className="flex flex-wrap gap-2 rounded-3xl border border-base-200 bg-base-100/80 p-2 shadow-sm backdrop-blur">
+            <div className="flex flex-wrap gap-2 rounded border border-base-200 bg-base-100/80 p-2 shadow-sm backdrop-blur">
               {TEMPLATE_CATEGORIES.map((cat) => {
                 const isActive = activeCategory === cat.value;
 
@@ -113,19 +113,19 @@ export const Templates: React.FC = () => {
                       setActiveCategory(cat.value);
                       setSelectedTemplate(null);
                     }}
-                    className={`relative min-h-[44px] overflow-hidden rounded-full px-5 py-2 text-xs font-black uppercase tracking-widest ${
+                    className={`relative min-h-[44px] overflow-hidden rounded px-5 py-2 text-xs font-black uppercase tracking-widest ${
                       isActive ? 'text-primary-content' : 'text-base-content/45'
                     }`}
                   >
                     {isActive ? (
                       <motion.span
                         layoutId="templates-page-pill"
-                        className="absolute inset-0 rounded-full bg-primary shadow-lg shadow-primary/20"
+                        className="absolute inset-0 rounded bg-primary shadow-lg shadow-primary/20"
                         transition={QUICK_SPRING}
                       />
                     ) : (
                       <motion.span
-                        className="absolute inset-0 rounded-full"
+                        className="absolute inset-0 rounded"
                         whileHover={{ backgroundColor: 'rgba(226,232,240,0.85)' }}
                         transition={QUICK_SPRING}
                       />
@@ -138,11 +138,11 @@ export const Templates: React.FC = () => {
           </LayoutGroup>
 
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 rounded-full border border-base-200 bg-base-100 px-4 py-2 text-xs font-black uppercase tracking-widest text-base-content/35 shadow-sm">
+            <div className="flex items-center gap-2 rounded border border-base-200 bg-base-100 px-4 py-2 text-xs font-black uppercase tracking-widest text-base-content/35 shadow-sm">
               <Filter size={14} />
               <span>Showing {filteredTemplates.length} layouts</span>
             </div>
-            <div className="rounded-full border border-primary/15 bg-primary/5 px-4 py-2 text-xs font-black uppercase tracking-widest text-primary/80 shadow-sm">
+            <div className="rounded border border-primary/15 bg-primary/5 px-4 py-2 text-xs font-black uppercase tracking-widest text-primary/80 shadow-sm">
               {selectedTemplate ? selectedTemplate.name : 'Choose a theme to continue'}
             </div>
           </div>
@@ -210,7 +210,7 @@ export const Templates: React.FC = () => {
                     whileHover={{ y: -2 }}
                     whileTap={TAP_PRESS}
                     onClick={handleProceed}
-                    className="btn btn-primary h-12 flex-1 rounded-sm px-8 font-black uppercase tracking-widest shadow-lg shadow-primary/20 sm:flex-none"
+                    className="btn btn-primary h-12 flex-1 rounded px-8 font-black uppercase tracking-widest shadow-lg shadow-primary/20 sm:flex-none"
                   >
                     Use Theme
                   </motion.button>

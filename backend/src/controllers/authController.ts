@@ -3,6 +3,20 @@ import { User } from '../models/User';
 import { AuthenticatedRequest } from '../types';
 import { buildAppUser, ensureUserWorkspace } from '../services/workspaceService';
 
+const deriveDisplayName = (name?: string, email?: string, auth0Id?: string): string => {
+  const explicitName = name?.trim();
+  if (explicitName) {
+    return explicitName;
+  }
+
+  const emailLocalPart = email?.split('@')[0]?.trim();
+  if (emailLocalPart) {
+    return emailLocalPart.replace(/[._-]+/g, ' ');
+  }
+
+  return auth0Id || 'Member';
+};
+
 export const getMe = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -24,8 +38,10 @@ export const syncUser = async (
   try {
     const auth0Id = req.auth?.payload?.sub;
     const { email, name, avatar } = req.body;
+    const normalizedEmail = email?.trim().toLowerCase();
+    const normalizedName = deriveDisplayName(name, normalizedEmail, auth0Id);
 
-    if (!auth0Id || !email || !name) {
+    if (!auth0Id || !normalizedEmail) {
       res.status(400).json({
         success: false,
         error: { code: 'VALIDATION_ERROR', message: 'Missing required fields' },
@@ -38,13 +54,13 @@ export const syncUser = async (
     if (!user) {
       user = new User({
         auth0Id,
-        email,
-        name,
+        email: normalizedEmail,
+        name: normalizedName,
         avatar,
       });
     } else {
-      user.email = email;
-      user.name = name;
+      user.email = normalizedEmail;
+      user.name = normalizedName;
       user.avatar = avatar;
     }
 

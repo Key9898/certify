@@ -81,7 +81,7 @@ export const BatchGenerate: React.FC = () => {
       <div className="mx-auto max-w-6xl">
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <div className="mb-2 flex items-center gap-3">
-            <div className="h-6 w-1.5 rounded-full bg-primary" />
+            <div className="h-6 w-1.5 rounded bg-primary" />
             <h1 className="text-3xl font-black tracking-tighter text-base-content">
               Batch Generation
             </h1>
@@ -90,13 +90,13 @@ export const BatchGenerate: React.FC = () => {
             Issue hundreds of professional certificates instantly via CSV or Excel automation.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <div className="rounded-full border border-base-200 bg-base-100 px-4 py-2 text-xs font-black uppercase tracking-widest text-base-content/45 shadow-sm">
+            <div className="rounded border border-base-200 bg-base-100 px-4 py-2 text-xs font-black uppercase tracking-widest text-base-content/45 shadow-sm">
               Current Stage: {STEPS[currentStepIndex]?.label ?? 'Upload CSV'}
             </div>
-            <div className="rounded-full border border-primary/15 bg-primary/5 px-4 py-2 text-xs font-black uppercase tracking-widest text-primary/80 shadow-sm">
+            <div className="rounded border border-primary/15 bg-primary/5 px-4 py-2 text-xs font-black uppercase tracking-widest text-primary/80 shadow-sm">
               Template: {selectedTemplate?.name ?? 'Not selected'}
             </div>
-            <div className="rounded-full border border-accent/15 bg-accent/5 px-4 py-2 text-xs font-black uppercase tracking-widest text-accent/80 shadow-sm">
+            <div className="rounded border border-accent/15 bg-accent/5 px-4 py-2 text-xs font-black uppercase tracking-widest text-accent/80 shadow-sm">
               Rows Queued: {preview?.total ?? 0}
             </div>
           </div>
@@ -399,7 +399,7 @@ export const BatchGenerate: React.FC = () => {
                 <div className="flex justify-center pb-12">
                   <Button
                     variant="outline"
-                    className="h-auto rounded-full border-2 px-12 py-6 text-lg font-black shadow-xl shadow-base-200 hover:border-primary hover:bg-primary hover:text-primary-content"
+                    className="h-auto rounded border-2 px-12 py-6 text-lg font-black shadow-xl shadow-base-200 hover:border-primary hover:bg-primary hover:text-primary-content"
                     onClick={handleReset}
                   >
                     Generate Another Batch

@@ -9,6 +9,7 @@ import {
   generatePdfHandler,
   generatePngHandler,
   deleteCertificate,
+  revokeCertificate,
 } from '../controllers/certificateController';
 
 const router = Router();
@@ -32,6 +33,7 @@ router.post(
   pdfLimiter,
   generatePngHandler
 );
+router.patch('/:id/revoke', checkJwt, attachUser, validateObjectId('id'), revokeCertificate);
 router.delete('/:id', checkJwt, attachUser, validateObjectId('id'), deleteCertificate);
 
 export default router;

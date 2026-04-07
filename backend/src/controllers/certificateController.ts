@@ -147,6 +147,44 @@ export const generatePngHandler = async (
   }
 };
 
+export const revokeCertificate = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const workspaceUserIds = await getWorkspaceMemberIds(req.user!);
+    const certificate = await Certificate.findOne({
+      _id: req.params.id,
+      createdBy: { $in: workspaceUserIds },
+    });
+
+    if (!certificate) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Certificate not found' },
+      });
+      return;
+    }
+
+    const canManage = await canManageWorkspaceResource(req.user!, certificate.createdBy);
+    if (!canManage) {
+      res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: 'You cannot revoke this team certificate.' },
+      });
+      return;
+    }
+
+    certificate.status = 'revoked';
+    await certificate.save();
+
+    res.json({ success: true, data: { message: 'Certificate revoked successfully' } });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteCertificate = async (
   req: AuthenticatedRequest,
   res: Response,

@@ -24,10 +24,16 @@ const Integrations = lazy(() =>
 );
 const Settings = lazy(() => import('@/pages/Settings').then((m) => ({ default: m.Settings })));
 const Verify = lazy(() => import('@/pages/Verify').then((m) => ({ default: m.Verify })));
+const VerifyPortal = lazy(() => import('@/pages/Verify').then((m) => ({ default: m.VerifyPortal })));
 const TemplateBuilder = lazy(() =>
   import('@/pages/TemplateBuilder').then((m) => ({ default: m.TemplateBuilder }))
 );
-const isDevPreviewEnabled = import.meta.env.DEV;
+
+// Support & Legal
+const About = lazy(() => import('@/pages/Support').then((m) => ({ default: m.About })));
+const FAQ = lazy(() => import('@/pages/Support').then((m) => ({ default: m.FAQ })));
+const Privacy = lazy(() => import('@/pages/Legal').then((m) => ({ default: m.Privacy })));
+const Terms = lazy(() => import('@/pages/Legal').then((m) => ({ default: m.Terms })));
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
@@ -87,7 +93,7 @@ const AppRoutes: React.FC = () => {
   const location = useLocation();
   const scene = (children: React.ReactNode) => <RouteScene>{children}</RouteScene>;
   const protectedScene = (children: React.ReactNode) =>
-    scene(isDevPreviewEnabled ? children : <ProtectedRoute>{children}</ProtectedRoute>);
+    scene(<ProtectedRoute>{children}</ProtectedRoute>);
 
   return (
     <AnimatePresence initial={false} mode="wait">
@@ -105,6 +111,11 @@ const AppRoutes: React.FC = () => {
         <Route path={ROUTES.SETTINGS} element={protectedScene(<Settings />)} />
         <Route path={ROUTES.TEMPLATE_BUILDER} element={protectedScene(<TemplateBuilder />)} />
         <Route path={ROUTES.VERIFY} element={scene(<Verify />)} />
+        <Route path={ROUTES.VERIFY_PORTAL} element={scene(<VerifyPortal />)} />
+        <Route path={ROUTES.ABOUT} element={scene(<About />)} />
+        <Route path={ROUTES.FAQ} element={scene(<FAQ />)} />
+        <Route path={ROUTES.PRIVACY} element={scene(<Privacy />)} />
+        <Route path={ROUTES.TERMS} element={scene(<Terms />)} />
         <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
       </Routes>
     </AnimatePresence>

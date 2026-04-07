@@ -15,6 +15,7 @@ export interface ICertificate {
   customFields?: Record<string, unknown>;
   pdfUrl?: string;
   certificateId: string;
+  status: 'active' | 'revoked';
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -40,6 +41,11 @@ const CertificateSchema = new Schema<ICertificateDocument>(
       type: String,
       unique: true,
       default: () => nanoid(12).toUpperCase(),
+    },
+    status: {
+      type: String,
+      enum: ['active', 'revoked'],
+      default: 'active',
     },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },

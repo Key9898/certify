@@ -1,10 +1,7 @@
 import type { Template } from './template';
 
 export type IntegrationProvider =
-  | 'zapier'
-  | 'make'
   | 'google_sheets'
-  | 'moodle'
   | 'canvas'
   | 'custom';
 

@@ -57,7 +57,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.6, opacity: 0 }}
               transition={SOFT_SPRING}
-              className="bg-white rounded-full p-2 shadow-xl"
+              className="bg-white rounded p-2 shadow-xl"
             >
               <CheckCircle size={32} className="text-primary" />
             </motion.div>

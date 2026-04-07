@@ -54,3 +54,14 @@ export const webhookLimiter = rateLimit({
     error: { code: 'RATE_LIMIT', message: 'Too many webhook operations. Please slow down.' },
   },
 });
+
+export const verifyLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: { code: 'RATE_LIMIT', message: 'Too many verification requests. Please wait before trying again.' },
+  },
+});

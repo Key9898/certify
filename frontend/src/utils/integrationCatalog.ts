@@ -25,28 +25,4 @@ export const INTEGRATION_CATALOG: IntegrationCatalogItem[] = [
     recommendedMode: 'single',
     highlights: ['Advanced fallback', 'Flexible payload overrides', 'Portable contract'],
   },
-  {
-    provider: 'zapier',
-    label: 'Zapier',
-    category: 'automation',
-    summary: 'Trigger certificate issuance from CRMs, forms, and connected no-code tools.',
-    recommendedMode: 'single',
-    highlights: ['No-code workflows', 'Fast webhook setup', 'Secondary path'],
-  },
-  {
-    provider: 'make',
-    label: 'Make',
-    category: 'automation',
-    summary: 'Run advanced multi-step scenarios, approvals, and bulk issuance jobs.',
-    recommendedMode: 'batch',
-    highlights: ['Scenario builder', 'Conditional logic', 'Secondary path'],
-  },
-  {
-    provider: 'moodle',
-    label: 'Moodle',
-    category: 'lms',
-    summary: 'Issue certificates when students complete modules, cohorts, or assessments.',
-    recommendedMode: 'single',
-    highlights: ['Course completion hooks', 'Student milestones', 'Secondary path'],
-  },
 ];

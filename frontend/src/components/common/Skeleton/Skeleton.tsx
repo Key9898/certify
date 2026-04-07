@@ -10,7 +10,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({ className = '', variant = 'r
   const variantClasses = {
     text: 'h-4 w-full rounded',
     rect: 'h-24 w-full rounded',
-    circle: 'h-12 w-12 rounded-full',
+    circle: 'h-12 w-12 rounded',
   };
 
   return (

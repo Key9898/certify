@@ -32,12 +32,6 @@ export const PRIMARY_INTEGRATION_PROVIDERS: IntegrationProvider[] = [
 
 export const FALLBACK_INTEGRATION_PROVIDERS: IntegrationProvider[] = ['custom'];
 
-export const SECONDARY_INTEGRATION_PROVIDERS: IntegrationProvider[] = [
-  'zapier',
-  'make',
-  'moodle',
-];
-
 export const GOOGLE_SHEETS_DEFAULT_MAPPING: GoogleSheetsMappingState = {
   recipientName: 'Recipient Name',
   recipientEmail: 'Recipient Email',
@@ -147,42 +141,6 @@ export const INTEGRATION_SPOTLIGHTS: Record<
           'Persist the returned certificate identifiers or PDF URL where your downstream workflow can access them.',
       },
     ],
-  },
-  zapier: {
-    provider: 'zapier',
-    tier: 'secondary',
-    eyebrow: 'Secondary',
-    headline: 'No-code form and CRM automations.',
-    summary:
-      'Useful when a team already runs no-code workflows, but no longer the primary onboarding path.',
-    highlights: ['Webhook action', 'No-code', 'Form triggers'],
-    ctaLabel: 'Open Zapier Guide',
-    flowTitle: 'Zapier flow',
-    flowSteps: [],
-  },
-  make: {
-    provider: 'make',
-    tier: 'secondary',
-    eyebrow: 'Secondary',
-    headline: 'Multi-step orchestration and approvals.',
-    summary:
-      'Useful for advanced scenario builders, approval routers, and multi-system fan-out.',
-    highlights: ['Scenario builder', 'Approvals', 'Routers'],
-    ctaLabel: 'Open Make Guide',
-    flowTitle: 'Make flow',
-    flowSteps: [],
-  },
-  moodle: {
-    provider: 'moodle',
-    tier: 'secondary',
-    eyebrow: 'Secondary',
-    headline: 'Additional LMS completion workflows.',
-    summary:
-      'Still available for Moodle-based education teams, but positioned behind the primary Canvas path.',
-    highlights: ['LMS', 'Course completion', 'Academic delivery'],
-    ctaLabel: 'Open Moodle Guide',
-    flowTitle: 'Moodle flow',
-    flowSteps: [],
   },
 };
 

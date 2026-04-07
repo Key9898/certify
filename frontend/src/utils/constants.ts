@@ -22,4 +22,9 @@ export const ROUTES = {
   TEMPLATE_BUILDER: '/templates/new',
   SETTINGS: '/settings',
   VERIFY: '/verify/:certificateId',
+  VERIFY_PORTAL: '/verify',
+  ABOUT: '/about',
+  FAQ: '/faq',
+  PRIVACY: '/privacy',
+  TERMS: '/terms',
 } as const;

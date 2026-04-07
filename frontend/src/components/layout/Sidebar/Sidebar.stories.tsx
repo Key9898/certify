@@ -33,7 +33,7 @@ const SidebarPreview = ({
               <a
                 href={to}
                 className={[
-                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                  'flex items-center gap-3 rounded px-3 py-2.5 text-sm font-medium transition-colors',
                   activeRoute === to
                     ? 'bg-primary text-primary-content'
                     : 'text-base-content hover:bg-base-200',

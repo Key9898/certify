@@ -32,7 +32,7 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="bg-primary/10 rounded-lg p-2 shrink-0">
+            <div className="bg-primary/10 rounded p-2 shrink-0">
               <Award size={18} className="text-primary" aria-hidden="true" />
             </div>
             <div className="min-w-0">

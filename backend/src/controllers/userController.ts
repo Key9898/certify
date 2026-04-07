@@ -4,6 +4,51 @@ import { User } from '../models/User';
 import { Organization } from '../models/Organization';
 import { buildAppUser, isWorkspaceAdmin } from '../services/workspaceService';
 
+export const deleteAccount = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = req.user!;
+    const auth0Id = user.auth0Id;
+
+    await User.findByIdAndDelete(user._id);
+
+    const mgmtClientId = process.env.AUTH0_MGMT_CLIENT_ID;
+    const mgmtClientSecret = process.env.AUTH0_MGMT_CLIENT_SECRET;
+    const domain = process.env.AUTH0_DOMAIN;
+
+    if (mgmtClientId && mgmtClientSecret && domain) {
+      try {
+        const tokenRes = await fetch(`https://${domain}/oauth/token`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            grant_type: 'client_credentials',
+            client_id: mgmtClientId,
+            client_secret: mgmtClientSecret,
+            audience: `https://${domain}/api/v2/`,
+          }),
+        });
+        const tokenData = (await tokenRes.json()) as { access_token?: string };
+        if (tokenData.access_token) {
+          await fetch(`https://${domain}/api/v2/users/${encodeURIComponent(auth0Id)}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${tokenData.access_token}` },
+          });
+        }
+      } catch (err) {
+        console.error('Failed to delete Auth0 user (non-fatal):', err);
+      }
+    }
+
+    res.json({ success: true, data: null });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DOMAIN_REGEX = /^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;

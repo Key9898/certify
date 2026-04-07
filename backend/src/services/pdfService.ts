@@ -162,6 +162,11 @@ const renderBackgroundTemplateHtml = (template: TemplateRenderSource, data: PdfD
     })
     .join('');
 
+  // Check if user has explicitly placed a certificateId field in the template
+  const hasIdField = (template.fields || []).some(
+    (f) => f.name === 'certificateId' && f.visible !== false
+  );
+
   return `
     <!DOCTYPE html>
     <html>
@@ -185,12 +190,24 @@ const renderBackgroundTemplateHtml = (template: TemplateRenderSource, data: PdfD
           object-fit: cover;
           object-position: center;
         }
+        .cert-id-stamp {
+          position: absolute;
+          bottom: 6mm;
+          right: 8mm;
+          font-size: 8px;
+          font-family: monospace;
+          color: rgba(0,0,0,0.35);
+          letter-spacing: 0.5px;
+          line-height: 1;
+          pointer-events: none;
+        }
       </style>
     </head>
     <body>
       <div class="certificate">
         ${backgroundImageUrl ? `<img src="${escapeHtml(backgroundImageUrl)}" alt="Template background" class="background-image" />` : ''}
         ${fieldsHtml}
+        ${!hasIdField ? `<div class="cert-id-stamp">ID: ${escapeHtml(data.certificateId)}</div>` : ''}
       </div>
     </body>
     </html>

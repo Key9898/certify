@@ -2,10 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 import { nanoid } from 'nanoid';
 
 export type IntegrationProvider =
-  | 'zapier'
-  | 'make'
   | 'google_sheets'
-  | 'moodle'
   | 'canvas'
   | 'custom';
 
@@ -152,7 +149,7 @@ const IntegrationSchema = new Schema<IIntegrationDocument>(
     name: { type: String, required: true, trim: true },
     provider: {
       type: String,
-      enum: ['zapier', 'make', 'google_sheets', 'moodle', 'canvas', 'custom'],
+      enum: ['google_sheets', 'canvas', 'custom'],
       required: true,
     },
     description: { type: String, trim: true },

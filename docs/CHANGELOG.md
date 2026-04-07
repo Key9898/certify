@@ -10,9 +10,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Design System Standardization**: Enforced a strict 0.25rem (rounded) corner radius across the entire application (Pages, Components, and Portals) to align with the core corporate design system.
 
+### Changed
+- **Mass Refactoring**: Systematically refactored all non-compliant "bubble-mode" rounding tokens (rounded-lg, rounded-xl, rounded-2xl, rounded-full) to standard `rounded` utility while preserving decorative blurs and status indicators.
+- **Corporate UI Polish**: Standardized buttons, cards, avatars, and navigation elements in Header, Sidebar, and Dashboard for a premium, professional SaaS aesthetic.
+
+- **Certificate Revocation**: `status: 'active' | 'revoked'` field on Certificate model; `PATCH /api/certificates/:id/revoke` authenticated endpoint.
+- **Public Verify Rate Limiter**: `verifyLimiter` (20 req/min per IP) applied to `GET /api/verify/:certificateId`.
+- **Revoked Certificate UI**: Verify page shows dedicated "Certificate Revoked" state (HTTP 410) with `ShieldAlert` icon.
+- **Settings Modularization**: Refactored monolithic Settings into a tab-based system (Account, Team, Branding, Developer, Security).
+- **Security Hub**: Integrated Password Change UI with Auth0 connection detection and reset workflows.
+- **Dashboard UI/UX Overhaul**: Complete professional transformation of the main dashboard with premium SaaS layout.
+
+- **Layout Optimization**: Normalized spacing and grid patterns across all modules for a consistent user experience.
+- **Home Workflow Optimization**: Revamped the "How Certify Powers You" section with balanced card dimensions (p-8) and optimized grid spacing (gap-8) to eliminate awkward text wrapping and improve visual rhythm.
+- **Cross-Page Hash Navigation**: Updated "Features" link to `/#features` across all headers and footers to ensure instant jump to Home page features section.
+- **Accessibility Refinement**: Standardized CTA and Hero backgrounds to `slate-950` and `slate-900` to fix text contrast and visibility issues.
+- **Home Instant Scroll**: Immersive `useLayoutEffect` implementation for zero-delay navigation to the features section from any page.
+- **Unified Portal Layout**: Integrated persistent Header and Footer across all support and legal portals.
+- **Refinement**: Removed redundant grid pattern from VerifyPortal for a cleaner, more consistent look.
+- **Scroll-to-Top**: Framer-motion animated floating button for improved long-page navigation.
+
+### Changed
+
+- **Standardized Footer**: Complete reorganization into Product, Legal, and Support categories; updated developer credit to "Developed by Wunna Aung" and removed separate "Built with ❤️" line.
+- **Unified Branding Navigation**: Added "Verification" portal link to the main header and restructured footer hierarchy.
+- **Responsive Motion System**: Enhanced the Home page with staggered reveal animations and glassmorphic UI elements for verification.
+- **Branding Assets Overhaul**: Reorganized the `public/` directory into a structured `Logo/` and `favicon/` architecture; replaced the generic Lucide `Award` branding icon with a dedicated `logo.svg` across Sidebar, Header, Footer, Home, and Verify modules for improved brand consistency and visual fidelity.
+- **Delete Account**: Danger Zone section in Settings with a `DELETE` confirmation gate; backend `DELETE /api/users/account` removes the user from MongoDB and attempts Auth0 Management API deletion if `AUTH0_MGMT_CLIENT_ID`/`AUTH0_MGMT_CLIENT_SECRET` env vars are set
 - Canva-compatible background template builder that lets users import custom certificate artwork, place dynamic fields, and reuse the layout for CSV/XLSX batch PDF generation
-- Home-page authentication prompt with Sign in, Sign up, and Sign in with Google actions that open Auth0-hosted popup forms with a redirect fallback
+- Home-page authentication prompt with Sign in, Sign up, and Sign in with Google actions that launch Auth0-hosted Universal Login pages from a Certify modal
 - **Security Hardening**: SSRF protection utility with DNS resolution checks for webhook URLs
 - **Security Hardening**: Secure logger with sensitive data redaction (passwords, tokens, API keys, secrets)
 - **Security Hardening**: File upload validation with magic byte signature checking and filename sanitization
@@ -22,9 +50,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **High-Fidelity Interaction System**: Glassmorphism, animated glow points, and a standardized Framer Motion stagger system for premium feedback.
 - **Unified Brand Design Tokens**: Extended `global.css` with `.glass-card`, `.glow-point`, `.brand-tag`, and `.meta-label` utility classes.
 - **Advanced Layout Animations**: Integrated `LayoutGroup` for fluid transitions in the Template selection and navigation systems.
-- Repository-side production readiness tooling with `npm run readiness`, a deployment preflight script, backend runtime env warnings, and GitHub CI workflow coverage
-- Native Google Sheets API write-back and Canvas API callback support for Integration Hub workflows
-- Backend connector test runner plus frontend Integration Hub coverage for native provider flows
 - Workspace organizations with team invitations, role management, and workspace-scoped access to templates, certificates, batches, and analytics
 - White-label workspace branding with brand name, logo, colors, support email, custom domain, and hide-powered-by controls
 - Third-party Integration Hub with provider catalog, workspace-managed webhook endpoints, setup testing, and inbound single/batch execution flows
@@ -34,13 +59,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Public REST API with API keys, Swagger docs, webhooks, analytics, public verification, PNG export, and batch ZIP download
 - Vitest unit test setup with 25 passing tests for CSV parsing, validators, and formatters
 - Demo mode for exploring the UI without Auth0 credentials
+- **Integrations Optimization**: Standardized the Hub with a clean grid system and vertical field grouping; removed secondary providers (Zapier, Make, Moodle) to focus on native first-class integrations.
+- **Responsive Alignment**: Improved padding, margins, and grid breakpoints across Admin settings and Integration Hub for better visual rhythm on desktop and mobile.
 - Storybook coverage for the remaining shared UI and certificate components
 
 ### Changed
 
+- **Branding Assets Overhaul**: Reorganized the `public/` directory into a structured `Logo/` and `favicon/` architecture; replaced the generic Lucide `Award` branding icon with a dedicated `logo.svg` across Sidebar, Header, Footer, Home, and Verify modules for improved brand consistency and visual fidelity
+- Auth0 entry actions now use hosted redirect-based login pages instead of popup-first flows, local development defaults to `http://localhost:5174` with canonical localhost handling for callback stability, and API audience tokens are requested on demand after login instead of during the initial marketing-site auth redirect
+- Home-page Sign In, Sign Up, Google, and Explore Templates entrypoints now force a fresh Universal Login step for signed-out visitors so Auth0 SSO session reuse does not skip the visible credential form on localhost or production
+- Frontend API calls now use the local Vite proxy during development instead of the production `VITE_API_URL`, and the backend CORS fallback now matches the supported localhost port range
+- Authenticated account chrome now normalizes Auth0 profile data from `name`, `nickname`, `given_name`, or email-local fallback so sign-up flows without a full-name field still show the real signed-in identity consistently
 - Template authoring now supports both preset themes and imported background templates with drag-and-drop field placement for recipient data, dates, IDs, logos, and signatures
 - Home header now surfaces working Sign In, Start Free, and Dashboard actions more clearly, while the dashboard shell keeps the desktop sidebar fixed during page scrolling
-- Local development now allows the authenticated dashboard shell routes to render as preview routes without Auth0 so homepage CTA and sidebar troubleshooting do not block localhost UI QA
 - **Security Hardening**: Replaced vulnerable `xlsx` package with `exceljs` to mitigate prototype pollution vulnerability
 - **Security Hardening**: Added rate limiting to batch, team, and webhook endpoints
 - **Security Hardening**: Integrated secure logging across error handler, webhook service, and batch controller
@@ -69,8 +100,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Localhost dashboard sidebar links now stay inside the dashboard shell because all authenticated app routes render as preview routes during local development while production remains protected
-- Home-page Explore Templates CTA now routes directly to `/dashboard` as a temporary navigation path
+- **Auth error URL cleanup**: Clear `?error=` and `?error_description=` URL params after displaying the auth error modal so hard reload no longer re-triggers the modal with stale error state
+- **FAQ.tsx `Award` icon missing import**: Fixed `ReferenceError: Award is not defined` console error — added `Award` to the `lucide-react` import list and removed the unused `ChevronDown` import
+- **Backend JWT validation 500 errors**: `express-oauth2-jwt-bearer` v1.7.4 throws `Error: An 'audience' is required to validate the 'aud' claim` at runtime even though TypeScript types mark `audience` as optional — restored `audience: process.env.AUTH0_AUDIENCE` in `backend/src/middleware/auth.ts` so authenticated API routes return 200 instead of 500
+- **Auth0 audience strategy — login vs token**: Removed `audience` from ALL `loginWithRedirect` calls and from `Auth0Provider.authorizationParams` to prevent the "Client not authorized to access resource server" error on the `/authorize` endpoint; audience is now passed **only** inside `getAccessTokenSilently({ authorizationParams: { audience } })` in `AuthContext.tsx` and `useAuth.ts`, which routes through the `/oauth/token` refresh-token exchange path (governed by the existing Client Grant) so the backend receives correctly-scoped JWT access tokens without re-triggering the authorization flow
+- Localhost dashboard sidebar links now stay inside the real authenticated dashboard shell instead of bouncing through temporary preview routing
+- Explore Templates now behaves like an auth entrypoint for signed-out visitors instead of pushing directly into a protected route that can dead-end on localhost or production
+- Auth entry actions now surface the hosted Auth0 sign-in/sign-up pages more reliably during local development by avoiding popup-first behavior
+- Landing-page auth CTAs no longer dead-end on the Auth0 consent screen before any visible form because the initial login redirect no longer requests the API audience
+- Authenticated dashboard routes now require real Auth0 login again, so local sessions reflect the actual signed-in user instead of a dev-only preview shell
+- Email/password Auth0 sign-ups no longer fail app-user creation when the hosted form returns no full name, because the backend now derives a usable display name and the frontend falls back to the real Auth0 profile while sync completes
+- Home-page Explore Templates CTA now opens the auth choice modal for signed-out visitors and sends authenticated users to `/dashboard`
 - Home certificate preview carousel no longer uses `AnimatePresence mode="wait"` with multiple children, removing the related console warning
 - Home CTA buttons now route correctly for authenticated users, and the header/logo/footer navigation flow has been aligned with the latest landing-page UX
 - Auth0 sign-in, sign-up, and Google flows now attempt the correct hosted Auth0 popup forms first, preserve the intended `/dashboard` return path, surface localhost origin misconfiguration hints, and redirect protected pages without firing auth side effects during render
@@ -82,7 +122,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Batch wizard completion now waits for real processing results
 - Protected raw downloads and uploads now consistently send Auth0 bearer tokens
 - Dashboard no longer crashes in demo mode because chart errors are isolated and React StrictMode was removed for the incompatible dev-only path
-- Inline CSS and hardcoded non-semantic color class regressions were removed from core marketing and preview surfaces
+- **`consent_required` silent auth failure (white screen / app crash):** Added `useRefreshTokens={true}` + `cacheLocation="localstorage"` to `Auth0Provider` — Chrome 80+ blocks third-party cookies used for iframe-based silent auth; refresh token rotation bypasses this entirely
+- App no longer shows white screen on unhandled render errors — top-level `ErrorBoundary` in `main.tsx` now catches all crashes and shows "Something went wrong" + Reload button
+- **Settings Implementation Gaps**: Restored missing React hooks imports and Lucide icons following the modular refactor; fixed prop assignment errors on the FileUpload component.
+- **Lint & Clean-up**: Eliminated all unused imports (SOFT_SPRING, Palette, Globe, etc.) and implicit 'any' types introduced during the architectural split.
 
 ### Removed
 

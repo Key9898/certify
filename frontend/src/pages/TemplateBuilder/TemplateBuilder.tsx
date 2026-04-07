@@ -505,14 +505,14 @@ export const TemplateBuilder: React.FC = () => {
             <div className="flex flex-wrap items-center gap-3">
               <Button
                 variant="ghost"
-                className="h-12 rounded-sm font-black uppercase tracking-widest"
+                className="h-12 rounded font-black uppercase tracking-widest"
                 onClick={() => navigate(ROUTES.TEMPLATES)}
               >
                 Cancel
               </Button>
               <Button
                 variant="primary"
-                className="h-12 rounded-sm px-8 font-black uppercase tracking-widest shadow-xl shadow-primary/20"
+                className="h-12 rounded px-8 font-black uppercase tracking-widest shadow-xl shadow-primary/20"
                 rightIcon={<Save size={18} />}
                 onClick={handleSave}
                 isLoading={isSaving}
@@ -1069,7 +1069,7 @@ export const TemplateBuilder: React.FC = () => {
             >
               <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="h-6 w-1 rounded-full bg-primary" />
+                  <div className="h-6 w-1 rounded bg-primary" />
                   <p className="text-[10px] font-black uppercase tracking-[0.25em] text-base-content/45">
                     Live Preview
                   </p>

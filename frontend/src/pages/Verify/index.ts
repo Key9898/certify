@@ -1,1 +1,1 @@
-export { Verify } from './Verify';
+export * from './VerifyPortal';

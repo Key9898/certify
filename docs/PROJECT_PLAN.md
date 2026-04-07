@@ -448,7 +448,7 @@ certify/
 | 13  | Email Delivery           | Phase 2 | Medium   |
 | 14  | Custom Template Builder  | Phase 2 | Medium   |
 | 15  | Template Categories      | Phase 2 | Low      |
-| 16  | Certificate Verification | Phase 2 | Medium   |
+| 16  | Certificate Verification | MVP     | High     |
 | 17  | PNG Download             | Phase 2 | Low      |
 | 18  | Public REST API          | Phase 3 | High     |
 | 19  | API Documentation        | Phase 3 | High     |
@@ -480,6 +480,8 @@ certify/
 | Re-download PDF       | Download previously generated certificates  |
 | Delete Certificate    | Remove unwanted certificates                |
 | Edit Profile          | Update user information                     |
+| Verify Certificates  | Public portal for instant certificate validation |
+
 
 ### What Users Cannot Do in MVP
 
@@ -489,7 +491,8 @@ certify/
 | CSV Import               | Phase 2      |
 | Email Delivery           | Phase 2      |
 | Custom Template Builder  | Phase 2      |
-| Certificate Verification | Phase 2      |
+| PNG Download             | Phase 2      |
+
 | API Access               | Phase 3      |
 | Team Collaboration       | Phase 3      |
 | Analytics                | Phase 3      |

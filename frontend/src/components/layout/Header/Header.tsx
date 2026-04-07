@@ -1,14 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Award, LayoutDashboard, Menu } from 'lucide-react';
+import { LayoutDashboard, Menu } from 'lucide-react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { ROUTES } from '@/utils/constants';
+import { getAuthProfileDisplayName, getAuthProfileInitial } from '@/utils/formatters';
 import type { HeaderProps } from './Header.types';
 import { QUICK_SPRING, SOFT_SPRING, TAP_PRESS } from '@/utils/motion';
 
 export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onOpenAuthModal }) => {
   const { user, isAuthenticated, loginWithRedirect } = useAuth0();
+  const displayName = getAuthProfileDisplayName(user);
 
   const handleAuthEntry = (mode: 'signin' | 'signup') => {
     if (onOpenAuthModal) {
@@ -18,7 +20,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onOpenAuthModal })
 
     void loginWithRedirect({
       appState: { returnTo: ROUTES.DASHBOARD },
-      authorizationParams: mode === 'signup' ? { screen_hint: 'signup' } : undefined,
+      authorizationParams: {
+        ...(mode === 'signup' ? { screen_hint: 'signup' } : {}),
+      },
     });
   };
 
@@ -49,7 +53,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onOpenAuthModal })
                 whileHover={{ rotate: -6, scale: 1.06, transition: QUICK_SPRING }}
                 className="rounded bg-primary p-2 shadow-lg shadow-primary/20"
               >
-                <Award size={20} className="text-primary-content" />
+                <img src="/Logo/logo.svg" alt="Certify" className="h-5 w-5 brightness-0 invert" />
               </motion.div>
               <span className="text-2xl font-black tracking-tighter text-base-content">Certify</span>
             </Link>
@@ -57,17 +61,23 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onOpenAuthModal })
         </div>
 
         <div className="hidden flex-1 justify-center lg:flex">
-          <div className="flex items-center gap-2 rounded-full border border-base-200 bg-base-100/85 px-2 py-2 shadow-sm">
+          <div className="flex items-center gap-1 rounded border border-base-200 bg-base-100/85 px-2 py-1.5 shadow-sm">
             <a
-              href="#features"
-              className="rounded-full px-4 py-2 text-sm font-bold text-base-content/55 transition-colors hover:bg-base-200 hover:text-base-content"
+              href="/#features"
+              className="rounded px-4 py-2 text-sm font-bold text-base-content/55 transition-colors hover:bg-base-200 hover:text-base-content"
             >
               Features
             </a>
+            <Link
+              to={ROUTES.VERIFY_PORTAL}
+              className="rounded px-4 py-2 text-sm font-bold text-base-content/55 transition-colors hover:bg-base-200 hover:text-base-content"
+            >
+              Verification
+            </Link>
             {isAuthenticated ? (
               <Link
                 to={ROUTES.TEMPLATES}
-                className="rounded-full px-4 py-2 text-sm font-bold text-base-content/55 transition-colors hover:bg-base-200 hover:text-base-content"
+                className="rounded px-4 py-2 text-sm font-bold text-base-content/55 transition-colors hover:bg-base-200 hover:text-base-content"
               >
                 Templates
               </Link>
@@ -96,20 +106,20 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onOpenAuthModal })
                 <motion.div
                   tabIndex={0}
                   role="button"
-                    className="btn btn-ghost btn-circle avatar p-0.5 ring-1 ring-primary/20 ring-offset-1 hover:ring-primary"
+                    className="btn btn-ghost rounded avatar p-0.5 ring-1 ring-primary/20 ring-offset-1 hover:ring-primary"
                   whileHover={{ y: -2, scale: 1.03 }}
                   transition={SOFT_SPRING}
                 >
-                  <div className="w-10 overflow-hidden rounded-full">
+                  <div className="w-10 overflow-hidden rounded">
                     {user?.picture ? (
                       <img
                         src={user.picture}
-                        alt={user.name || 'User avatar'}
+                        alt={displayName || 'User avatar'}
                         className="h-full w-full object-cover"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-primary text-base font-bold text-primary-content">
-                        {user?.name?.charAt(0).toUpperCase() || 'U'}
+                        {getAuthProfileInitial(user)}
                       </div>
                     )}
                   </div>
@@ -121,7 +131,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onOpenAuthModal })
                   <li className="mb-2 border-b border-base-100 px-4 py-3">
                     <div className="flex flex-col items-start gap-1 p-0">
                       <span className="leading-none font-black text-base-content">
-                        {user?.name || 'Workspace User'}
+                        {displayName}
                       </span>
                       <span className="w-full truncate text-xs font-medium text-base-content/40">
                         {user?.email || 'Authenticated account'}

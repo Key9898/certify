@@ -1,6 +1,6 @@
 # Certify - Project Progress
 
-**Last Updated:** 2026-04-06
+**Last Updated:** 2026-04-09
 
 ---
 
@@ -8,7 +8,7 @@
 
 **Phase:** Phase 3 - Feature Complete (Polished)
 
-**Status:** All Phase 1, 2, and 3 product features are implemented and have undergone a comprehensive high-fidelity UI/UX overhaul. The application now features a premium corporate aesthetic characterized by glassmorphism, animated glow points, and a unified Framer Motion system. Native Google Sheets write-back, Canvas callbacks, and the Integration Hub are fully functional with new immersive interfaces. Production deployments and secrets have been provisioned, `npm run readiness:strict` reports 0 blocking items, the template system now supports both preset layouts and imported background artwork with dynamic field placement, and batch imports now accept both CSV and XLSX files end-to-end. For localhost UI QA, the authenticated dashboard shell routes can render in DEV without Auth0 while hosted Auth0 testing still depends on exact tenant callback/origin settings.
+**Status:** All Phase 1, 2, and 3 product features are implemented and have undergone a comprehensive high-fidelity UI/UX overhaul. The application now features a premium corporate aesthetic with a modular architecture and a finalized 0.25rem (rounded) design system. All pages, components, and portals have been refactored to remove informal "bubble" designs while maintaining visual integrity via decorative blurs. Production readiness is verified with 0 blocking items.
 
 ---
 
@@ -16,6 +16,18 @@
 
 | Date       | Task                                      | Notes |
 | ---------- | ----------------------------------------- | ----- |
+| 2026-04-10 | Full UI/UX Standardization | Mass refactored entire codebase (Pages & Components) to 0.25rem rounding standard to eliminate "bubble" designs and enforce corporate aesthetics. |
+| 2026-04-09 | Design System Initialization | Aligned the main layout containers (Dashboard, Landing) to the 0.25rem (rounded) corporate standard. |
+| 2026-04-09 | Settings Modularization & Navigation | Rebuilt monolithic Settings.tsx into 5 dedicated tab components with a professional sidebar navigation system and added a new Password Change UI. |
+| 2026-04-09 | Integrations Hub Layout Optimization | Optimized provider forms with a standardized grid layout and removed secondary connectors (Zapier/Make/Moodle) as per MVP focus. |
+| 2026-04-07 | Update Footer Credits | Removed "Built with ❤️" line and replaced "All rights reserved" with "Developed by Wunna Aung" as requested |
+| 2026-04-07 | Implement Verification Portal & Marketing UI Overhaul | Added immersive `/verify` portal, integrated home page search widget, created professional FAQ/About/Privacy/Terms pages, and added ScrollToTop navigation |
+| 2026-04-07 | Overhaul Branding Assets and Public Directory | Reorganized `public/` into `Logo/` and `favicon/`, replaced Lucide `Award` with dedicated `logo.svg` across all core branding containers, and updated `index.html` favicon to use a premium SVG asset |
+| 2026-04-07 | Restore visible hosted login forms for signed-out marketing flows | Removed the API audience from the initial Auth0 redirect triggered by home-page CTAs, forced a fresh Universal Login prompt for Sign In/Sign Up/Google, and kept the API audience on-demand for post-login app data access |
+| 2026-04-07 | Align consent, protected-route auth, and Explore Templates entry flow | Changed Explore Templates to open the auth choice modal for signed-out visitors before sending authenticated users to the dashboard, while protected routes preserve the intended return path after login |
+| 2026-04-07 | Make hosted Auth0 sign-up sessions resolve to a real Certify user | Added Auth0 profile display-name fallbacks on both frontend and backend so email/password sign-up flows without a full-name field still sync cleanly, while dashboard/header/settings fall back to the real Auth0 identity during local profile sync |
+| 2026-04-07 | Restore real authenticated app state in local development | Removed the dev-only dashboard route bypass, switched DEV API calls back to the local `/api` proxy, and aligned backend fallback CORS with the supported localhost port range so real Auth0 sessions can sync against the local app stack |
+| 2026-04-07 | Stabilize localhost Auth0 entry flow | Switched landing-page auth actions to Auth0 hosted redirects, defaulted Vite dev to port 5174, redirected `127.0.0.1` to `localhost` in DEV, and moved API audience token requests out of the initial login step so hosted sign-in/sign-up pages can open reliably during local testing |
 | 2026-04-06 | Document today's auth, template, import, and deployment alignment | Synced CHANGELOG, PROGRESS, DECISIONS, and PROJECT_PLAN with the imported background template workflow, Auth0 hosted entrypoint strategy, localhost dashboard preview behavior, and current deployment state |
 | 2026-04-06 | Remove obsolete local env example files | Deleted `frontend/.env.example` and `backend/.env.example` after production/local environment values were provisioned directly |
 | 2026-04-06 | Enable end-to-end CSV and XLSX batch imports | Replaced the vulnerable `xlsx` package with `exceljs` and aligned frontend upload parsing plus backend ingestion so CSV/XLSX uploads both work cleanly |
@@ -37,7 +49,14 @@
 | 2026-04-05 | Implement native Google Sheets + Canvas connectors and expand automated coverage | Added Google Sheets API row write-back, Canvas submission-comment callbacks, provider-specific settings in Integration Hub, backend service/integration tests, frontend Integration Hub tests, and deployment/env scaffolding updates |
 | 2026-04-04 | Implement Third-party Integrations + UI/UX refresh | Added workspace-scoped Integration Hub, inbound webhook-based external workflows, setup testing, provider-specific guides, launch-kit recipes, a Sheets/Canvas-first onboarding flow, and a project-wide shell/dashboard/landing polish pass |
 | 2026-04-04 | Implement Team Collaboration + White Label | Added workspace organizations, invitations, roles, workspace-shared resources, branded verification views, and root `npm run dev` orchestration |
+| 2026-04-07 | Public Portals & Home Overhaul | Professional redesign of Verify, About, FAQ, Privacy, and Terms pages; Home page workflow section optimization; implemented cross-page hash navigation; fixed contrast/accessibility issues; standardized legal heroes. |
 | 2026-04-04 | Close implementation gaps from deep scan  | Fixed API key/webhook response contracts, persisted settings colors, restored live preview, protected raw downloads/uploads with auth headers, connected analytics charts to real data, and added `docs/SESSION_SUMMARY.md` |
+| 2026-04-08 | Add password reset and delete account to Settings | Password reset sends Auth0 email for email/password users; delete account removes MongoDB user + attempts Auth0 Management API deletion; Danger Zone section with DELETE confirmation gate |
+| 2026-04-09 | Fix Auth0 "Client not authorized" + 500 API errors (full resolution) | Removed `audience` from ALL `loginWithRedirect` calls and `Auth0Provider.authorizationParams` — this was the root cause of "Client not authorized to access resource server" on the `/authorize` endpoint; audience is now only passed inside `getAccessTokenSilently({ authorizationParams: { audience } })` so tokens are obtained via `/oauth/token` refresh-token exchange (Client Grant path). Simultaneously restored `audience` in `backend/src/middleware/auth.ts` because `express-oauth2-jwt-bearer` v1.7.4 requires it at runtime despite optional TypeScript typing — resolves all 500 errors on authenticated API endpoints. |
+| 2026-04-09 | Fix FAQ.tsx Award icon ReferenceError | Added missing `Award` import from `lucide-react` and removed unused `ChevronDown`; eliminates `ReferenceError: Award is not defined` console crash on the FAQ page |
+| 2026-04-08 | Fix API token acquisition after Google sign-in | Restored `audience` in Auth0Provider.authorizationParams so refresh token includes API scope; without it `getAccessTokenSilently` returned `login_required` and all API calls failed with 401 |
+| 2026-04-07 | Verification Infrastructure — status, revoke, rate limit, stamp | Added `status: active/revoked` to Certificate model; verifyController returns HTTP 410 for revoked certs; `PATCH /api/certificates/:id/revoke` endpoint; `verifyLimiter` (20 req/min) on public verify route; animated "Authentic & Verified" stamp on Verify.tsx; HTTP status propagated through api.ts error objects |
+| 2026-04-07 | Fix silent auth consent_required crash + white screen | useRefreshTokens=true + cacheLocation=localstorage added to Auth0Provider; top-level ErrorBoundary added; root cause: Chrome blocks third-party cookies for iframe silent auth |
 | 2026-03-29 | Fix demo mode black screen                | Removed React.StrictMode (recharts 3.x + react-redux@9 incompatibility); added ErrorBoundary around charts; fixed vite.config.ts coverage config TS error |
 | 2026-03-28 | Vitest unit test setup                    | 25 tests passing - csvParser, validators, formatters; CLAUDE.md Section 33 added |
 | 2026-03-28 | Wire webhook triggers into services       | certificate.created, certificate.pdf_generated, batch.completed, batch.failed |
@@ -84,7 +103,7 @@
 | Configure Husky + lint-staged  | Done    | Pre-commit hooks setup |
 | Setup Auth0                    | Done    | Auth0Provider + JWT middleware + user sync with hosted Universal Login flows |
 | Create User model              | Done    | Mongoose schema with settings |
-| Implement login/signup         | Done    | Auth0-hosted sign-in/sign-up with popup-first and redirect fallback through AuthContext |
+| Implement login/signup         | Done    | Auth0-hosted sign-in/sign-up with redirect-based Universal Login flows and resilient profile syncing through AuthContext |
 
 ### Week 2-3: Templates & Editor
 
@@ -157,17 +176,18 @@
 ## Next Steps
 
 1. Commit and push the latest repository changes, then confirm Vercel + Render have redeployed the newest build
-2. Resolve the environment-side localhost Auth0 callback/origin mismatch against the exact SPA application settings, then re-test hosted Sign in, Sign up, and Google login flows locally
-3. Run production QA for imported background templates: upload PNG -> place fields -> create single certificate -> batch CSV/XLSX export -> verify PDF/PNG output alignment
-4. Run production provider QA: Google Sheets write-back -> Canvas callback comment -> verification link flow
-5. Tighten production security: rotate sensitive keys/tokens periodically and narrow MongoDB Atlas network access when stable
-6. Optional: add monitoring/alerts, review free-tier cold start behavior (Render spin-down), and evaluate Canva Connect as a future convenience integration rather than a core dependency
+2. Run a full local authenticated smoke test with a real Auth0 user: sign in → confirm header avatar/name → confirm `/api/auth/sync` succeeds → verify dashboard/templates/certificates data loads from the backend (expected HTTP 200 now that Auth0 audience strategy is corrected)
+3. Confirm Auth0 Dashboard settings: Allowed Callback URLs, Logout URLs, and Web Origins include `http://localhost:5174` (and the port currently in use) for local dev
+4. Test the full verify flow end-to-end: issue a certificate → open public verify URL → confirm "Authentic & Verified" stamp → revoke via `PATCH /api/certificates/:id/revoke` → re-open public verify URL → confirm 410 "Certificate Revoked" state
+5. Run production QA for imported background templates: upload PNG → place fields → create single certificate → confirm certificateId stamp appears at bottom-right when no explicit id field is placed
+6. Tighten production security: rotate sensitive keys/tokens periodically and narrow MongoDB Atlas network access when stable
+7. Optional: add monitoring/alerts, review free-tier cold start behavior (Render spin-down), and evaluate Canva Connect as a future convenience integration rather than a core dependency
 
 ---
 
 ## Blockers
 
-Repository-side deployment readiness passes and production environments have been provisioned. The remaining active blocker is environment-specific: localhost Auth0 hosted login testing can still fail until the exact SPA tenant callback/origin configuration matches the running dev origin.
+Repository-side deployment readiness passes and production environments have been provisioned. No code-side blockers are currently open, but local real-user auth still depends on the Auth0 SPA application being authorized for the `https://certify-api` audience and the local backend being available behind the Vite dev proxy.
 
 ---
 

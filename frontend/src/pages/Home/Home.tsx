@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { ArrowRight, Award, CheckCircle, FileText, Zap } from 'lucide-react';
@@ -15,6 +15,8 @@ import {
   TAP_PRESS,
   VIEWPORT_ONCE,
 } from '@/utils/motion';
+import { VerifySearchWidget } from '@/components/common/VerifySearchWidget/VerifySearchWidget';
+import { ScrollToTop } from '@/components/common/ScrollToTop/ScrollToTop';
 
 const CERTIFICATE_PREVIEWS = [
   {
@@ -178,11 +180,11 @@ const CertificatePreview: React.FC<{
         className="relative z-10 mb-2 md:mb-6"
       >
         <motion.div
-          className={`mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-current/10 md:h-16 md:w-16 ${getPrimaryColor()}`}
+          className={`mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded bg-current/10 md:h-16 md:w-16 ${getPrimaryColor()}`}
           animate={{ rotate: isFeatured ? 0 : -4 }}
           transition={SOFT_SPRING}
         >
-          <Award className="h-5 w-5 text-current md:h-9 md:w-9" />
+          <img src="/Logo/logo.svg" alt="Award" className="h-5 w-5 brightness-0 invert md:h-9 md:w-9" />
         </motion.div>
         <p
           className={`text-[6px] font-black uppercase tracking-[0.4em] opacity-90 md:text-[10px] ${getPrimaryColor()}`}
@@ -208,7 +210,7 @@ const CertificatePreview: React.FC<{
       </motion.h2>
 
       <motion.div
-        className={`relative z-10 mx-auto mb-3 h-0.5 w-12 rounded-full bg-current/20 md:mb-5 md:h-1 md:w-20 ${getPrimaryColor()}`}
+        className={`relative z-10 mx-auto mb-3 h-0.5 w-12 rounded bg-current/20 md:mb-5 md:h-1 md:w-20 ${getPrimaryColor()}`}
         animate={{ opacity: isFeatured ? 1 : 0.35, scaleX: isFeatured ? 1 : 0.8 }}
         transition={SOFT_SPRING}
       />
@@ -281,8 +283,8 @@ const CertificatePreview: React.FC<{
 };
 
 export const Home: React.FC = () => {
-  const { isAuthenticated, loginWithRedirect, loginWithPopup, isLoading, error: auth0Error } =
-    useAuth0();
+  const { isAuthenticated, loginWithRedirect, isLoading, error: auth0Error } = useAuth0();
+  const location = useLocation();
   const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
@@ -301,6 +303,16 @@ export const Home: React.FC = () => {
 
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  React.useLayoutEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+    }
+  }, [location.hash]);
 
   const openAuthModal = (mode: 'signin' | 'signup') => {
     setAuthModalMode(mode);
@@ -325,6 +337,27 @@ export const Home: React.FC = () => {
     );
   }, [auth0Error]);
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const authErrorCode = searchParams.get('error');
+    const authErrorDescription = searchParams.get('error_description');
+
+    if (!authErrorCode) {
+      return;
+    }
+
+    setAuthModalMode('signin');
+    setIsAuthModalOpen(true);
+    setAuthError(
+      authErrorDescription
+        ? `${authErrorCode}: ${authErrorDescription}`
+        : `Authentication failed with error: ${authErrorCode}`
+    );
+
+    // Clear error params from URL so hard reload doesn't re-trigger the modal
+    window.history.replaceState({}, '', window.location.pathname);
+  }, [location.search]);
+
   const authenticate = async (
     action: 'signin' | 'signup' | 'google',
     options?: {
@@ -340,30 +373,19 @@ export const Home: React.FC = () => {
       authorizationParams: {
         ...(options?.screenHint ? { screen_hint: options.screenHint } : {}),
         ...(options?.connection ? { connection: options.connection } : {}),
+        prompt: 'login' as const,
       },
     };
 
     try {
-      await loginWithPopup({
-        authorizationParams: authOptions.authorizationParams,
-      });
       closeAuthModal();
-      navigate(ROUTES.DASHBOARD);
+      await loginWithRedirect(authOptions);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Authentication failed.';
 
       setAuthError(
         `${message} If you are testing locally, make sure ${window.location.origin} is added to Allowed Callback URLs, Allowed Logout URLs, and Allowed Web Origins in Auth0.`
       );
-
-      const normalizedMessage = message.toLowerCase();
-      if (
-        normalizedMessage.includes('popup') ||
-        normalizedMessage.includes('web_message') ||
-        normalizedMessage.includes('origin')
-      ) {
-        await loginWithRedirect(authOptions);
-      }
     } finally {
       setActiveAuthAction(null);
     }
@@ -376,6 +398,15 @@ export const Home: React.FC = () => {
     }
 
     openAuthModal('signup');
+  };
+
+  const handleExploreTemplates = () => {
+    if (isAuthenticated) {
+      navigate(ROUTES.DASHBOARD);
+      return;
+    }
+
+    openAuthModal('signin');
   };
 
   const cardVariants: Variants = {
@@ -443,7 +474,7 @@ export const Home: React.FC = () => {
           >
             <span className="relative flex h-2 w-2">
               <motion.span
-                className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-55"
+                className="absolute inline-flex h-full w-full rounded bg-primary opacity-55"
                 animate={{ scale: [1, 1.9], opacity: [0.55, 0] }}
                 transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
               />
@@ -523,12 +554,13 @@ export const Home: React.FC = () => {
               whileTap={TAP_PRESS}
               transition={QUICK_SPRING}
             >
-              <Link
-                to={ROUTES.DASHBOARD}
+              <button
+                type="button"
+                onClick={handleExploreTemplates}
                 className="btn btn-ghost btn-lg rounded px-8 text-lg font-bold"
               >
                 Explore Templates
-              </Link>
+              </button>
             </motion.div>
           </motion.div>
 
@@ -557,6 +589,23 @@ export const Home: React.FC = () => {
                 </p>
               </motion.div>
             ))}
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...SOFT_SPRING, delay: 0.5 }}
+            className="mt-20 flex w-full max-w-4xl flex-col items-center gap-6 rounded bg-base-200/50 p-8 border border-base-200 backdrop-blur-md md:p-12"
+          >
+            <div className="text-center">
+              <h2 className="mb-2 text-2xl font-black tracking-tighter text-base-content md:text-3xl">
+                Verify a Digital Achievement
+              </h2>
+              <p className="mb-8 font-medium text-base-content/50">
+                Enter a Certificate ID to validate its authenticity instantly.
+              </p>
+            </div>
+            <VerifySearchWidget variant="large" />
           </motion.div>
         </motion.div>
 
@@ -610,14 +659,14 @@ export const Home: React.FC = () => {
                   key={preview.id}
                   type="button"
                   onClick={() => setActiveIndex(index)}
-                  className="flex h-11 w-11 items-center justify-center rounded-full"
+                  className="flex h-11 w-11 items-center justify-center rounded"
                   whileHover={{ y: -2 }}
                   whileTap={TAP_PRESS}
                   transition={QUICK_SPRING}
                   aria-label={`Show design ${index + 1}`}
                 >
                   <motion.span
-                    className={`block rounded-full ${
+                    className={`block rounded ${
                       activeIndex === index ? 'bg-primary shadow-lg shadow-primary/30' : 'bg-base-300'
                     }`}
                     animate={{
@@ -646,7 +695,7 @@ export const Home: React.FC = () => {
                   initial={{ opacity: 0, scale: 0.88, x: 10 }}
                   animate={{ opacity: 1, scale: 1, x: 0 }}
                   transition={{ ...SOFT_SPRING, delay: 0.7 + index * 0.05 }}
-                  className="h-11 w-11 overflow-hidden rounded-full border-[4px] border-base-100 bg-primary/20 shadow-inner ring-1 ring-black/5"
+                  className="h-11 w-11 overflow-hidden rounded border-[4px] border-base-100 bg-primary/20 shadow-inner ring-1 ring-black/5"
                 >
                   <img
                     src={`https://images.unsplash.com/photo-${id}?w=100&h=100&auto=format&fit=crop&q=80`}
@@ -690,14 +739,14 @@ export const Home: React.FC = () => {
             How Certify Powers You
           </motion.h3>
 
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
             {WORKFLOW_STEPS.map((item, index) => (
               <motion.div
                 key={item.step}
                 variants={REVEAL_ITEM}
                 whileHover={{ y: -8 }}
                 transition={{ ...SOFT_SPRING, delay: index * 0.04 }}
-                className="relative rounded border border-base-200 bg-base-100 p-12 shadow-sm"
+                className="relative rounded border border-base-200 bg-base-100 p-8 shadow-sm"
               >
                 <motion.div
                   whileHover={{ scale: 1.08, rotate: -4 }}
@@ -756,7 +805,7 @@ export const Home: React.FC = () => {
                       <motion.div
                         whileHover={{ scale: 1.08 }}
                         transition={QUICK_SPRING}
-                        className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 shadow-inner"
+                        className="flex h-8 w-8 items-center justify-center rounded bg-primary/20 shadow-inner"
                       >
                         <CheckCircle size={18} className="text-primary" />
                       </motion.div>
@@ -790,7 +839,7 @@ export const Home: React.FC = () => {
                 <motion.img
                   src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80"
                   alt="Feature showcase"
-                  className="w-full rounded-sm"
+                  className="w-full rounded"
                   whileHover={{ scale: 1.03 }}
                   transition={SOFT_SPRING}
                 />
@@ -867,6 +916,7 @@ export const Home: React.FC = () => {
         activeAction={activeAuthAction}
         error={authError}
       />
+      <ScrollToTop />
     </div>
   );
 };

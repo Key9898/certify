@@ -26,8 +26,8 @@ export const AuthPromptModal: React.FC<AuthPromptModalProps> = ({
       <div className="space-y-5">
         <p className="text-sm leading-relaxed text-base-content/60">
           {isSignupMode
-            ? 'Choose how you want to start. Certify will open a secure Auth0 sign-up popup so you can enter your email and password, or continue with Google.'
-            : 'Choose how you want to continue. Certify will open a secure Auth0 sign-in popup so you can enter your account details, then take you straight to your dashboard.'}
+            ? 'Choose how you want to start. Certify will open a secure Auth0 sign-up page so you can enter your email and password, or continue with Google.'
+            : 'Choose how you want to continue. Certify will open a secure Auth0 sign-in page so you can enter your account details, then take you straight to your dashboard.'}
         </p>
 
         <div className="space-y-3">
@@ -90,9 +90,11 @@ export const AuthPromptModal: React.FC<AuthPromptModalProps> = ({
         ) : null}
 
         <div className="rounded border border-base-200 bg-base-200/50 px-4 py-3 text-xs leading-relaxed text-base-content/55">
-          Your email/password form is hosted by Auth0 for security. If the popup is blocked or
-          your localhost origin is not allowed in Auth0 yet, Certify will try the full-page login
-          flow instead.
+          Your email/password form is hosted by Auth0 for security. For local development, add
+          the exact current origin to Auth0:
+          <span className="mt-2 block rounded bg-base-100 px-2 py-1 font-mono text-[11px] text-base-content/70">
+            {typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5174'}
+          </span>
         </div>
       </div>
     </Modal>

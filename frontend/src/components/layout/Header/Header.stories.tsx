@@ -24,7 +24,7 @@ const HeaderPreview = ({
             </button>
           )}
           <div className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
-            <div className="bg-primary rounded-lg p-1.5">
+            <div className="bg-primary rounded p-1.5">
               <Award size={20} className="text-white" />
             </div>
             <span className="text-xl font-bold text-base-content">Certify</span>
@@ -34,7 +34,7 @@ const HeaderPreview = ({
           {isAuthenticated && (
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                <div className="w-9 rounded-full ring ring-primary ring-offset-base-100 ring-offset-1 bg-primary text-white flex items-center justify-center text-sm font-bold">
+                <div className="w-9 rounded ring ring-primary ring-offset-base-100 ring-offset-1 bg-primary text-white flex items-center justify-center text-sm font-bold">
                   {userName.charAt(0).toUpperCase()}
                 </div>
               </div>

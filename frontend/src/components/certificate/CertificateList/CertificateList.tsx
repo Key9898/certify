@@ -41,7 +41,7 @@ export const CertificateList: React.FC<CertificateListProps> = ({
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={SOFT_SPRING}
-        className="flex flex-col items-center justify-center py-32 px-6 text-center bg-base-100/50 border border-dashed border-base-200 rounded-sm"
+        className="flex flex-col items-center justify-center py-32 px-6 text-center bg-base-100/50 border border-dashed border-base-200 rounded"
       >
         <div className="relative mb-10">
           <div className="flex h-24 w-24 items-center justify-center rounded bg-primary/5 text-primary/20">
@@ -50,7 +50,7 @@ export const CertificateList: React.FC<CertificateListProps> = ({
           <motion.div
             animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary"
+            className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded bg-primary/10 text-primary"
           >
             <Plus size={16} />
           </motion.div>
@@ -62,7 +62,7 @@ export const CertificateList: React.FC<CertificateListProps> = ({
         </p>
 
         <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }}>
-          <Link to={ROUTES.TEMPLATES} className="btn btn-primary h-14 rounded-sm px-10 font-black uppercase tracking-widest shadow-xl shadow-primary/20 gap-2">
+          <Link to={ROUTES.TEMPLATES} className="btn btn-primary h-14 rounded px-10 font-black uppercase tracking-widest shadow-xl shadow-primary/20 gap-2">
             <Plus size={20} />
             Begin Issuance
           </Link>

@@ -142,7 +142,7 @@ export const BatchProgress: React.FC<BatchProgressProps> = ({ job }) => {
           </div>
         </div>
 
-        <div className="relative h-2 w-full overflow-hidden rounded-full bg-base-200">
+        <div className="relative h-2 w-full overflow-hidden rounded bg-base-200">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${percent}%` }}
@@ -167,7 +167,7 @@ export const BatchProgress: React.FC<BatchProgressProps> = ({ job }) => {
                 <motion.button
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="btn btn-primary h-10 rounded-sm px-6 text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary/20"
+                  className="btn btn-primary h-10 rounded px-6 text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary/20"
                   onClick={handleDownloadZip}
                   disabled={zipLoading}
                   whileHover={zipLoading ? undefined : { y: -2 }}

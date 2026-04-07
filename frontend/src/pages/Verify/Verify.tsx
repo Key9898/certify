@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, Download, ArrowLeft, Shield } from 'lucide-react';
+import { CheckCircle, XCircle, Download, ArrowLeft, ShieldAlert } from 'lucide-react';
 import { get } from '@/utils/api';
+import { QUICK_SPRING } from '@/utils/motion';
 
 interface VerifyData {
   certificateId: string;
@@ -36,6 +37,7 @@ export const Verify: React.FC = () => {
   const [data, setData] = useState<VerifyData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [isRevoked, setIsRevoked] = useState(false);
   const brandName = data?.organization?.whiteLabel.brandName || data?.organization?.name || 'Certify';
   const showPoweredBy = !data?.organization?.whiteLabel.hidePoweredBy;
 
@@ -45,8 +47,13 @@ export const Verify: React.FC = () => {
       try {
         const res = await get<VerifyData>(`/verify/${certificateId}`);
         setData(res.data ?? null);
-      } catch {
-        setNotFound(true);
+      } catch (err: unknown) {
+        const status = (err as { status?: number })?.status;
+        if (status === 410) {
+          setIsRevoked(true);
+        } else {
+          setNotFound(true);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -66,7 +73,12 @@ export const Verify: React.FC = () => {
               className="h-8 w-auto object-contain"
             />
           ) : (
-            <Shield size={22} className="text-primary" />
+            <motion.div
+              whileHover={{ rotate: -6, scale: 1.06, transition: QUICK_SPRING }}
+              className="rounded bg-primary p-2 shadow-lg shadow-primary/20"
+            >
+              <img src="/Logo/logo.svg" alt="Certify" className="h-5 w-5 brightness-0 invert" />
+            </motion.div>
           )}
           <span className="font-bold text-lg text-base-content">{brandName}</span>
         </Link>
@@ -79,6 +91,23 @@ export const Verify: React.FC = () => {
               <span className="loading loading-spinner loading-lg text-primary mx-auto" />
               <p className="text-base-content/60 mt-4">Verifying certificate...</p>
             </div>
+          ) : isRevoked ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="card bg-base-100 p-10 text-center"
+            >
+              <ShieldAlert size={56} className="text-warning mx-auto mb-4" />
+              <h1 className="text-xl font-bold text-base-content mb-2">Certificate Revoked</h1>
+              <p className="text-base-content/60 mb-6">
+                The certificate ID <code className="text-primary">{certificateId}</code> has been
+                revoked by the issuer and is no longer valid.
+              </p>
+              <Link to="/" className="btn btn-outline btn-sm">
+                <ArrowLeft size={14} />
+                Go Home
+              </Link>
+            </motion.div>
           ) : notFound ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -102,16 +131,39 @@ export const Verify: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               className="space-y-4"
             >
-              {/* Valid badge */}
-              <div className="card bg-success/10 border border-success/30 p-4 flex flex-row items-center gap-3">
-                <CheckCircle size={28} className="text-success shrink-0" />
+              {/* Authenticated & Verified stamp */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 18, delay: 0.15 }}
+                className="card border-2 border-success bg-success/10 p-5 flex flex-row items-center gap-4"
+              >
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 14, delay: 0.3 }}
+                >
+                  <CheckCircle size={40} className="text-success shrink-0" />
+                </motion.div>
                 <div>
-                  <p className="font-semibold text-success">Certificate Verified</p>
-                  <p className="text-sm text-base-content/60">
-                    This certificate is authentic and was issued by {brandName}.
-                  </p>
+                  <motion.p
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-lg font-black tracking-tight text-success uppercase"
+                  >
+                    Authentic &amp; Verified
+                  </motion.p>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-sm text-base-content/60"
+                  >
+                    This certificate is genuine and was officially issued by {brandName}.
+                  </motion.p>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Certificate details */}
               <div className="card bg-base-100 border border-base-200">

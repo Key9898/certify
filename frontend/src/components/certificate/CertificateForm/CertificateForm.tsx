@@ -94,9 +94,9 @@ export const CertificateForm: React.FC<CertificateFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       {/* Recipient Section */}
-      <section className="bg-base-100 border border-base-200 rounded-2xl p-6 shadow-sm">
+      <section className="bg-base-100 border border-base-200 rounded p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-6">
-          <div className="bg-primary/10 p-2 rounded-lg">
+          <div className="bg-primary/10 p-2 rounded">
             <Users size={20} className="text-primary" />
           </div>
           <h3 className="text-lg font-black text-base-content tracking-tight">
@@ -123,9 +123,9 @@ export const CertificateForm: React.FC<CertificateFormProps> = ({
       </section>
 
       {/* Certificate Section */}
-      <section className="bg-base-100 border border-base-200 rounded-2xl p-6 shadow-sm">
+      <section className="bg-base-100 border border-base-200 rounded p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-6">
-          <div className="bg-accent/10 p-2 rounded-lg">
+          <div className="bg-accent/10 p-2 rounded">
             <Award size={20} className="text-accent" />
           </div>
           <h3 className="text-lg font-black text-base-content tracking-tight">
@@ -172,9 +172,9 @@ export const CertificateForm: React.FC<CertificateFormProps> = ({
       </section>
 
       {/* Issuer Section */}
-      <section className="bg-base-100 border border-base-200 rounded-2xl p-6 shadow-sm">
+      <section className="bg-base-100 border border-base-200 rounded p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-6">
-          <div className="bg-success/10 p-2 rounded-lg">
+          <div className="bg-success/10 p-2 rounded">
             <Shield size={20} className="text-success" />
           </div>
           <h3 className="text-lg font-black text-base-content tracking-tight">

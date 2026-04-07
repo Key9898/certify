@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
+  AlertCircle,
   ArrowRight,
   Check,
   Copy,
@@ -16,7 +17,6 @@ import {
   Webhook,
 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { useAppUser } from '@/context/AuthContext';
 import { useDemo } from '@/context/DemoContext';
 import { useTemplates } from '@/hooks/useTemplates';
 import { INTEGRATION_CATALOG } from '@/utils/integrationCatalog';
@@ -32,7 +32,6 @@ import {
   getIntegrationSpotlight,
   GOOGLE_SHEETS_DEFAULT_MAPPING,
   PRIMARY_INTEGRATION_PROVIDERS,
-  SECONDARY_INTEGRATION_PROVIDERS,
 } from '@/utils/integrationSpotlights';
 import {
   createIntegration,
@@ -340,7 +339,6 @@ const scrollToIntegrationForm = () => {
 };
 
 export const Integrations: React.FC = () => {
-  const { appUser } = useAppUser();
   const { templates, isLoading: templatesLoading } = useTemplates();
   const { isDemoMode, mockIntegrations, setMockIntegrations } = useDemo();
   const [catalog, setCatalog] = useState<IntegrationCatalogItem[]>(INTEGRATION_CATALOG);
@@ -448,13 +446,6 @@ export const Integrations: React.FC = () => {
     [catalogByProvider]
   );
 
-  const secondaryCatalogItems = useMemo(
-    () =>
-      SECONDARY_INTEGRATION_PROVIDERS.map((provider) => catalogByProvider.get(provider)).filter(
-        Boolean
-      ) as IntegrationCatalogItem[],
-    [catalogByProvider]
-  );
 
   const selectedTemplateName =
     templateNameById.get(form.templateId) || selectedIntegration?.templateName || '';
@@ -597,8 +588,6 @@ export const Integrations: React.FC = () => {
   );
   const successRate = totalRuns > 0 ? Math.round((successfulRuns / totalRuns) * 100) : 0;
 
-  const currentBrand =
-    appUser?.organization?.whiteLabel.brandName || appUser?.organization?.name || 'Your workspace';
 
   const resetForm = () => {
     setEditingId(null);
@@ -907,143 +896,110 @@ export const Integrations: React.FC = () => {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.16),transparent_42%),linear-gradient(135deg,rgba(15,23,42,0.02),rgba(59,130,246,0.03))]" />
           <div className="relative grid gap-6 px-6 py-8 md:grid-cols-[1.4fr_0.9fr] md:px-8">
             <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-primary">
-                <Webhook size={14} />
-                Integration Hub
+              <div className="mb-4 inline-flex items-center gap-2 rounded border border-primary/20 bg-primary/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+                <Webhook size={12} />
+                Automation Center
               </div>
-              <h1 className="max-w-2xl text-3xl font-black tracking-tight text-base-content md:text-4xl">
-                Connect {currentBrand} to automation tools, spreadsheets, and LMS workflows.
+              <h1 className="text-3xl font-black tracking-tight text-base-content md:text-4xl lg:text-5xl">
+                Integrations Hub
               </h1>
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-base-content/60 md:text-base">
-                Pick a provider guide, apply a sample launch kit, and spin up a webhook-driven
-                certificate flow without guessing the payload contract.
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-base-content/60 md:text-base">
+                Connect your business workflows and automate certificate issuance with 
+                Google Sheets, Canvas LMS, and Webhooks.
               </p>
 
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="mt-8 flex flex-wrap gap-3">
                 <motion.div whileHover={{ y: -3 }} whileTap={TAP_PRESS} transition={QUICK_SPRING}>
                   <Link
                     to={ROUTES.TEMPLATE_BUILDER}
                     className="btn btn-primary rounded px-6 font-bold"
                   >
-                    Pair with a Template
+                    Pair with Template
                     <ArrowRight size={16} />
                   </Link>
                 </motion.div>
                 <motion.a
                   href="#integration-form"
-                  className="btn btn-ghost rounded px-5 font-bold"
+                  className="btn btn-ghost rounded border border-base-200 px-5 font-bold"
                   whileHover={{ y: -3, backgroundColor: 'rgba(226,232,240,0.7)' }}
                   whileTap={TAP_PRESS}
                   transition={QUICK_SPRING}
                 >
-                  Configure a Workflow
+                  Setup Guide
                 </motion.a>
               </div>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ ...SOFT_SPRING, delay: 0.08 }}
-                  whileHover={{ y: -3 }}
-                  className="rounded border border-base-200 bg-base-100/90 px-4 py-4 shadow-sm"
-                >
-                  <p className="text-[10px] font-black uppercase tracking-[0.22em] text-base-content/35">
-                    Spotlight Provider
-                  </p>
-                  <p className="mt-2 text-lg font-black tracking-tight text-base-content">
-                    {activeCatalogItem.label}
-                  </p>
-                  <p className="mt-1 text-sm text-base-content/55">
-                    {activeCatalogItem.recommendedMode} flow loaded
-                  </p>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ ...SOFT_SPRING, delay: 0.12 }}
-                  whileHover={{ y: -3 }}
-                  className="rounded border border-base-200 bg-base-100/90 px-4 py-4 shadow-sm"
-                >
-                  <p className="text-[10px] font-black uppercase tracking-[0.22em] text-base-content/35">
-                    Launch Kits
-                  </p>
-                  <p className="mt-2 text-lg font-black tracking-tight text-base-content">
-                    {activeGuide.recipes.length}
-                  </p>
-                  <p className="mt-1 text-sm text-base-content/55">
-                    guided rollout recipes ready
-                  </p>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ ...SOFT_SPRING, delay: 0.16 }}
-                  whileHover={{ y: -3 }}
-                  className="rounded border border-base-200 bg-base-100/90 px-4 py-4 shadow-sm"
-                >
-                  <p className="text-[10px] font-black uppercase tracking-[0.22em] text-base-content/35">
-                    Template Matches
-                  </p>
-                  <p className="mt-2 text-lg font-black tracking-tight text-base-content">
-                    {workspaceTemplateMatches.length}
-                  </p>
-                  <p className="mt-1 text-sm text-base-content/55">
-                    workspace templates mapped
-                  </p>
-                </motion.div>
+              <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                {[
+                  { label: 'Spotlight', value: activeCatalogItem.label, detail: 'Selected provider' },
+                  { label: 'Launch Kits', value: activeGuide.recipes.length, detail: 'Ready recipes' },
+                  { label: 'Sync Status', value: workspaceTemplateMatches.length, detail: 'Matches found' },
+                ].map((stat, index) => (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ ...SOFT_SPRING, delay: index * 0.05 }}
+                    className="rounded border border-base-200 bg-base-100/60 p-4 shadow-sm"
+                  >
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/40">{stat.label}</p>
+                    <p className="mt-1 text-lg font-black text-base-content">{stat.value}</p>
+                    <p className="text-[11px] text-base-content/50">{stat.detail}</p>
+                  </motion.div>
+                ))}
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { label: 'Live Integrations', value: integrations.length },
-                { label: 'Active', value: activeCount },
-                { label: 'Webhook Runs', value: totalRuns },
-                { label: 'Success Rate', value: `${successRate}%` },
-              ].map((item, index) => (
-                <motion.div
-                  key={item.label}
-                  className="rounded border border-base-200 bg-base-100/90 p-4 shadow-sm"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ ...SOFT_SPRING, delay: index * 0.04 }}
-                  whileHover={{ y: -4 }}
-                >
-                  <p className="text-[11px] font-black uppercase tracking-[0.24em] text-base-content/35">
-                    {item.label}
-                  </p>
-                  <p className="mt-2 text-3xl font-black tracking-tight text-base-content">
-                    {item.value}
-                  </p>
-                </motion.div>
-              ))}
+            <div className="flex flex-col justify-center">
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: 'Integrations', value: integrations.length },
+                  { label: 'Active Flows', value: activeCount },
+                  { label: 'Automations', value: totalRuns },
+                  { label: 'Success', value: `${successRate}%` },
+                ].map((item, index) => (
+                  <motion.div
+                    key={item.label}
+                    className="rounded border border-primary/10 bg-primary/5 p-5 shadow-sm text-center"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ ...SOFT_SPRING, delay: index * 0.04 }}
+                    whileHover={{ y: -4 }}
+                  >
+                    <p className="text-[9px] font-black uppercase tracking-widest text-primary/60">
+                      {item.label}
+                    </p>
+                    <p className="mt-2 text-3xl font-black tracking-tight text-base-content">
+                      {item.value}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
         </motion.section>
 
-        <section className="space-y-5">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.24em] text-base-content/35">
-                First-Class Integrations
+        <section className="space-y-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+                Primary Channels
               </p>
-              <h2 className="mt-2 text-2xl font-black tracking-tight text-base-content">
-                Start with Google Sheets or Canvas
+              <h2 className="mt-2 text-2xl font-black tracking-tight text-base-content md:text-3xl">
+                Ready-to-Issue Launch Kits
               </h2>
-              <p className="mt-3 max-w-3xl text-sm leading-relaxed text-base-content/60">
-                The hub now prioritizes the two workflows most teams can launch fastest:
-                spreadsheet-driven operations and Canvas completion moments. Custom Webhook
-                stays available as the advanced fallback, while Zapier, Make, and Moodle remain
-                optional secondary paths.
+              <p className="mt-3 text-sm leading-relaxed text-base-content/60">
+                Choose a workflow provider to access step-by-step onboarding recipes. 
+                Google Sheets and Canvas are the recommended paths for fast, automated issuance.
               </p>
             </div>
-            <div className="rounded border border-base-200 bg-base-100 px-4 py-3 text-sm font-medium text-base-content/60">
-              Focused onboarding, fewer branches, and clearer rollout guidance.
+            <div className="hidden rounded bg-base-200/50 px-4 py-3 text-xs font-semibold text-base-content/50 lg:block">
+              Focused onboarding for production workflows.
             </div>
           </div>
 
-          <div className="grid gap-5 xl:grid-cols-[1.05fr_1.05fr_0.9fr]">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {primaryCatalogItems.map((item, index) => {
               const spotlight = getIntegrationSpotlight(item.provider);
 
@@ -1054,77 +1010,61 @@ export const Integrations: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ ...SOFT_SPRING, delay: index * 0.05 }}
                   whileHover={{ y: -6 }}
-                  className={`relative overflow-hidden rounded border p-6 shadow-sm ${
+                  className={`group relative overflow-hidden rounded border p-6 shadow-sm transition-all ${
                     guideProvider === item.provider
-                      ? 'border-primary/40 bg-primary/5'
-                      : 'border-base-200 bg-base-100'
+                      ? 'border-primary/40 bg-primary/5 ring-1 ring-primary/20'
+                      : 'border-base-200 bg-base-100 hover:border-primary/20'
                   }`}
                 >
-                  <div className="absolute inset-x-0 top-0 h-1 bg-primary/70" />
                   <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">
-                        {spotlight.eyebrow}
-                      </p>
-                      <h3 className="mt-2 text-2xl font-black tracking-tight text-base-content">
-                        {item.label}
-                      </h3>
+                    <div className="rounded bg-primary/10 p-3 text-primary shadow-sm">
+                      <Globe size={22} />
                     </div>
-                    <div className="rounded bg-primary/10 p-3 text-primary">
-                      <Globe size={18} />
+                    <div className="flex flex-wrap justify-end gap-1.5">
+                       {spotlight.highlights.slice(0, 2).map((highlight) => (
+                         <span key={highlight} className="rounded bg-base-200 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-base-content/60">
+                           {highlight}
+                         </span>
+                       ))}
                     </div>
                   </div>
-                  <p className="mt-4 text-sm leading-relaxed text-base-content/65">
-                    {spotlight.summary}
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {spotlight.highlights.map((highlight) => (
-                      <span
-                        key={highlight}
-                        className="rounded-full border border-primary/15 bg-primary/8 px-3 py-1 text-[11px] font-bold text-primary"
-                      >
-                        {highlight}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="mt-5 rounded border border-base-200 bg-base-100 px-4 py-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                      Why this is first
-                    </p>
-                    <p className="mt-2 text-sm leading-relaxed text-base-content/60">
-                      {spotlight.headline}
+                  
+                  <div className="mt-6">
+                    <h3 className="text-xl font-black tracking-tight text-base-content">
+                      {item.label}
+                    </h3>
+                    <p className="mt-3 text-sm leading-relaxed text-base-content/60 line-clamp-3">
+                      {item.summary}
                     </p>
                   </div>
-                  <div className="mt-5 flex flex-wrap gap-2">
+
+                  <div className="mt-6 flex flex-col gap-2">
                     <motion.button
                       type="button"
                       onClick={() => setGuideProvider(item.provider)}
-                      className="btn btn-sm btn-ghost rounded px-4 font-bold"
-                      whileHover={{ y: -2 }}
-                      whileTap={TAP_PRESS}
-                      transition={QUICK_SPRING}
+                      className={`btn btn-sm w-full font-bold ${
+                        guideProvider === item.provider ? 'btn-primary' : 'btn-ghost border-base-200'
+                      }`}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      Open Guide
+                      {guideProvider === item.provider ? 'Active Guide' : 'Open Setup Guide'}
                     </motion.button>
-                    <motion.button
+                    <button
                       type="button"
                       onClick={() =>
                         handleLoadProviderIntoForm(item.provider, item.recommendedMode)
                       }
-                      className="btn btn-sm btn-primary rounded px-4 font-bold"
-                      whileHover={{ y: -2 }}
-                      whileTap={TAP_PRESS}
-                      transition={QUICK_SPRING}
+                      className="btn btn-sm btn-outline border-base-200 font-bold hover:btn-primary"
                     >
                       {spotlight.ctaLabel}
-                    </motion.button>
+                    </button>
                   </div>
                 </motion.article>
               );
             })}
 
             {fallbackCatalogItems.map((item) => {
-              const spotlight = getIntegrationSpotlight(item.provider);
 
               return (
                 <motion.article
@@ -1133,358 +1073,262 @@ export const Integrations: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ ...SOFT_SPRING, delay: 0.12 }}
                   whileHover={{ y: -6 }}
-                  className={`rounded border p-6 shadow-sm ${
+                  className={`relative overflow-hidden rounded border p-6 shadow-sm transition-all ${
                     guideProvider === item.provider
-                      ? 'border-primary/40 bg-primary/5'
-                      : 'border-base-200 bg-base-100'
+                      ? 'border-primary/40 bg-primary/5 ring-1 ring-primary/20'
+                      : 'border-base-200 bg-base-100 hover:border-primary/20'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-[11px] font-black uppercase tracking-[0.24em] text-base-content/35">
-                        {spotlight.eyebrow}
-                      </p>
-                      <h3 className="mt-2 text-2xl font-black tracking-tight text-base-content">
-                        {item.label}
-                      </h3>
+                    <div className="rounded bg-base-200 p-3 text-base-content/70 shadow-sm">
+                      <Webhook size={22} />
                     </div>
-                    <div className="rounded bg-base-200 p-3 text-base-content/70">
-                      <Webhook size={18} />
-                    </div>
+                    <span className="rounded bg-warning/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-warning">
+                      Fallback Mode
+                    </span>
                   </div>
-                  <p className="mt-4 text-sm leading-relaxed text-base-content/65">
-                    {spotlight.summary}
-                  </p>
-                  <div className="mt-4 space-y-2">
-                    {spotlight.flowSteps.map((step) => (
-                      <div key={step.title} className="rounded border border-base-200 bg-base-100 px-4 py-3">
-                        <p className="font-bold text-base-content">{step.title}</p>
-                        <p className="mt-1 text-sm leading-relaxed text-base-content/55">
-                          {step.description}
-                        </p>
-                      </div>
-                    ))}
+
+                  <div className="mt-6">
+                    <h3 className="text-xl font-black tracking-tight text-base-content">
+                      {item.label}
+                    </h3>
+                    <p className="mt-3 text-sm leading-relaxed text-base-content/60">
+                      Standard webhook integration for custom platforms and advanced logic.
+                    </p>
                   </div>
-                  <div className="mt-5 flex flex-wrap gap-2">
+
+                  <div className="mt-6 flex flex-col gap-2">
                     <motion.button
                       type="button"
                       onClick={() => setGuideProvider(item.provider)}
-                      className="btn btn-sm btn-ghost rounded px-4 font-bold"
-                      whileHover={{ y: -2 }}
-                      whileTap={TAP_PRESS}
-                      transition={QUICK_SPRING}
+                      className={`btn btn-sm w-full font-bold ${
+                        guideProvider === item.provider ? 'btn-primary' : 'btn-ghost border-base-200'
+                      }`}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      Open Fallback Guide
+                      View Logic
                     </motion.button>
-                    <motion.button
+                    <button
                       type="button"
                       onClick={() =>
                         handleLoadProviderIntoForm(item.provider, item.recommendedMode)
                       }
-                      className="btn btn-sm btn-outline rounded px-4 font-bold"
-                      whileHover={{ y: -2 }}
-                      whileTap={TAP_PRESS}
-                      transition={QUICK_SPRING}
+                      className="btn btn-sm btn-outline border-base-200 font-bold hover:btn-primary"
                     >
-                      {spotlight.ctaLabel}
-                    </motion.button>
+                      Manual Setup
+                    </button>
                   </div>
                 </motion.article>
               );
             })}
           </div>
 
-          <div className="rounded border border-base-200 bg-base-100 p-5">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                  Secondary Integrations
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-base-content/60">
-                  Zapier, Make, and Moodle stay available, but they now sit behind the primary
-                  Google Sheets and Canvas launchers so the onboarding path stays focused.
-                </p>
-              </div>
-            </div>
-
-              <div className="mt-4 grid gap-3 md:grid-cols-3">
-                {secondaryCatalogItems.map((item) => (
-                  <motion.button
-                    key={item.provider}
-                    type="button"
-                    onClick={() => setGuideProvider(item.provider)}
-                    className={`rounded border px-4 py-4 text-left ${
-                      guideProvider === item.provider
-                        ? 'border-primary/40 bg-primary/5'
-                        : 'border-base-200 bg-base-100 hover:border-base-300'
-                    }`}
-                    whileHover={{ y: -4 }}
-                    whileTap={TAP_PRESS}
-                    transition={QUICK_SPRING}
-                  >
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                      {item.category}
-                  </p>
-                  <h3 className="mt-2 text-lg font-black tracking-tight text-base-content">
-                    {item.label}
-                  </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-base-content/55">
-                      {item.summary}
-                    </p>
-                  </motion.button>
-                ))}
-              </div>
-          </div>
         </section>
 
         <motion.section
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded border border-base-200 bg-base-100 shadow-sm"
+          className="rounded border border-base-200 bg-base-100 shadow-sm overflow-hidden"
         >
-          <div className="grid gap-6 px-6 py-6 xl:grid-cols-[0.92fr_1.08fr]">
-            <div className="space-y-5">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="grid gap-0 xl:grid-cols-[400px_1fr] border-b border-base-200">
+            <div className="bg-base-200/30 p-6 md:p-8 border-b xl:border-b-0 xl:border-r border-base-200">
+              <div className="space-y-6">
                 <div>
-                  <p className="text-[11px] font-black uppercase tracking-[0.24em] text-base-content/35">
-                    Provider Setup Guide
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/40">
+                    Configuration Center
                   </p>
                   <h2 className="mt-2 text-2xl font-black tracking-tight text-base-content">
-                    {activeCatalogItem.label} onboarding playbook
+                    {activeCatalogItem.label} Playbook
                   </h2>
                   <p className="mt-3 text-sm leading-relaxed text-base-content/60">
                     {activeGuide.headline}
                   </p>
                 </div>
-                <motion.button
-                  type="button"
-                  onClick={() =>
-                    handleLoadProviderIntoForm(
-                      guideProvider,
-                      activeCatalogItem.recommendedMode
-                    )
-                  }
-                  className="btn btn-outline rounded px-5 font-bold"
-                  whileHover={{ y: -2 }}
-                  whileTap={TAP_PRESS}
-                  transition={QUICK_SPRING}
-                >
-                  Use Provider Defaults
-                </motion.button>
-              </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                {[
-                  {
-                    label: 'Recommended mode',
-                    value: activeCatalogItem.recommendedMode,
-                  },
-                  {
-                    label: 'Workspace template matches',
-                    value: workspaceTemplateMatches.length || '0',
-                  },
-                  {
-                    label: 'Best for',
-                    value: `${activeGuide.idealFor.length} workflow types`,
-                  },
-                  {
-                    label: 'QA checks',
-                    value: activeGuide.qaChecks.length,
-                  },
-                ].map((item, index) => (
-                  <motion.div
-                    key={item.label}
-                    className="rounded border border-base-200 bg-base-100 p-4"
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ ...SOFT_SPRING, delay: index * 0.03 }}
-                    whileHover={{ y: -3 }}
-                  >
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                      {item.label}
-                    </p>
-                    <p className="mt-2 text-lg font-black text-base-content">
-                      {item.value}
-                    </p>
-                  </motion.div>
-                ))}
-              </div>
-
-              <div className="rounded border border-base-200 bg-base-200/35 p-5">
-                <div className="flex items-center gap-2 text-primary">
-                  <Sparkles size={15} />
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em]">
-                    Setup lead
-                  </p>
-                </div>
-                <p className="mt-3 text-sm leading-relaxed text-base-content/65">
-                  {activeGuide.setupLead}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {activeGuide.idealFor.map((item) => (
-                    <span
-                      key={item}
-                      className="rounded-full border border-primary/15 bg-primary/8 px-3 py-1 text-[11px] font-bold text-primary"
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="rounded border border-base-200 bg-base-100 p-5">
-                <div className="flex items-center gap-2">
-                  <Check size={15} className="text-primary" />
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                    Onboarding progress
-                  </p>
-                </div>
-                <div className="mt-4 space-y-3">
-                  {onboardingMilestones.map((milestone, index) => (
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                  {[
+                    { label: 'Primary Mode', value: activeCatalogItem.recommendedMode },
+                    { label: 'Library Matches', value: workspaceTemplateMatches.length || '0' },
+                    { label: 'QA Protocols', value: activeGuide.qaChecks.length },
+                  ].map((item, index) => (
                     <motion.div
-                      key={milestone.label}
-                      className="flex gap-3 rounded border border-base-200 bg-base-100 px-4 py-3"
-                      whileHover={{ y: -2 }}
-                      transition={QUICK_SPRING}
+                      key={item.label}
+                      className="rounded border border-base-200 bg-base-100 p-4 shadow-sm"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
                     >
-                      <div
-                        className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-black ${
-                          milestone.complete
-                            ? 'bg-primary text-primary-content'
-                            : 'bg-base-200 text-base-content/50'
-                        }`}
-                      >
-                        {milestone.complete ? <Check size={14} /> : index + 1}
-                      </div>
-                      <div>
-                        <p className="font-bold text-base-content">{milestone.label}</p>
-                        <p className="mt-1 text-sm leading-relaxed text-base-content/55">
-                          {milestone.detail}
-                        </p>
-                      </div>
+                      <p className="text-[9px] font-black uppercase tracking-widest text-base-content/40">
+                        {item.label}
+                      </p>
+                      <p className="mt-1 text-base font-black text-base-content uppercase">
+                        {item.value}
+                      </p>
                     </motion.div>
                   ))}
                 </div>
               </div>
             </div>
 
+            <div className="p-6 md:p-8">
+              {/* Right column content starts here */}
+
+                <div className="rounded border border-base-200 bg-base-100 p-5 shadow-sm">
+                  <div className="flex items-center gap-2 text-primary">
+                    <Sparkles size={14} />
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em]">
+                      Setup Lead
+                    </p>
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-base-content/65">
+                    {activeGuide.setupLead}
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {activeGuide.idealFor.map((item) => (
+                      <span
+                        key={item}
+                        className="rounded bg-primary/5 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-primary"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/40 pl-1">
+                    Onboarding Landmarks
+                  </p>
+                  <div className="space-y-2">
+                    {onboardingMilestones.map((milestone, index) => (
+                      <motion.div
+                        key={milestone.label}
+                        className={`flex gap-3 rounded border px-4 py-3 shadow-sm transition-colors ${
+                          milestone.complete ? 'border-success/20 bg-success/5' : 'border-base-200 bg-base-100'
+                        }`}
+                        whileHover={{ x: 4 }}
+                      >
+                        <div
+                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded text-[10px] font-black ${
+                            milestone.complete
+                              ? 'bg-success text-success-content'
+                              : 'bg-base-200 text-base-content/40'
+                          }`}
+                        >
+                          {milestone.complete ? <Check size={12} /> : index + 1}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-base-content">{milestone.label}</p>
+                          <p className="mt-0.5 text-[11px] leading-relaxed text-base-content/50">
+                            {milestone.detail}
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 md:p-8 bg-base-100">
+              {/* Main Instruction Flow */}
+
             <div className="space-y-6">
               <div className="rounded border border-base-200 bg-base-100 p-5">
                 {guideProvider === 'google_sheets' ? (
-                  <div className="grid gap-5 xl:grid-cols-[0.92fr_1.08fr]">
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                        Column mapping UI
-                      </p>
-                      <div className="mt-4 space-y-3">
+                  <div className="grid gap-8 lg:grid-cols-2">
+                    <div className="space-y-6">
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+                          Sync Configuration
+                        </p>
+                        <h3 className="mt-2 text-xl font-black tracking-tight text-base-content">
+                          Column Mapping
+                        </h3>
+                        <p className="mt-2 text-sm text-base-content/60">
+                          Define exactly which spreadsheet headers contain your certificate data.
+                        </p>
+                      </div>
+                      
+                      <div className="grid gap-4">
                         {[
                           {
                             key: 'recipientName',
-                            label: 'Recipient name column',
-                            helper: 'Maps the learner or attendee full name.',
+                            label: 'Recipient Name',
+                            helper: 'Full name for the certificate',
                           },
                           {
                             key: 'recipientEmail',
-                            label: 'Recipient email column',
-                            helper: 'Used for certificate delivery and audit trails.',
+                            label: 'Recipient Email',
+                            helper: 'Used for delivery and tracking',
                           },
                           {
                             key: 'certificateTitle',
-                            label: 'Certificate title column',
-                            helper: 'Can be a course name, workshop title, or track label.',
+                            label: 'Issue Title',
+                            helper: 'Workshop or Course name',
                           },
                           {
                             key: 'issueDate',
-                            label: 'Issue date column',
-                            helper: 'Use an ISO date or a consistent sheet date format.',
+                            label: 'Issue Date',
+                            helper: 'ISO or Spreadsheet date format',
                           },
                           {
                             key: 'statusColumn',
-                            label: 'Row status column',
-                            helper: 'Write back Ready, Queued, Issued, or Failed states here.',
-                          },
-                          {
-                            key: 'certificateIdColumn',
-                            label: 'Certificate ID column',
-                            helper: 'Store the Certify certificate identifier after issuing.',
-                          },
-                          {
-                            key: 'pdfUrlColumn',
-                            label: 'PDF URL column',
-                            helper: 'Keep the returned PDF URL in the same row for operators.',
+                            label: 'Status Row',
+                            helper: 'Write-back column for state',
                           },
                         ].map((field) => (
-                          <label key={field.key} className="form-control">
-                            <span className="label-text mb-2 font-bold text-base-content">
-                              {field.label}
-                            </span>
-                            <input
-                              value={
-                                sheetMapping[
-                                  field.key as keyof typeof GOOGLE_SHEETS_DEFAULT_MAPPING
-                                ]
-                              }
-                              onChange={(event) =>
-                                {
+                          <div key={field.key} className="rounded border border-base-200 bg-base-100 p-4 shadow-sm hover:border-primary/20 transition-all">
+                            <label className="form-control w-full">
+                              <span className="label-text mb-2 font-bold text-base-content flex items-center justify-between">
+                                {field.label}
+                                <span className="text-[9px] font-black uppercase text-base-content/30 tracking-widest">{field.key}</span>
+                              </span>
+                              <input
+                                value={sheetMapping[field.key as keyof typeof GOOGLE_SHEETS_DEFAULT_MAPPING]}
+                                onChange={(event) => {
                                   const nextValue = event.target.value;
-
-                                  setSheetMapping((current) => ({
-                                    ...current,
-                                    [field.key]: nextValue,
-                                  }));
-
-                                  if (guideProvider === 'google_sheets') {
-                                    setForm((current) => ({
-                                      ...current,
-                                      ...(field.key === 'statusColumn'
-                                        ? { googleSheetsStatusColumn: nextValue }
-                                        : {}),
-                                      ...(field.key === 'certificateIdColumn'
-                                        ? {
-                                            googleSheetsCertificateIdColumn: nextValue,
-                                          }
-                                        : {}),
-                                      ...(field.key === 'pdfUrlColumn'
-                                        ? { googleSheetsPdfUrlColumn: nextValue }
-                                        : {}),
-                                    }));
-                                  }
-                                }
-                              }
-                              className="input input-bordered rounded"
-                            />
-                            <span className="mt-2 text-xs text-base-content/55">
-                              {field.helper}
-                            </span>
-                          </label>
+                                  setSheetMapping(c => ({...c, [field.key]: nextValue}));
+                                  if (field.key === 'statusColumn') setForm(f => ({...f, googleSheetsStatusColumn: nextValue}));
+                                }}
+                                className="input input-sm input-bordered rounded bg-base-200/50"
+                                placeholder={`e.g. ${field.label}`}
+                              />
+                              <p className="mt-2 text-[10px] text-base-content/50 italic">{field.helper}</p>
+                            </label>
+                          </div>
                         ))}
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <div className="rounded border border-base-200 bg-base-100">
-                        <div className="border-b border-base-200 px-4 py-3">
-                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                            Apps Script starter
-                          </p>
+                    <div className="space-y-6">
+                      <div className="rounded border border-base-200 bg-base-900 overflow-hidden shadow-lg">
+                        <div className="border-b border-white/10 bg-white/5 px-4 py-3 flex items-center justify-between">
+                           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Apps Script Starter</p>
+                           <span className="badge badge-primary badge-xs font-bold px-2 py-2">v4.0</span>
                         </div>
-                        <pre className="overflow-x-auto px-4 py-4 text-xs leading-relaxed text-base-content/75">
-{googleSheetsStarterSnippet}
-                        </pre>
+                        <div className="relative group">
+                          <pre className="overflow-x-auto p-5 text-[11px] leading-relaxed text-blue-100/90 font-mono">
+                            {googleSheetsStarterSnippet}
+                          </pre>
+                        </div>
                       </div>
 
-                      <div className="rounded border border-base-200 bg-base-200/35 p-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                          Row status write-back
+                      <div className="rounded border border-base-200 bg-base-200/40 p-5">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/40">
+                          Workflow Handshake
                         </p>
-                        <div className="mt-3 space-y-3">
-                          {activeSpotlight.flowSteps.map((step) => (
-                            <div key={step.title} className="rounded border border-base-200 bg-base-100 px-4 py-3">
-                              <p className="font-bold text-base-content">{step.title}</p>
-                              <p className="mt-1 text-sm leading-relaxed text-base-content/55">
-                                {step.description}
-                              </p>
+                        <div className="mt-4 space-y-3">
+                          {activeSpotlight.flowSteps.map((step, idx) => (
+                            <div key={step.title} className="flex gap-3">
+                              <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-primary/20 text-[10px] font-black text-primary">
+                                {idx + 1}
+                              </div>
+                              <div>
+                                <p className="text-xs font-bold text-base-content">{step.title}</p>
+                                <p className="mt-1 text-[11px] leading-relaxed text-base-content/50">{step.description}</p>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -1492,110 +1336,100 @@ export const Integrations: React.FC = () => {
                     </div>
                   </div>
                 ) : guideProvider === 'canvas' ? (
-                  <div className="grid gap-5 xl:grid-cols-[0.92fr_1.08fr]">
-                    <div className="space-y-4">
+                 <div className="grid gap-8 lg:grid-cols-2">
+                    <div className="space-y-6">
                       <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                          Course and module presets
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+                          Instructional Assets
                         </p>
-                        <div className="mt-4 space-y-3">
-                          {activeGuide.recipes.map((recipe) => (
-                            <motion.article
-                              key={recipe.id}
-                              className={`rounded border px-4 py-4 ${
-                                activeCanvasPreset?.id === recipe.id
-                                  ? 'border-primary/40 bg-primary/5'
-                                  : 'border-base-200 bg-base-100'
-                              }`}
-                              whileHover={{ y: -4 }}
-                              transition={QUICK_SPRING}
-                            >
-                              <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                                <div>
-                                  <p className="font-bold text-base-content">{recipe.name}</p>
-                                  <p className="mt-2 text-sm leading-relaxed text-base-content/60">
-                                    {recipe.summary}
-                                  </p>
-                                </div>
-                                <motion.button
-                                  type="button"
-                                  onClick={() => {
-                                    setCanvasPresetId(recipe.id);
-                                    handleApplyRecipe(recipe);
-                                  }}
-                                  className="btn btn-sm btn-primary rounded px-4 font-bold"
-                                  whileHover={{ y: -2 }}
-                                  whileTap={TAP_PRESS}
-                                  transition={QUICK_SPRING}
-                                >
-                                  Use Preset
-                                </motion.button>
-                              </div>
-                            </motion.article>
-                          ))}
-                        </div>
+                        <h3 className="mt-2 text-xl font-black tracking-tight text-base-content">
+                          Course & Module Presets
+                        </h3>
+                        <p className="mt-2 text-sm text-base-content/60">
+                          Deploy pre-configured logic for common Canvas LMS trigger points.
+                        </p>
                       </div>
 
-                      <div className="rounded border border-base-200 bg-base-200/35 p-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                          Learner field mapping
+                      <div className="grid gap-4">
+                        {activeGuide.recipes.map((recipe) => (
+                          <motion.article
+                            key={recipe.id}
+                            className={`rounded border p-5 shadow-sm transition-all ${
+                              activeCanvasPreset?.id === recipe.id
+                                ? 'border-primary/40 bg-primary/5 ring-1 ring-primary/20'
+                                : 'border-base-200 bg-base-100 hover:border-primary/20'
+                            }`}
+                            whileHover={{ y: -4 }}
+                          >
+                            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                              <div>
+                                <p className="text-base font-black text-base-content">{recipe.name}</p>
+                                <p className="mt-1 text-xs leading-relaxed text-base-content/50">
+                                  {recipe.summary}
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCanvasPresetId(recipe.id);
+                                  handleApplyRecipe(recipe);
+                                }}
+                                className={`btn btn-sm font-bold ${
+                                  activeCanvasPreset?.id === recipe.id ? 'btn-primary' : 'btn-ghost border-base-200'
+                                }`}
+                              >
+                                {activeCanvasPreset?.id === recipe.id ? 'Applied' : 'Use Preset'}
+                              </button>
+                            </div>
+                          </motion.article>
+                        ))}
+                      </div>
+
+                      <div className="rounded border border-base-200 bg-base-200/40 p-5">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/40 pl-1">
+                          Learner Attribute Mapping
                         </p>
-                        <div className="mt-3 space-y-3">
+                        <div className="mt-4 space-y-2">
                           {activeGuide.fieldMappings.map((field) => (
                             <div
                               key={`${field.source}-${field.target}`}
-                              className="rounded border border-base-200 bg-base-100 px-4 py-3"
+                              className="flex items-center justify-between rounded border border-base-200 bg-base-100 px-4 py-2.5 shadow-sm"
                             >
-                              <p className="text-xs font-black uppercase tracking-[0.18em] text-base-content/40">
-                                {field.source}
-                              </p>
-                              <div className="mt-2 flex items-center gap-2 text-sm font-bold text-base-content">
-                                <ArrowRight size={14} className="text-primary" />
-                                {field.target}
+                              <span className="text-[10px] font-black uppercase tracking-wider text-base-content/40">{field.source}</span>
+                              <div className="flex items-center gap-2">
+                                <ArrowRight size={12} className="text-primary/40" />
+                                <span className="text-xs font-bold text-base-content">{field.target}</span>
                               </div>
-                              <p className="mt-2 text-xs text-base-content/55">
-                                Example: {field.example}
-                              </p>
                             </div>
                           ))}
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <div className="rounded border border-base-200 bg-base-100">
-                        <div className="border-b border-base-200 px-4 py-3">
-                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                            Completion payload
-                          </p>
+                    <div className="space-y-6">
+                      <div className="rounded border border-base-200 bg-base-900 overflow-hidden shadow-lg">
+                        <div className="border-b border-white/10 bg-white/5 px-4 py-3">
+                           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Completion Payload</p>
                         </div>
-                        <pre className="overflow-x-auto px-4 py-4 text-xs leading-relaxed text-base-content/75">
-{canvasPayloadSnippet}
+                        <pre className="overflow-x-auto p-5 text-[11px] leading-relaxed text-blue-100/90 font-mono">
+                          {canvasPayloadSnippet}
                         </pre>
                       </div>
 
-                      <div className="rounded border border-base-200 bg-base-100">
-                        <div className="border-b border-base-200 px-4 py-3">
-                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                            Certificate return flow
-                          </p>
-                        </div>
-                        <pre className="overflow-x-auto px-4 py-4 text-xs leading-relaxed text-base-content/75">
-{providerReturnSnippet}
-                        </pre>
-                      </div>
-
-                      <div className="rounded border border-base-200 bg-base-200/35 p-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                          Canvas return flow
+                      <div className="rounded border border-base-200 bg-base-200/40 p-5">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/40">
+                          Handoff Logic
                         </p>
-                        <div className="mt-3 space-y-3">
-                          {activeSpotlight.flowSteps.map((step) => (
-                            <div key={step.title} className="rounded border border-base-200 bg-base-100 px-4 py-3">
-                              <p className="font-bold text-base-content">{step.title}</p>
-                              <p className="mt-1 text-sm leading-relaxed text-base-content/55">
-                                {step.description}
-                              </p>
+                        <div className="mt-4 space-y-4">
+                          {activeSpotlight.flowSteps.map((step, idx) => (
+                            <div key={step.title} className="flex gap-4">
+                              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-primary/10 text-[10px] font-black text-primary">
+                                {idx + 1}
+                              </div>
+                              <div>
+                                <p className="text-xs font-bold text-base-content">{step.title}</p>
+                                <p className="mt-1 text-[11px] leading-relaxed text-base-content/50">{step.description}</p>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -1603,122 +1437,90 @@ export const Integrations: React.FC = () => {
                     </div>
                   </div>
                 ) : guideProvider === 'custom' ? (
-                  <div className="grid gap-5 xl:grid-cols-[0.92fr_1.08fr]">
-                    <div className="space-y-4">
+                  <div className="grid gap-8 lg:grid-cols-2">
+                    <div className="space-y-6">
                       <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                          Advanced fallback flow
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+                          Advanced Rollout
                         </p>
-                        <div className="mt-4 space-y-3">
-                          {activeSpotlight.flowSteps.map((step) => (
-                            <div key={step.title} className="rounded border border-base-200 bg-base-100 px-4 py-4">
-                              <p className="font-bold text-base-content">{step.title}</p>
-                              <p className="mt-2 text-sm leading-relaxed text-base-content/60">
-                                {step.description}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
+                        <h3 className="mt-2 text-xl font-black tracking-tight text-base-content">
+                          Custom Webhook Flow
+                        </h3>
+                        <p className="mt-2 text-sm text-base-content/60">
+                          Orchestrate complex automation sequences using our universal webhook endpoint.
+                        </p>
                       </div>
 
-                      <div className="rounded border border-base-200 bg-base-200/35 p-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                          Payload field mapping
-                        </p>
-                        <div className="mt-3 space-y-3">
-                          {activeGuide.fieldMappings.map((field) => (
-                            <div
-                              key={`${field.source}-${field.target}`}
-                              className="rounded border border-base-200 bg-base-100 px-4 py-3"
-                            >
-                              <p className="text-xs font-black uppercase tracking-[0.18em] text-base-content/40">
-                                {field.source}
-                              </p>
-                              <div className="mt-2 flex items-center gap-2 text-sm font-bold text-base-content">
-                                <ArrowRight size={14} className="text-primary" />
-                                {field.target}
-                              </div>
-                              <p className="mt-2 text-xs text-base-content/55">
-                                Example: {field.example}
-                              </p>
+                      <div className="space-y-3">
+                        {activeSpotlight.flowSteps.map((step, idx) => (
+                          <div key={step.title} className="flex gap-4 p-4 rounded border border-base-200 bg-base-100 shadow-sm">
+                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-base-200 text-[11px] font-black text-base-content">
+                              {idx + 1}
                             </div>
-                          ))}
-                        </div>
+                            <div>
+                              <p className="text-sm font-bold text-base-content">{step.title}</p>
+                              <p className="mt-1 text-xs leading-relaxed text-base-content/50">{step.description}</p>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <div className="rounded border border-base-200 bg-base-100">
-                        <div className="border-b border-base-200 px-4 py-3">
-                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                            Response contract
-                          </p>
+                    <div className="space-y-6">
+                      <div className="rounded border border-base-200 bg-base-900 overflow-hidden shadow-lg">
+                        <div className="border-b border-white/10 bg-white/5 px-4 py-3">
+                           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Response Contract</p>
                         </div>
-                        <pre className="overflow-x-auto px-4 py-4 text-xs leading-relaxed text-base-content/75">
-{providerReturnSnippet}
+                        <pre className="overflow-x-auto p-5 text-[11px] leading-relaxed text-blue-100/90 font-mono">
+                          {providerReturnSnippet}
                         </pre>
                       </div>
-                      <div className="rounded border border-base-200 bg-base-200/35 p-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                          Why this stays advanced
-                        </p>
-                        <p className="mt-3 text-sm leading-relaxed text-base-content/60">
-                          Custom Webhook is intentionally flexible, but it assumes a server-side
-                          tool can safely store the webhook URL and handle returned certificate IDs
-                          or batch job IDs.
-                        </p>
+
+                      <div className="rounded border border-warning/20 bg-warning/5 p-5">
+                         <div className="flex items-center gap-2 text-warning">
+                            <AlertCircle size={14} />
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em]">Usage Warning</p>
+                         </div>
+                         <p className="mt-3 text-xs leading-relaxed text-base-content/70">
+                           Custom Webhooks are flexible but assume your system can safely store 
+                           the endpoint and handle our response payloads for batch or single jobs.
+                         </p>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+                  <div className="grid gap-8 lg:grid-cols-2">
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                        Setup steps
-                      </p>
-                      <div className="mt-4 space-y-4">
-                        {activeGuide.setupSteps.map((step, index) => (
-                          <div
-                            key={step.title}
-                            className="rounded border border-base-200 bg-base-100 px-4 py-4"
-                          >
-                            <div className="flex items-center gap-3">
-                              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-black text-primary">
-                                {index + 1}
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Technical Setup</p>
+                        <div className="mt-6 space-y-4">
+                          {activeGuide.setupSteps.map((step, idx) => (
+                            <div key={step.title} className="flex gap-4 p-4 rounded border border-base-200 bg-base-100 shadow-sm">
+                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-primary/10 text-xs font-black text-primary">
+                                {idx + 1}
                               </span>
-                              <p className="font-bold text-base-content">{step.title}</p>
+                              <div>
+                                <p className="text-sm font-bold text-base-content">{step.title}</p>
+                                <p className="mt-1 text-xs leading-relaxed text-base-content/50">{step.description}</p>
+                              </div>
                             </div>
-                            <p className="mt-3 text-sm leading-relaxed text-base-content/60">
-                              {step.description}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
                     </div>
-
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/35">
-                        Payload field mapping
-                      </p>
-                      <div className="mt-4 space-y-3">
-                        {activeGuide.fieldMappings.map((field) => (
-                          <div
-                            key={`${field.source}-${field.target}`}
-                            className="rounded border border-base-200 bg-base-200/35 px-4 py-4"
-                          >
-                            <p className="text-xs font-black uppercase tracking-[0.18em] text-base-content/40">
-                              {field.source}
-                            </p>
-                            <div className="mt-2 flex items-center gap-2 text-sm font-bold text-base-content">
-                              <ArrowRight size={14} className="text-primary" />
-                              {field.target}
+                    
+                    <div className="rounded border border-base-200 bg-base-200/40 p-6">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/40 pl-1">Contract Mappings</p>
+                        <div className="mt-6 space-y-3">
+                          {activeGuide.fieldMappings.map((field) => (
+                            <div key={`${field.source}-${field.target}`} className="rounded border border-base-200 bg-base-100 p-4 shadow-sm">
+                               <p className="text-[10px] font-black uppercase tracking-widest text-base-content/40">{field.source}</p>
+                               <div className="mt-2 flex items-center gap-2 text-sm font-bold text-base-content">
+                                 <ArrowRight size={14} className="text-primary" />
+                                 {field.target}
+                               </div>
+                               <p className="mt-1 text-[11px] text-base-content/40 italic">Example: {field.example}</p>
                             </div>
-                            <p className="mt-2 text-xs text-base-content/55">
-                              Example: {field.example}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
                     </div>
                   </div>
                 )}
@@ -1899,10 +1701,10 @@ export const Integrations: React.FC = () => {
           </div>
         </motion.section>
 
-        <div className="grid gap-6 xl:grid-cols-[0.95fr_1.25fr]">
+        <div className="grid grid-cols-1 gap-8 2xl:grid-cols-[0.9fr_1.3fr]">
           <section
             id="integration-form"
-            className="rounded border border-base-200 bg-base-100 p-6 shadow-sm"
+            className="h-fit rounded border border-base-200 bg-base-100 p-6 shadow-sm xl:p-8"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -1918,20 +1720,24 @@ export const Integrations: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-6 space-y-4">
-              <label className="form-control">
-                <span className="label-text mb-2 font-bold text-base-content">Integration name</span>
+            <div className="mt-8 space-y-6">
+              <div className="form-control w-full">
+                <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                  <span className="text-sm font-bold text-base-content">Integration name</span>
+                </label>
                 <input
                   value={form.name}
                   onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-                  className="input input-bordered rounded"
+                  className="input input-bordered w-full rounded focus:input-primary"
                   placeholder="Canvas course completions"
                 />
-              </label>
+              </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <label className="form-control">
-                  <span className="label-text mb-2 font-bold text-base-content">Provider</span>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="form-control w-full">
+                  <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                    <span className="text-sm font-bold text-base-content">Provider</span>
+                  </label>
                   <select
                     value={form.provider}
                     onChange={(event) => {
@@ -1961,7 +1767,7 @@ export const Integrations: React.FC = () => {
                             : current.canvasReturnMode,
                       }));
                     }}
-                    className="select select-bordered rounded"
+                    className="select select-bordered w-full rounded focus:select-primary"
                   >
                     {catalog.map((item) => (
                       <option key={item.provider} value={item.provider}>
@@ -1969,10 +1775,12 @@ export const Integrations: React.FC = () => {
                       </option>
                     ))}
                   </select>
-                </label>
+                </div>
 
-                <label className="form-control">
-                  <span className="label-text mb-2 font-bold text-base-content">Mode</span>
+                <div className="form-control w-full">
+                  <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                    <span className="text-sm font-bold text-base-content">Mode</span>
+                  </label>
                   <select
                     value={form.mode}
                     onChange={(event) =>
@@ -1981,12 +1789,12 @@ export const Integrations: React.FC = () => {
                         mode: event.target.value as IntegrationFormState['mode'],
                       }))
                     }
-                    className="select select-bordered rounded"
+                    className="select select-bordered w-full rounded focus:select-primary"
                   >
                     <option value="single">Single certificate</option>
                     <option value="batch">Batch job</option>
                   </select>
-                </label>
+                </div>
               </div>
 
               <div className="rounded border border-primary/20 bg-primary/5 px-4 py-4">
@@ -2012,14 +1820,16 @@ export const Integrations: React.FC = () => {
                 </div>
               </div>
 
-              <label className="form-control">
-                <span className="label-text mb-2 font-bold text-base-content">Default template</span>
+              <div className="form-control w-full">
+                <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                  <span className="text-sm font-bold text-base-content">Default template</span>
+                </label>
                 <select
                   value={form.templateId}
                   onChange={(event) =>
                     setForm((current) => ({ ...current, templateId: event.target.value }))
                   }
-                  className="select select-bordered rounded"
+                  className="select select-bordered w-full rounded focus:select-primary"
                   disabled={templatesLoading || templates.length === 0}
                 >
                   {templates.map((template) => (
@@ -2028,23 +1838,27 @@ export const Integrations: React.FC = () => {
                     </option>
                   ))}
                 </select>
-              </label>
+              </div>
 
-              <label className="form-control">
-                <span className="label-text mb-2 font-bold text-base-content">Workflow notes</span>
+              <div className="form-control w-full">
+                <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                  <span className="text-sm font-bold text-base-content">Workflow notes</span>
+                </label>
                 <textarea
                   value={form.description}
                   onChange={(event) =>
                     setForm((current) => ({ ...current, description: event.target.value }))
                   }
-                  className="textarea textarea-bordered min-h-28 rounded"
+                  className="textarea textarea-bordered min-h-32 w-full rounded focus:textarea-primary"
                   placeholder="Describe the source trigger, audience, or automation context."
                 />
-              </label>
+              </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <label className="form-control">
-                  <span className="label-text mb-2 font-bold text-base-content">Default title</span>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="form-control w-full">
+                  <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                    <span className="text-sm font-bold text-base-content">Default title</span>
+                  </label>
                   <input
                     value={form.certificateTitle}
                     onChange={(event) =>
@@ -2053,28 +1867,32 @@ export const Integrations: React.FC = () => {
                         certificateTitle: event.target.value,
                       }))
                     }
-                    className="input input-bordered rounded"
+                    className="input input-bordered w-full rounded focus:input-primary"
                     placeholder="Certificate of Achievement"
                   />
-                </label>
+                </div>
 
-                <label className="form-control">
-                  <span className="label-text mb-2 font-bold text-base-content">Default issuer</span>
+                <div className="form-control w-full">
+                  <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                    <span className="text-sm font-bold text-base-content">Default issuer</span>
+                  </label>
                   <input
                     value={form.issuerName}
                     onChange={(event) =>
                       setForm((current) => ({ ...current, issuerName: event.target.value }))
                     }
-                    className="input input-bordered rounded"
+                    className="input input-bordered w-full rounded focus:input-primary"
                     placeholder="Global Academy"
                   />
-                </label>
+                </div>
               </div>
 
-              <label className="form-control">
-                <span className="label-text mb-2 font-bold text-base-content">
-                  Default description
-                </span>
+              <div className="form-control w-full">
+                <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                  <span className="text-sm font-bold text-base-content">
+                    Default description
+                  </span>
+                </label>
                 <textarea
                   value={form.descriptionDefault}
                   onChange={(event) =>
@@ -2083,10 +1901,10 @@ export const Integrations: React.FC = () => {
                       descriptionDefault: event.target.value,
                     }))
                   }
-                  className="textarea textarea-bordered min-h-24 rounded"
+                  className="textarea textarea-bordered min-h-24 w-full rounded focus:textarea-primary"
                   placeholder="Optional fallback description for incoming payloads."
                 />
-              </label>
+              </div>
 
               {form.provider === 'google_sheets' && (
                 <div className="rounded border border-base-200 bg-base-200/35 p-4">
@@ -2100,7 +1918,7 @@ export const Integrations: React.FC = () => {
                         spreadsheet rows after Apps Script sends the webhook request.
                       </p>
                     </div>
-                    <label className="mt-1 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full">
+                    <label className="mt-1 flex min-h-[44px] min-w-[44px] items-center justify-center rounded">
                       <input
                         type="checkbox"
                         checked={form.googleSheetsEnabled}
@@ -2115,11 +1933,13 @@ export const Integrations: React.FC = () => {
                     </label>
                   </div>
 
-                  <div className="mt-4 grid gap-4 md:grid-cols-2">
-                    <label className="form-control">
-                      <span className="label-text mb-2 font-bold text-base-content">
-                        Spreadsheet ID
-                      </span>
+                  <div className="mt-4 grid gap-6 md:grid-cols-2">
+                    <div className="form-control w-full">
+                      <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                        <span className="text-sm font-bold text-base-content">
+                          Spreadsheet ID
+                        </span>
+                      </label>
                       <input
                         value={form.googleSheetsSpreadsheetId}
                         onChange={(event) =>
@@ -2128,15 +1948,17 @@ export const Integrations: React.FC = () => {
                             googleSheetsSpreadsheetId: event.target.value,
                           }))
                         }
-                        className="input input-bordered rounded"
+                        className="input input-bordered w-full rounded focus:input-primary"
                         placeholder="1AbCdEfGh..."
                       />
-                    </label>
+                    </div>
 
-                    <label className="form-control">
-                      <span className="label-text mb-2 font-bold text-base-content">
-                        Sheet name
-                      </span>
+                    <div className="form-control w-full">
+                      <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                        <span className="text-sm font-bold text-base-content">
+                          Sheet name
+                        </span>
+                      </label>
                       <input
                         value={form.googleSheetsSheetName}
                         onChange={(event) =>
@@ -2145,17 +1967,19 @@ export const Integrations: React.FC = () => {
                             googleSheetsSheetName: event.target.value,
                           }))
                         }
-                        className="input input-bordered rounded"
+                        className="input input-bordered w-full rounded focus:input-primary"
                         placeholder="Ready to Issue"
                       />
-                    </label>
+                    </div>
                   </div>
 
-                  <div className="mt-4 grid gap-4 md:grid-cols-2">
-                    <label className="form-control">
-                      <span className="label-text mb-2 font-bold text-base-content">
-                        Status column header
-                      </span>
+                  <div className="mt-4 grid gap-6 md:grid-cols-2">
+                    <div className="form-control w-full">
+                      <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                        <span className="text-sm font-bold text-base-content">
+                          Status column header
+                        </span>
+                      </label>
                       <input
                         value={form.googleSheetsStatusColumn}
                         onChange={(event) =>
@@ -2164,14 +1988,17 @@ export const Integrations: React.FC = () => {
                             googleSheetsStatusColumn: event.target.value,
                           }))
                         }
-                        className="input input-bordered rounded"
+                        className="input input-bordered w-full rounded focus:input-primary"
+                        placeholder="Certify Status"
                       />
-                    </label>
+                    </div>
 
-                    <label className="form-control">
-                      <span className="label-text mb-2 font-bold text-base-content">
-                        Batch job ID header
-                      </span>
+                    <div className="form-control w-full">
+                      <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                        <span className="text-sm font-bold text-base-content">
+                          Batch job ID header
+                        </span>
+                      </label>
                       <input
                         value={form.googleSheetsBatchJobIdColumn}
                         onChange={(event) =>
@@ -2180,14 +2007,17 @@ export const Integrations: React.FC = () => {
                             googleSheetsBatchJobIdColumn: event.target.value,
                           }))
                         }
-                        className="input input-bordered rounded"
+                        className="input input-bordered w-full rounded focus:input-primary"
+                        placeholder="Certify Batch ID"
                       />
-                    </label>
+                    </div>
 
-                    <label className="form-control">
-                      <span className="label-text mb-2 font-bold text-base-content">
-                        Certificate ID header
-                      </span>
+                    <div className="form-control w-full">
+                      <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                        <span className="text-sm font-bold text-base-content">
+                          Certificate ID header
+                        </span>
+                      </label>
                       <input
                         value={form.googleSheetsCertificateIdColumn}
                         onChange={(event) =>
@@ -2196,14 +2026,17 @@ export const Integrations: React.FC = () => {
                             googleSheetsCertificateIdColumn: event.target.value,
                           }))
                         }
-                        className="input input-bordered rounded"
+                        className="input input-bordered w-full rounded focus:input-primary"
+                        placeholder="Certify ID"
                       />
-                    </label>
+                    </div>
 
-                    <label className="form-control">
-                      <span className="label-text mb-2 font-bold text-base-content">
-                        PDF URL header
-                      </span>
+                    <div className="form-control w-full">
+                      <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                        <span className="text-sm font-bold text-base-content">
+                          PDF URL header
+                        </span>
+                      </label>
                       <input
                         value={form.googleSheetsPdfUrlColumn}
                         onChange={(event) =>
@@ -2212,14 +2045,17 @@ export const Integrations: React.FC = () => {
                             googleSheetsPdfUrlColumn: event.target.value,
                           }))
                         }
-                        className="input input-bordered rounded"
+                        className="input input-bordered w-full rounded focus:input-primary"
+                        placeholder="Certificate PDF URL"
                       />
-                    </label>
+                    </div>
 
-                    <label className="form-control md:col-span-2">
-                      <span className="label-text mb-2 font-bold text-base-content">
-                        Processed-at header
-                      </span>
+                    <div className="form-control w-full md:col-span-2">
+                      <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                        <span className="text-sm font-bold text-base-content">
+                          Processed-at header
+                        </span>
+                      </label>
                       <input
                         value={form.googleSheetsProcessedAtColumn}
                         onChange={(event) =>
@@ -2228,9 +2064,10 @@ export const Integrations: React.FC = () => {
                             googleSheetsProcessedAtColumn: event.target.value,
                           }))
                         }
-                        className="input input-bordered rounded"
+                        className="input input-bordered w-full rounded focus:input-primary"
+                        placeholder="Processed At"
                       />
-                    </label>
+                    </div>
                   </div>
 
                   <div className="mt-4 rounded border border-primary/15 bg-primary/8 px-4 py-3 text-sm text-base-content/65">
@@ -2252,7 +2089,7 @@ export const Integrations: React.FC = () => {
                         certificate links back into assignment submissions after issuing.
                       </p>
                     </div>
-                    <label className="mt-1 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full">
+                    <label className="mt-1 flex min-h-[44px] min-w-[44px] items-center justify-center rounded">
                       <input
                         type="checkbox"
                         checked={form.canvasEnabled}
@@ -2267,11 +2104,13 @@ export const Integrations: React.FC = () => {
                     </label>
                   </div>
 
-                  <div className="mt-4 grid gap-4 md:grid-cols-2">
-                    <label className="form-control">
-                      <span className="label-text mb-2 font-bold text-base-content">
-                        Canvas base URL
-                      </span>
+                  <div className="mt-4 grid gap-6 md:grid-cols-2">
+                    <div className="form-control w-full">
+                      <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                        <span className="text-sm font-bold text-base-content">
+                          Canvas base URL
+                        </span>
+                      </label>
                       <input
                         value={form.canvasBaseUrl}
                         onChange={(event) =>
@@ -2280,15 +2119,17 @@ export const Integrations: React.FC = () => {
                             canvasBaseUrl: event.target.value,
                           }))
                         }
-                        className="input input-bordered rounded"
+                        className="input input-bordered w-full rounded focus:input-primary"
                         placeholder="https://canvas.yourschool.edu"
                       />
-                    </label>
+                    </div>
 
-                    <label className="form-control">
-                      <span className="label-text mb-2 font-bold text-base-content">
-                        Course ID
-                      </span>
+                    <div className="form-control w-full">
+                      <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                        <span className="text-sm font-bold text-base-content">
+                          Course ID
+                        </span>
+                      </label>
                       <input
                         value={form.canvasCourseId}
                         onChange={(event) =>
@@ -2297,15 +2138,17 @@ export const Integrations: React.FC = () => {
                             canvasCourseId: event.target.value,
                           }))
                         }
-                        className="input input-bordered rounded"
+                        className="input input-bordered w-full rounded focus:input-primary"
                         placeholder="42"
                       />
-                    </label>
+                    </div>
 
-                    <label className="form-control">
-                      <span className="label-text mb-2 font-bold text-base-content">
-                        Assignment ID
-                      </span>
+                    <div className="form-control w-full">
+                      <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                        <span className="text-sm font-bold text-base-content">
+                          Assignment ID
+                        </span>
+                      </label>
                       <input
                         value={form.canvasAssignmentId}
                         onChange={(event) =>
@@ -2314,15 +2157,17 @@ export const Integrations: React.FC = () => {
                             canvasAssignmentId: event.target.value,
                           }))
                         }
-                        className="input input-bordered rounded"
+                        className="input input-bordered w-full rounded focus:input-primary"
                         placeholder="8"
                       />
-                    </label>
+                    </div>
 
-                    <label className="form-control">
-                      <span className="label-text mb-2 font-bold text-base-content">
-                        Module ID
-                      </span>
+                    <div className="form-control w-full">
+                      <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                        <span className="text-sm font-bold text-base-content">
+                          Module ID
+                        </span>
+                      </label>
                       <input
                         value={form.canvasModuleId}
                         onChange={(event) =>
@@ -2331,17 +2176,19 @@ export const Integrations: React.FC = () => {
                             canvasModuleId: event.target.value,
                           }))
                         }
-                        className="input input-bordered rounded"
+                        className="input input-bordered w-full rounded focus:input-primary"
                         placeholder="Optional module milestone"
                       />
-                    </label>
+                    </div>
                   </div>
 
-                  <div className="mt-4 grid gap-4 md:grid-cols-2">
-                    <label className="form-control">
-                      <span className="label-text mb-2 font-bold text-base-content">
-                        Completion preset
-                      </span>
+                  <div className="mt-4 grid gap-6 md:grid-cols-2">
+                    <div className="form-control w-full">
+                      <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                        <span className="text-sm font-bold text-base-content">
+                          Completion preset
+                        </span>
+                      </label>
                       <select
                         value={form.canvasCompletionPreset}
                         onChange={(event) =>
@@ -2351,18 +2198,20 @@ export const Integrations: React.FC = () => {
                               event.target.value as CanvasCompletionPreset,
                           }))
                         }
-                        className="select select-bordered rounded"
+                        className="select select-bordered w-full rounded focus:select-primary"
                       >
                         <option value="course_completion">Course completion</option>
                         <option value="module_completion">Module completion</option>
                         <option value="capstone_completion">Capstone completion</option>
                       </select>
-                    </label>
+                    </div>
 
-                    <label className="form-control">
-                      <span className="label-text mb-2 font-bold text-base-content">
-                        Return mode
-                      </span>
+                    <div className="form-control w-full">
+                      <label className="label cursor-pointer justify-start gap-2 p-0 mb-2">
+                        <span className="text-sm font-bold text-base-content">
+                          Return mode
+                        </span>
+                      </label>
                       <select
                         value={form.canvasReturnMode}
                         onChange={(event) =>
@@ -2371,12 +2220,12 @@ export const Integrations: React.FC = () => {
                             canvasReturnMode: event.target.value as CanvasReturnMode,
                           }))
                         }
-                        className="select select-bordered rounded"
+                        className="select select-bordered w-full rounded focus:select-primary"
                       >
                         <option value="submission_comment">Assignment comment</option>
                         <option value="response_only">Response only</option>
                       </select>
-                    </label>
+                    </div>
                   </div>
 
                   <div className="mt-4 rounded border border-primary/15 bg-primary/8 px-4 py-3 text-sm text-base-content/65">
@@ -2393,7 +2242,7 @@ export const Integrations: React.FC = () => {
                     Return a PDF URL immediately for single certificate flows.
                   </p>
                 </div>
-                <label className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full">
+                <label className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded">
                   <input
                     type="checkbox"
                     checked={form.autoGeneratePdf}
@@ -2468,7 +2317,7 @@ export const Integrations: React.FC = () => {
                 </div>
               ) : integrations.length === 0 ? (
                 <div className="mt-6 rounded border border-dashed border-base-300 bg-base-200/30 px-6 py-10 text-center">
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded bg-primary/10 text-primary">
                     <Webhook size={22} />
                   </div>
                   <h3 className="text-lg font-black text-base-content">No integrations yet</h3>
@@ -2503,35 +2352,37 @@ export const Integrations: React.FC = () => {
                               whileTap={TAP_PRESS}
                               transition={QUICK_SPRING}
                             >
-                              <h3 className="text-xl font-black tracking-tight text-base-content">
+                              <h3 className="text-xl font-black tracking-tight text-base-content break-words max-w-full">
                                 {integration.name}
                               </h3>
                             </motion.button>
-                            <span className="badge badge-outline border-primary/20 bg-primary/5 px-3 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-primary">
-                              {integration.provider.replace('_', ' ')}
-                            </span>
-                            <span
-                              className={`badge px-3 py-3 text-[11px] font-black uppercase tracking-[0.18em] ${
-                                integration.status === 'active'
-                                  ? 'badge-success'
-                                  : 'badge-ghost text-base-content/50'
-                              }`}
-                            >
-                              {integration.status}
-                            </span>
-                            <span className="badge badge-ghost px-3 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-base-content/55">
-                              {integration.mode}
-                            </span>
-                            {integration.settings.googleSheets?.enabled && (
+                            <div className="flex flex-wrap gap-2">
                               <span className="badge badge-outline border-primary/20 bg-primary/5 px-3 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-primary">
-                                Sheets sync
+                                {integration.provider.replace('_', ' ')}
                               </span>
-                            )}
-                            {integration.settings.canvas?.enabled && (
-                              <span className="badge badge-outline border-accent/20 bg-accent/10 px-3 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-accent">
-                                Canvas handoff
+                              <span
+                                className={`badge px-3 py-3 text-[11px] font-black uppercase tracking-[0.18em] ${
+                                  integration.status === 'active'
+                                    ? 'badge-success'
+                                    : 'badge-ghost text-base-content/50'
+                                }`}
+                              >
+                                {integration.status}
                               </span>
-                            )}
+                              <span className="badge badge-ghost px-3 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-base-content/55">
+                                {integration.mode}
+                              </span>
+                              {integration.settings.googleSheets?.enabled && (
+                                <span className="badge badge-outline border-primary/20 bg-primary/5 px-3 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-primary">
+                                  Sheets sync
+                                </span>
+                              )}
+                              {integration.settings.canvas?.enabled && (
+                                <span className="badge badge-outline border-accent/20 bg-accent/10 px-3 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-accent">
+                                  Canvas handoff
+                                </span>
+                              )}
+                            </div>
                           </div>
 
                           <p className="max-w-2xl text-sm leading-relaxed text-base-content/60">

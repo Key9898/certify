@@ -22,6 +22,14 @@ export const verifyCertificate = async (
       return;
     }
 
+    if (certificate.status === 'revoked') {
+      res.status(410).json({
+        success: false,
+        error: { code: 'REVOKED', message: 'This certificate has been revoked by the issuer.' },
+      });
+      return;
+    }
+
     const createdBy =
       certificate.createdBy && typeof certificate.createdBy === 'object' && '_id' in certificate.createdBy
         ? certificate.createdBy

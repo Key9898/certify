@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { checkJwt, attachUser } from '../middleware/auth';
 import { validateObjectId } from '../middleware/validate';
 import { teamLimiter } from '../middleware/rateLimiter';
-import { updateSettings } from '../controllers/userController';
+import { updateSettings, deleteAccount } from '../controllers/userController';
 import {
   cancelTeamInvitation,
   getTeamWorkspace,
@@ -14,6 +14,7 @@ import {
 const router = Router();
 
 router.patch('/settings', checkJwt, attachUser, updateSettings);
+router.delete('/account', checkJwt, attachUser, deleteAccount);
 router.get('/team', checkJwt, attachUser, getTeamWorkspace);
 router.post('/team/invitations', checkJwt, attachUser, teamLimiter, inviteTeamMember);
 router.patch('/team/members/:userId', checkJwt, attachUser, validateObjectId('userId'), teamLimiter, updateTeamMemberRole);
