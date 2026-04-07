@@ -100,6 +100,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **CI backend build failure**: Removed deprecated `zapier`, `make`, and `moodle` provider entries from `INTEGRATION_CATALOG` in `integrationService.ts` — these providers were already removed from the `IntegrationProvider` type union, causing TS2322 type mismatch errors on every push
+- **CI frontend test failure**: Rewrote `Integrations.test.tsx` to assert against current UI text (`Integrations Hub`, `Google Sheets, Canvas LMS, and Webhooks`) instead of stale strings that no longer exist in the page after the Hub layout optimization
+- **Decorative blur blobs**: Restored `rounded-full` on background decorative blurs in `Dashboard.tsx`, `Home.tsx`, and `main.tsx` that were incorrectly flattened to `rounded` during the mass design-system refactor
 - **Auth error URL cleanup**: Clear `?error=` and `?error_description=` URL params after displaying the auth error modal so hard reload no longer re-triggers the modal with stale error state
 - **FAQ.tsx `Award` icon missing import**: Fixed `ReferenceError: Award is not defined` console error — added `Award` to the `lucide-react` import list and removed the unused `ChevronDown` import
 - **Backend JWT validation 500 errors**: `express-oauth2-jwt-bearer` v1.7.4 throws `Error: An 'audience' is required to validate the 'aud' claim` at runtime even though TypeScript types mark `audience` as optional — restored `audience: process.env.AUTH0_AUDIENCE` in `backend/src/middleware/auth.ts` so authenticated API routes return 200 instead of 500

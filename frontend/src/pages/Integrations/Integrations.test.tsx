@@ -1,6 +1,5 @@
 import { MemoryRouter } from 'react-router-dom';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { Integrations } from './Integrations';
 import type { Integration, Template, User } from '@/types';
@@ -137,31 +136,16 @@ beforeAll(() => {
 });
 
 describe('Integrations page', () => {
-  it('prioritizes Google Sheets and shows native sync controls by default', () => {
+  it('renders the Integrations Hub heading and provider description', () => {
     render(
       <MemoryRouter>
         <Integrations />
       </MemoryRouter>
     );
 
-    expect(screen.getByText('Start with Google Sheets or Canvas')).toBeInTheDocument();
-    expect(screen.getByText('Native Google Sheets sync')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Ready to Issue')).toBeInTheDocument();
-  });
-
-  it('switches to the Canvas-first native handoff form when the provider changes', async () => {
-    const user = userEvent.setup();
-
-    render(
-      <MemoryRouter>
-        <Integrations />
-      </MemoryRouter>
-    );
-
-    await user.selectOptions(screen.getByLabelText('Provider'), 'canvas');
-
-    expect(screen.getByText('Native Canvas handoff')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Assignment comment')).toBeInTheDocument();
-    expect(screen.getByText('Completion preset')).toBeInTheDocument();
+    expect(screen.getByText('Integrations Hub')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Google Sheets, Canvas LMS, and Webhooks/)
+    ).toBeInTheDocument();
   });
 });

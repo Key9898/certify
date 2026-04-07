@@ -12,22 +12,6 @@ export interface IntegrationCatalogItem {
 
 export const INTEGRATION_CATALOG: IntegrationCatalogItem[] = [
   {
-    provider: 'zapier',
-    label: 'Zapier',
-    category: 'automation',
-    summary: 'Trigger certificate creation from 7,000+ apps with a single webhook step.',
-    recommendedMode: 'single',
-    highlights: ['No-code automations', 'CRM and form triggers', 'Fast webhook setup'],
-  },
-  {
-    provider: 'make',
-    label: 'Make',
-    category: 'automation',
-    summary: 'Chain certificate issuance into complex multi-step scenarios and approvals.',
-    recommendedMode: 'batch',
-    highlights: ['Scenario builder', 'Conditional logic', 'Async batch-friendly'],
-  },
-  {
     provider: 'google_sheets',
     label: 'Google Sheets',
     category: 'spreadsheet',
@@ -35,14 +19,6 @@ export const INTEGRATION_CATALOG: IntegrationCatalogItem[] = [
       'Turn spreadsheet rows into certificates with Apps Script plus native status write-back through the Google Sheets API.',
     recommendedMode: 'batch',
     highlights: ['Spreadsheet source of truth', 'Apps Script starter', 'Native row write-back'],
-  },
-  {
-    provider: 'moodle',
-    label: 'Moodle',
-    category: 'lms',
-    summary: 'Issue certificates when learners complete courses or assessments.',
-    recommendedMode: 'single',
-    highlights: ['Course completion events', 'LMS-ready payloads', 'Branded verify pages'],
   },
   {
     provider: 'canvas',
@@ -62,6 +38,7 @@ export const INTEGRATION_CATALOG: IntegrationCatalogItem[] = [
     highlights: ['Portable payload contract', 'Works with internal tools', 'Flexible field overrides'],
   },
 ];
+
 
 const DEFAULT_CERTIFICATE_TITLE = 'Certificate of Achievement';
 const DEFAULT_ISSUER_NAME = 'Certify';
