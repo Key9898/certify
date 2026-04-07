@@ -23,7 +23,7 @@ const Integrations = lazy(() =>
   import('@/pages/Integrations').then((m) => ({ default: m.Integrations }))
 );
 const Settings = lazy(() => import('@/pages/Settings').then((m) => ({ default: m.Settings })));
-const Verify = lazy(() => import('@/pages/Verify').then((m) => ({ default: m.Verify })));
+const Verify = lazy(() => import('@/pages/Verify').then((m) => ({ default: m.VerifyPortal })));
 const VerifyPortal = lazy(() => import('@/pages/Verify').then((m) => ({ default: m.VerifyPortal })));
 const TemplateBuilder = lazy(() =>
   import('@/pages/TemplateBuilder').then((m) => ({ default: m.TemplateBuilder }))

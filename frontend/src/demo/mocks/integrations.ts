@@ -4,7 +4,7 @@ export const MOCK_INTEGRATIONS: Integration[] = [
   {
     _id: 'integration-zapier-demo',
     name: 'Zapier Course Awards',
-    provider: 'zapier',
+    provider: 'custom',
     description: 'Create a branded certificate whenever a Typeform + CRM flow is marked complete.',
     status: 'active',
     mode: 'single',
