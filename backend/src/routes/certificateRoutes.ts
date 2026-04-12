@@ -15,7 +15,13 @@ import {
 const router = Router();
 
 router.get('/', checkJwt, attachUser, listCertificates);
-router.get('/:id', checkJwt, attachUser, validateObjectId('id'), getCertificate);
+router.get(
+  '/:id',
+  checkJwt,
+  attachUser,
+  validateObjectId('id'),
+  getCertificate
+);
 router.post('/', checkJwt, attachUser, createCertificateHandler);
 router.post(
   '/generate-pdf/:id',
@@ -33,7 +39,19 @@ router.post(
   pdfLimiter,
   generatePngHandler
 );
-router.patch('/:id/revoke', checkJwt, attachUser, validateObjectId('id'), revokeCertificate);
-router.delete('/:id', checkJwt, attachUser, validateObjectId('id'), deleteCertificate);
+router.patch(
+  '/:id/revoke',
+  checkJwt,
+  attachUser,
+  validateObjectId('id'),
+  revokeCertificate
+);
+router.delete(
+  '/:id',
+  checkJwt,
+  attachUser,
+  validateObjectId('id'),
+  deleteCertificate
+);
 
 export default router;

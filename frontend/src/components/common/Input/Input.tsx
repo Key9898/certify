@@ -22,7 +22,9 @@ export const Input: React.FC<InputProps> = ({
         </label>
       )}
       <div className={leftAddon || rightAddon ? 'join w-full' : ''}>
-        {leftAddon && <span className="join-item btn btn-outline">{leftAddon}</span>}
+        {leftAddon && (
+          <span className="join-item btn btn-outline">{leftAddon}</span>
+        )}
         <input
           id={inputId}
           className={[
@@ -35,10 +37,14 @@ export const Input: React.FC<InputProps> = ({
             .filter(Boolean)
             .join(' ')}
           aria-invalid={!!error}
-          aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
+          aria-describedby={
+            error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined
+          }
           {...props}
         />
-        {rightAddon && <span className="join-item btn btn-outline">{rightAddon}</span>}
+        {rightAddon && (
+          <span className="join-item btn btn-outline">{rightAddon}</span>
+        )}
       </div>
       {error && (
         <label className="label" id={`${inputId}-error`}>

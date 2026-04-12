@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle, ExternalLink, Wand2 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -11,8 +11,18 @@ import { useTemplates } from '@/hooks/useTemplates';
 import { useAppUser } from '@/context/AuthContext';
 import { useDemo } from '@/context/DemoContext';
 import { createCertificate, generatePdf } from '@/utils/certificateApi';
-import { DEFAULT_PRIMARY_COLOR, DEFAULT_SECONDARY_COLOR, ROUTES } from '@/utils/constants';
-import { QUICK_SPRING, SOFT_SPRING, TAP_PRESS, STAGGER_CONTAINER, REVEAL_ITEM } from '@/utils/motion';
+import {
+  DEFAULT_PRIMARY_COLOR,
+  DEFAULT_SECONDARY_COLOR,
+  ROUTES,
+} from '@/utils/constants';
+import {
+  QUICK_SPRING,
+  SOFT_SPRING,
+  TAP_PRESS,
+  STAGGER_CONTAINER,
+  REVEAL_ITEM,
+} from '@/utils/motion';
 import type { Template } from '@/types';
 import type { CertificateFormData } from '@/components/certificate/CertificateForm/CertificateForm.types';
 
@@ -24,20 +34,25 @@ interface SuccessState {
   recipientName: string;
 }
 
-const STEP_ORDER: Array<Exclude<Step, 'success'>> = ['select-template', 'fill-details'];
+const STEP_ORDER: Array<Exclude<Step, 'success'>> = [
+  'select-template',
+  'fill-details',
+];
 
 export const CreateCertificate: React.FC = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { appUser, isLoadingUser } = useAppUser();
   const { isDemoMode, setMockCertificates } = useDemo();
-  const { templates, isLoading: tmplLoading, error: tmplError } = useTemplates();
+  const {
+    templates,
+    isLoading: tmplLoading,
+    error: tmplError,
+  } = useTemplates();
 
-  const preselectedId = (location.state as { templateId?: string })?.templateId;
-  const preselected = templates.find((template) => template._id === preselectedId) ?? null;
-
-  const [step, setStep] = useState<Step>(preselected ? 'fill-details' : 'select-template');
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(preselected);
+  const [step, setStep] = useState<Step>('select-template');
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(
+    null
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [success, setSuccess] = useState<SuccessState | null>(null);
@@ -45,7 +60,9 @@ export const CreateCertificate: React.FC = () => {
 
   const editorKey = [
     selectedTemplate?._id || 'no-template',
-    appUser?.settings.defaultLogo || appUser?.organization?.whiteLabel.logoUrl || 'no-logo',
+    appUser?.settings.defaultLogo ||
+      appUser?.organization?.whiteLabel.logoUrl ||
+      'no-logo',
     appUser?.organization?.whiteLabel.primaryColor ||
       appUser?.settings.defaultColors.primary ||
       DEFAULT_PRIMARY_COLOR,
@@ -146,7 +163,9 @@ export const CreateCertificate: React.FC = () => {
       });
       setStep('success');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create certificate');
+      setError(
+        err instanceof Error ? err.message : 'Failed to create certificate'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -182,17 +201,17 @@ export const CreateCertificate: React.FC = () => {
                   Certificate Wizard
                 </div>
                 <h1 className="text-3xl font-black tracking-tight text-base-content md:text-4xl">
-                  Issue Single Record
+                  Create Single Record
                 </h1>
                 <p className="mt-2 text-sm font-medium text-base-content/50">
-                  {step === 'select-template' 
-                    ? 'Begin by picking a high-fidelity template from your library.' 
+                  {step === 'select-template'
+                    ? 'Begin by picking a high-fidelity template from your templates.'
                     : 'Personalize the recipient details and branding parameters.'}
                 </p>
               </div>
             </div>
 
-            <motion.div 
+            <motion.div
               variants={STAGGER_CONTAINER}
               initial="hidden"
               animate="visible"
@@ -200,15 +219,16 @@ export const CreateCertificate: React.FC = () => {
             >
               {STEP_ORDER.map((currentStep, index) => {
                 const isActive = step === currentStep;
-                const isComplete = step === 'fill-details' && currentStep === 'select-template';
+                const isComplete =
+                  step === 'fill-details' && currentStep === 'select-template';
 
                 return (
                   <motion.div
                     key={currentStep}
                     variants={REVEAL_ITEM}
                     className={`relative overflow-hidden rounded border px-5 py-3 transition-colors ${
-                      isActive 
-                        ? 'border-primary/30 bg-primary/5 shadow-sm' 
+                      isActive
+                        ? 'border-primary/30 bg-primary/5 shadow-sm'
                         : isComplete
                           ? 'border-success/30 bg-success/5'
                           : 'border-base-200 bg-base-100/50 grayscale'
@@ -218,12 +238,20 @@ export const CreateCertificate: React.FC = () => {
                       <p className="text-[9px] font-black uppercase tracking-[0.2em] text-base-content/40">
                         Step {index + 1}
                       </p>
-                      {isComplete && <CheckCircle size={12} className="text-success" />}
+                      {isComplete && (
+                        <CheckCircle size={12} className="text-success" />
+                      )}
                     </div>
-                    <p className={`mt-1 text-xs font-black uppercase tracking-widest ${
-                      isActive || isComplete ? 'text-base-content' : 'text-base-content/30'
-                    }`}>
-                      {currentStep === 'select-template' ? 'Theme Base' : 'Personalize'}
+                    <p
+                      className={`mt-1 text-xs font-black uppercase tracking-widest ${
+                        isActive || isComplete
+                          ? 'text-base-content'
+                          : 'text-base-content/30'
+                      }`}
+                    >
+                      {currentStep === 'select-template'
+                        ? 'Theme Base'
+                        : 'Personalize'}
                     </p>
                     <div className="mt-3 h-1 w-full overflow-hidden rounded bg-base-200">
                       <motion.div
@@ -305,9 +333,9 @@ export const CreateCertificate: React.FC = () => {
                           {selectedTemplate.category} Theme
                         </p>
                       </div>
-                      <Button 
-                        variant="primary" 
-                        size="lg" 
+                      <Button
+                        variant="primary"
+                        size="lg"
                         className="w-full rounded font-black uppercase tracking-widest shadow-xl shadow-primary/20 sm:w-auto"
                         onClick={handleProceedToEditor}
                       >
@@ -332,7 +360,11 @@ export const CreateCertificate: React.FC = () => {
                     <motion.div
                       className="mb-4 h-12 w-12 rounded border-2 border-primary/20 border-t-primary"
                       animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: 'linear',
+                      }}
                     />
                     <p className="text-sm font-black uppercase tracking-widest text-base-content/40">
                       Syncing Branding Assets...
@@ -386,7 +418,11 @@ export const CreateCertificate: React.FC = () => {
                 transition={{ ...SOFT_SPRING, delay: 0.15 }}
                 className="mt-4 text-lg font-medium text-base-content/60"
               >
-                The record for <span className="font-black text-base-content">{success.recipientName}</span> has been verified and stored in the ledger.
+                The record for{' '}
+                <span className="font-black text-base-content">
+                  {success.recipientName}
+                </span>{' '}
+                has been verified and stored in the registry.
               </motion.p>
 
               <motion.div
@@ -426,12 +462,12 @@ export const CreateCertificate: React.FC = () => {
                       setSuccess(null);
                     }}
                   >
-                    Issue New
+                    Create New
                   </Button>
                 </div>
               </motion.div>
 
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}

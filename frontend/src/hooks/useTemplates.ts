@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchTemplates } from '@/utils/templateApi';
 import { useDemo } from '@/context/DemoContext';
 import type { Template } from '@/types';
@@ -9,27 +9,28 @@ export const useTemplates = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadTemplates = useCallback(async () => {
     if (isDemoMode) {
       setTemplates(mockTemplates);
       setIsLoading(false);
       return;
     }
 
-    const load = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const result = await fetchTemplates();
-        setTemplates(result.data || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load templates');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    load();
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await fetchTemplates();
+      setTemplates(result.data || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load templates');
+    } finally {
+      setIsLoading(false);
+    }
   }, [isDemoMode, mockTemplates]);
 
-  return { templates, isLoading, error };
+  useEffect(() => {
+    loadTemplates();
+  }, [loadTemplates]);
+
+  return { templates, isLoading, error, refetch: loadTemplates };
 };

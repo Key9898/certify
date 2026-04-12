@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -20,7 +26,12 @@ import { FileUpload } from '@/components/common/FileUpload';
 import { Input } from '@/components/common/Input';
 import { useCloudinary } from '@/hooks/useCloudinary';
 import { post } from '@/utils/api';
-import { DEFAULT_PRIMARY_COLOR, DEFAULT_SECONDARY_COLOR, ROUTES, TEMPLATE_CATEGORIES } from '@/utils/constants';
+import {
+  DEFAULT_PRIMARY_COLOR,
+  DEFAULT_SECONDARY_COLOR,
+  ROUTES,
+  TEMPLATE_CATEGORIES,
+} from '@/utils/constants';
 import type { Template } from '@/types';
 import type { ApiResponse } from '@/types/api';
 import type {
@@ -29,7 +40,12 @@ import type {
   TemplateFieldTextAlign,
   TemplateMode,
 } from '@/types/template';
-import { REVEAL_ITEM, SOFT_SPRING, STAGGER_CONTAINER, TAP_PRESS } from '@/utils/motion';
+import {
+  REVEAL_ITEM,
+  SOFT_SPRING,
+  STAGGER_CONTAINER,
+  TAP_PRESS,
+} from '@/utils/motion';
 
 const PRESET_TEMPLATES = [
   {
@@ -57,7 +73,11 @@ const FONT_OPTIONS = [
   'Garamond, serif',
 ] as const;
 
-const createPreviewAsset = (label: string, background: string, foreground: string) =>
+const createPreviewAsset = (
+  label: string,
+  background: string,
+  foreground: string
+) =>
   `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" width="640" height="320" viewBox="0 0 640 320">
       <rect width="640" height="320" rx="28" fill="${background}" />
@@ -79,7 +99,8 @@ const createPreviewAsset = (label: string, background: string, foreground: strin
 const SAMPLE_PREVIEW_DATA = {
   recipientName: 'Alex Morgan',
   certificateTitle: 'Certificate of Outstanding Completion',
-  description: 'Presented for successfully completing the Advanced Product Systems Program.',
+  description:
+    'Presented for successfully completing the Advanced Product Systems Program.',
   issueDate: 'April 6, 2026',
   expiryDate: 'April 6, 2027',
   issuerName: 'Certify Academy',
@@ -196,7 +217,7 @@ const DEFAULT_BACKGROUND_FIELDS: TemplateField[] = [
   },
   {
     name: 'issuerName',
-    label: 'Issuer Name',
+    label: 'Program Name',
     type: 'text',
     required: true,
     visible: true,
@@ -248,7 +269,7 @@ const DEFAULT_BACKGROUND_FIELDS: TemplateField[] = [
   },
   {
     name: 'issuerSignature',
-    label: 'Issuer Signature',
+    label: 'Signature',
     type: 'image',
     required: false,
     visible: false,
@@ -270,7 +291,9 @@ interface FormState {
   fields: TemplateField[];
 }
 
-type FormErrors = Partial<Record<'name' | 'category' | 'backgroundImageUrl' | 'fields', string>>;
+type FormErrors = Partial<
+  Record<'name' | 'category' | 'backgroundImageUrl' | 'fields', string>
+>;
 
 const cloneFields = (): TemplateField[] =>
   DEFAULT_BACKGROUND_FIELDS.map((field) => ({
@@ -280,11 +303,15 @@ const cloneFields = (): TemplateField[] =>
     style: field.style ? { ...field.style } : undefined,
   }));
 
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
 
 const resolvePreviewValue = (field: TemplateField): string => {
-  const sampleValue = SAMPLE_PREVIEW_DATA[field.name as keyof typeof SAMPLE_PREVIEW_DATA];
-  return typeof sampleValue === 'string' ? sampleValue : field.defaultValue || '';
+  const sampleValue =
+    SAMPLE_PREVIEW_DATA[field.name as keyof typeof SAMPLE_PREVIEW_DATA];
+  return typeof sampleValue === 'string'
+    ? sampleValue
+    : field.defaultValue || '';
 };
 
 const getTextAlignButtonClass = (isActive: boolean) =>
@@ -307,7 +334,8 @@ export const TemplateBuilder: React.FC = () => {
     backgroundImageUrl: '',
     fields: cloneFields(),
   });
-  const [selectedFieldName, setSelectedFieldName] = useState<string>('recipientName');
+  const [selectedFieldName, setSelectedFieldName] =
+    useState<string>('recipientName');
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -317,11 +345,14 @@ export const TemplateBuilder: React.FC = () => {
     [form.fields]
   );
   const selectedField = useMemo(
-    () => form.fields.find((field) => field.name === selectedFieldName) ?? form.fields[0],
+    () =>
+      form.fields.find((field) => field.name === selectedFieldName) ??
+      form.fields[0],
     [form.fields, selectedFieldName]
   );
   const selectedPreset = useMemo(
-    () => PRESET_TEMPLATES.find((template) => template.value === form.htmlContent),
+    () =>
+      PRESET_TEMPLATES.find((template) => template.value === form.htmlContent),
     [form.htmlContent]
   );
 
@@ -335,21 +366,32 @@ export const TemplateBuilder: React.FC = () => {
     }
   }, [form.fields, selectedField]);
 
-  const setFormValue = useCallback((key: keyof FormState, value: string | TemplateField[]) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-    setErrors((prev) => ({ ...prev, [key as keyof FormErrors]: undefined }));
-  }, []);
+  const setFormValue = useCallback(
+    (key: keyof FormState, value: string | TemplateField[]) => {
+      setForm((prev) => ({ ...prev, [key]: value }));
+      setErrors((prev) => ({ ...prev, [key as keyof FormErrors]: undefined }));
+    },
+    []
+  );
 
-  const updateField = useCallback((fieldName: string, updater: (field: TemplateField) => TemplateField) => {
-    setForm((prev) => ({
-      ...prev,
-      fields: prev.fields.map((field) => (field.name === fieldName ? updater(field) : field)),
-    }));
-    setErrors((prev) => ({ ...prev, fields: undefined }));
-  }, []);
+  const updateField = useCallback(
+    (fieldName: string, updater: (field: TemplateField) => TemplateField) => {
+      setForm((prev) => ({
+        ...prev,
+        fields: prev.fields.map((field) =>
+          field.name === fieldName ? updater(field) : field
+        ),
+      }));
+      setErrors((prev) => ({ ...prev, fields: undefined }));
+    },
+    []
+  );
 
   const updateSelectedFieldStyle = useCallback(
-    <K extends keyof TemplateFieldStyle>(key: K, value: TemplateFieldStyle[K]) => {
+    <K extends keyof TemplateFieldStyle>(
+      key: K,
+      value: TemplateFieldStyle[K]
+    ) => {
       if (!selectedField) {
         return;
       }
@@ -391,14 +433,19 @@ export const TemplateBuilder: React.FC = () => {
     }
   };
 
-  const handlePointerDown = (event: React.PointerEvent<HTMLButtonElement>, fieldName: string) => {
+  const handlePointerDown = (
+    event: React.PointerEvent<HTMLButtonElement>,
+    fieldName: string
+  ) => {
     dragFieldRef.current = fieldName;
     setSelectedFieldName(fieldName);
     event.currentTarget.setPointerCapture(event.pointerId);
     syncDraggedField(event.clientX, event.clientY);
   };
 
-  const handlePreviewPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+  const handlePreviewPointerMove = (
+    event: React.PointerEvent<HTMLDivElement>
+  ) => {
     if (!dragFieldRef.current) {
       return;
     }
@@ -408,6 +455,76 @@ export const TemplateBuilder: React.FC = () => {
   const handlePreviewPointerUp = () => {
     dragFieldRef.current = null;
   };
+
+  const setFieldStyle = useCallback(
+    (element: HTMLButtonElement | null, field: TemplateField) => {
+      if (!element) return;
+      const style = element.style;
+      style.setProperty('--field-x', `${field.position.x}%`);
+      style.setProperty('--field-y', `${field.position.y}%`);
+      if (field.size?.width !== undefined) {
+        style.setProperty('--field-width', `${field.size.width}%`);
+      }
+      if (field.type === 'image' && field.size?.height !== undefined) {
+        style.setProperty('--field-height', `${field.size.height}%`);
+      }
+      if (field.style) {
+        if (field.style.fontSize !== undefined) {
+          style.setProperty('--field-font-size', `${field.style.fontSize}px`);
+        }
+        if (field.style.fontWeight !== undefined) {
+          style.setProperty(
+            '--field-font-weight',
+            String(field.style.fontWeight)
+          );
+        }
+        if (field.style.fontFamily) {
+          style.setProperty('--field-font-family', field.style.fontFamily);
+        }
+        if (field.style.color) {
+          style.setProperty('--field-color', field.style.color);
+        }
+        if (field.style.textAlign) {
+          style.setProperty('--field-text-align', field.style.textAlign);
+        }
+        if (field.style.lineHeight !== undefined) {
+          style.setProperty(
+            '--field-line-height',
+            String(field.style.lineHeight)
+          );
+        }
+        if (field.style.letterSpacing !== undefined) {
+          style.setProperty(
+            '--field-letter-spacing',
+            `${field.style.letterSpacing}px`
+          );
+        }
+        if (field.style.fontStyle) {
+          style.setProperty('--field-font-style', field.style.fontStyle);
+        }
+        if (field.style.textTransform) {
+          style.setProperty(
+            '--field-text-transform',
+            field.style.textTransform
+          );
+        }
+      }
+    },
+    []
+  );
+
+  const setPresetStyle = useCallback(
+    (
+      element: HTMLDivElement | null,
+      primaryColor: string,
+      secondaryColor: string
+    ) => {
+      if (!element) return;
+      element.style.setProperty('--preset-primary', primaryColor);
+      element.style.setProperty('--preset-secondary', secondaryColor);
+    },
+    []
+  );
 
   const validate = (): boolean => {
     const nextErrors: FormErrors = {};
@@ -422,7 +539,8 @@ export const TemplateBuilder: React.FC = () => {
 
     if (form.mode === 'background') {
       if (!form.backgroundImageUrl) {
-        nextErrors.backgroundImageUrl = 'Upload a background image before publishing.';
+        nextErrors.backgroundImageUrl =
+          'Upload a background image before publishing.';
       }
 
       if (visibleFieldCount === 0) {
@@ -472,7 +590,9 @@ export const TemplateBuilder: React.FC = () => {
 
       navigate(ROUTES.TEMPLATES);
     } catch (error) {
-      setSaveError(error instanceof Error ? error.message : 'Failed to save template.');
+      setSaveError(
+        error instanceof Error ? error.message : 'Failed to save template.'
+      );
     } finally {
       setIsSaving(false);
     }
@@ -497,8 +617,9 @@ export const TemplateBuilder: React.FC = () => {
                 Background Template Builder
               </h1>
               <p className="mt-4 max-w-3xl text-lg font-medium leading-relaxed text-base-content/60">
-                Keep preset themes for quick work, or import a Canva-ready background, place your
-                data fields, and publish a reusable template for CSV or Excel batch PDF exports.
+                Keep preset themes for quick work, or import a Canva-ready
+                background, place your data fields, and publish a reusable
+                template for CSV or Excel batch PDF exports.
               </p>
             </div>
 
@@ -561,7 +682,9 @@ export const TemplateBuilder: React.FC = () => {
                     className="textarea textarea-bordered min-h-[120px] rounded"
                     placeholder="Describe when this template should be used and what makes it special."
                     value={form.description}
-                    onChange={(event) => setFormValue('description', event.target.value)}
+                    onChange={(event) =>
+                      setFormValue('description', event.target.value)
+                    }
                   />
                 </div>
 
@@ -573,9 +696,13 @@ export const TemplateBuilder: React.FC = () => {
                     id="template-category"
                     className="select select-bordered rounded"
                     value={form.category}
-                    onChange={(event) => setFormValue('category', event.target.value)}
+                    onChange={(event) =>
+                      setFormValue('category', event.target.value)
+                    }
                   >
-                    {TEMPLATE_CATEGORIES.filter((category) => category.value !== 'all').map((category) => (
+                    {TEMPLATE_CATEGORIES.filter(
+                      (category) => category.value !== 'all'
+                    ).map((category) => (
                       <option key={category.value} value={category.value}>
                         {category.label}
                       </option>
@@ -583,7 +710,9 @@ export const TemplateBuilder: React.FC = () => {
                   </select>
                   {errors.category ? (
                     <label className="label">
-                      <span className="label-text-alt text-error">{errors.category}</span>
+                      <span className="label-text-alt text-error">
+                        {errors.category}
+                      </span>
                     </label>
                   ) : null}
                 </div>
@@ -613,7 +742,9 @@ export const TemplateBuilder: React.FC = () => {
                         <motion.button
                           key={template.value}
                           type="button"
-                          onClick={() => setFormValue('htmlContent', template.value)}
+                          onClick={() =>
+                            setFormValue('htmlContent', template.value)
+                          }
                           whileTap={TAP_PRESS}
                           className={`card items-start rounded border p-5 text-left transition-colors ${
                             isActive
@@ -621,7 +752,9 @@ export const TemplateBuilder: React.FC = () => {
                               : 'border-base-200 hover:border-primary/30'
                           }`}
                         >
-                          <p className="text-base font-black text-base-content">{template.label}</p>
+                          <p className="text-base font-black text-base-content">
+                            {template.label}
+                          </p>
                           <p className="mt-2 text-sm leading-relaxed text-base-content/55">
                             {template.preview}
                           </p>
@@ -660,13 +793,18 @@ export const TemplateBuilder: React.FC = () => {
                           <input
                             type="color"
                             value={form[colorField.key]}
-                            onChange={(event) => setFormValue(colorField.key, event.target.value)}
+                            onChange={(event) =>
+                              setFormValue(colorField.key, event.target.value)
+                            }
                             className="h-12 w-12 cursor-pointer rounded border border-base-300 bg-transparent"
+                            aria-label={colorField.label}
                           />
                           <Input
                             label=""
                             value={form[colorField.key]}
-                            onChange={(event) => setFormValue(colorField.key, event.target.value)}
+                            onChange={(event) =>
+                              setFormValue(colorField.key, event.target.value)
+                            }
                             className="font-mono uppercase"
                           />
                         </div>
@@ -692,9 +830,10 @@ export const TemplateBuilder: React.FC = () => {
 
                   <div className="space-y-6">
                     <div className="rounded border border-info/30 bg-info/10 p-4 text-sm leading-relaxed text-base-content/70">
-                      Export your certificate art from Canva or any design tool as a landscape PNG
-                      in A4 ratio. Then place the live fields here so users can batch-fill names,
-                      dates, IDs, and logos before exporting PDFs.
+                      Export your certificate art from Canva or any design tool
+                      as a landscape PNG in A4 ratio. Then place the live fields
+                      here so users can bulk-fill names, dates, IDs, and logos
+                      before exporting PDFs.
                     </div>
 
                     <FileUpload
@@ -705,7 +844,9 @@ export const TemplateBuilder: React.FC = () => {
                       previewUrl={form.backgroundImageUrl || undefined}
                       hint="Recommended: A4 landscape canvas, high-resolution PNG"
                       isUploading={isUploading}
-                      error={errors.backgroundImageUrl || uploadError || undefined}
+                      error={
+                        errors.backgroundImageUrl || uploadError || undefined
+                      }
                     />
                   </div>
                 </motion.section>
@@ -724,8 +865,8 @@ export const TemplateBuilder: React.FC = () => {
                           Dynamic Fields
                         </h2>
                         <p className="text-sm text-base-content/55">
-                          Toggle what Certify should inject. Then drag visible fields directly on
-                          the preview canvas.
+                          Toggle what Certify should inject. Then drag visible
+                          fields directly on the preview canvas.
                         </p>
                       </div>
                     </div>
@@ -735,7 +876,8 @@ export const TemplateBuilder: React.FC = () => {
                         Live Placement
                       </p>
                       <p className="mt-1 text-lg font-black text-base-content">
-                        {visibleFieldCount} visible field{visibleFieldCount === 1 ? '' : 's'}
+                        {visibleFieldCount} visible field
+                        {visibleFieldCount === 1 ? '' : 's'}
                       </p>
                     </div>
                   </div>
@@ -746,22 +888,26 @@ export const TemplateBuilder: React.FC = () => {
                         const isSelected = selectedField?.name === field.name;
 
                         return (
-                          <button
+                          <div
                             key={field.name}
-                            type="button"
-                            onClick={() => setSelectedFieldName(field.name)}
-                            className={`flex w-full items-center justify-between rounded border px-4 py-3 text-left transition-colors ${
+                            className={`flex w-full items-center justify-between rounded border px-4 py-3 transition-colors ${
                               isSelected
                                 ? 'border-primary bg-primary/5 shadow-sm'
                                 : 'border-base-200 hover:border-primary/25'
                             }`}
                           >
-                            <div>
-                              <p className="text-sm font-black text-base-content">{field.label}</p>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedFieldName(field.name)}
+                              className="flex-1 text-left"
+                            >
+                              <p className="text-sm font-black text-base-content">
+                                {field.label}
+                              </p>
                               <p className="text-[10px] font-black uppercase tracking-widest text-base-content/35">
                                 {field.type} field
                               </p>
-                            </div>
+                            </button>
                             <input
                               type="checkbox"
                               className="toggle toggle-primary"
@@ -772,10 +918,9 @@ export const TemplateBuilder: React.FC = () => {
                                   visible: !(currentField.visible !== false),
                                 }))
                               }
-                              onClick={(event) => event.stopPropagation()}
                               aria-label={`Toggle ${field.label}`}
                             />
-                          </button>
+                          </div>
                         );
                       })}
                     </div>
@@ -823,7 +968,11 @@ export const TemplateBuilder: React.FC = () => {
                                   ...field,
                                   position: {
                                     ...field.position,
-                                    x: clamp(Number(event.target.value) || 0, 0, 100),
+                                    x: clamp(
+                                      Number(event.target.value) || 0,
+                                      0,
+                                      100
+                                    ),
                                   },
                                 }))
                               }
@@ -837,7 +986,11 @@ export const TemplateBuilder: React.FC = () => {
                                   ...field,
                                   position: {
                                     ...field.position,
-                                    y: clamp(Number(event.target.value) || 0, 0, 100),
+                                    y: clamp(
+                                      Number(event.target.value) || 0,
+                                      0,
+                                      100
+                                    ),
                                   },
                                 }))
                               }
@@ -845,13 +998,19 @@ export const TemplateBuilder: React.FC = () => {
                             <Input
                               label="Width (%)"
                               type="number"
-                              value={Math.round(selectedField.size?.width ?? 32)}
+                              value={Math.round(
+                                selectedField.size?.width ?? 32
+                              )}
                               onChange={(event) =>
                                 updateField(selectedField.name, (field) => ({
                                   ...field,
                                   size: {
                                     ...(field.size || {}),
-                                    width: clamp(Number(event.target.value) || 0, 8, 100),
+                                    width: clamp(
+                                      Number(event.target.value) || 0,
+                                      8,
+                                      100
+                                    ),
                                   },
                                 }))
                               }
@@ -862,13 +1021,19 @@ export const TemplateBuilder: React.FC = () => {
                             <Input
                               label="Height (%)"
                               type="number"
-                              value={Math.round(selectedField.size?.height ?? 12)}
+                              value={Math.round(
+                                selectedField.size?.height ?? 12
+                              )}
                               onChange={(event) =>
                                 updateField(selectedField.name, (field) => ({
                                   ...field,
                                   size: {
                                     width: field.size?.width ?? 18,
-                                    height: clamp(Number(event.target.value) || 0, 5, 60),
+                                    height: clamp(
+                                      Number(event.target.value) || 0,
+                                      5,
+                                      60
+                                    ),
                                   },
                                 }))
                               }
@@ -879,22 +1044,34 @@ export const TemplateBuilder: React.FC = () => {
                                 <Input
                                   label="Font Size (px)"
                                   type="number"
-                                  value={Math.round(selectedField.style?.fontSize ?? 24)}
+                                  value={Math.round(
+                                    selectedField.style?.fontSize ?? 24
+                                  )}
                                   onChange={(event) =>
                                     updateSelectedFieldStyle(
                                       'fontSize',
-                                      clamp(Number(event.target.value) || 0, 10, 96)
+                                      clamp(
+                                        Number(event.target.value) || 0,
+                                        10,
+                                        96
+                                      )
                                     )
                                   }
                                 />
                                 <Input
                                   label="Font Weight"
                                   type="number"
-                                  value={Math.round(selectedField.style?.fontWeight ?? 600)}
+                                  value={Math.round(
+                                    selectedField.style?.fontWeight ?? 600
+                                  )}
                                   onChange={(event) =>
                                     updateSelectedFieldStyle(
                                       'fontWeight',
-                                      clamp(Number(event.target.value) || 0, 300, 900)
+                                      clamp(
+                                        Number(event.target.value) || 0,
+                                        300,
+                                        900
+                                      )
                                     )
                                   }
                                 />
@@ -902,19 +1079,33 @@ export const TemplateBuilder: React.FC = () => {
 
                               <div className="grid gap-4 md:grid-cols-2">
                                 <div className="form-control">
-                                  <label className="label" htmlFor="field-font-family">
-                                    <span className="label-text font-medium">Font Family</span>
+                                  <label
+                                    className="label"
+                                    htmlFor="field-font-family"
+                                  >
+                                    <span className="label-text font-medium">
+                                      Font Family
+                                    </span>
                                   </label>
                                   <select
                                     id="field-font-family"
                                     className="select select-bordered rounded"
-                                    value={selectedField.style?.fontFamily || FONT_OPTIONS[0]}
+                                    value={
+                                      selectedField.style?.fontFamily ||
+                                      FONT_OPTIONS[0]
+                                    }
                                     onChange={(event) =>
-                                      updateSelectedFieldStyle('fontFamily', event.target.value)
+                                      updateSelectedFieldStyle(
+                                        'fontFamily',
+                                        event.target.value
+                                      )
                                     }
                                   >
                                     {FONT_OPTIONS.map((fontOption) => (
-                                      <option key={fontOption} value={fontOption}>
+                                      <option
+                                        key={fontOption}
+                                        value={fontOption}
+                                      >
                                         {fontOption}
                                       </option>
                                     ))}
@@ -922,24 +1113,39 @@ export const TemplateBuilder: React.FC = () => {
                                 </div>
 
                                 <div className="form-control">
-                                  <label className="label" htmlFor="field-color">
-                                    <span className="label-text font-medium">Text Color</span>
+                                  <label
+                                    className="label"
+                                    htmlFor="field-color"
+                                  >
+                                    <span className="label-text font-medium">
+                                      Text Color
+                                    </span>
                                   </label>
                                   <div className="flex items-center gap-3">
                                     <input
                                       id="field-color"
                                       type="color"
-                                      value={selectedField.style?.color || '#111827'}
+                                      value={
+                                        selectedField.style?.color || '#111827'
+                                      }
                                       onChange={(event) =>
-                                        updateSelectedFieldStyle('color', event.target.value)
+                                        updateSelectedFieldStyle(
+                                          'color',
+                                          event.target.value
+                                        )
                                       }
                                       className="h-11 w-14 cursor-pointer rounded border border-base-300 bg-transparent"
                                     />
                                     <Input
                                       label=""
-                                      value={selectedField.style?.color || '#111827'}
+                                      value={
+                                        selectedField.style?.color || '#111827'
+                                      }
                                       onChange={(event) =>
-                                        updateSelectedFieldStyle('color', event.target.value)
+                                        updateSelectedFieldStyle(
+                                          'color',
+                                          event.target.value
+                                        )
                                       }
                                       className="font-mono uppercase"
                                     />
@@ -956,7 +1162,11 @@ export const TemplateBuilder: React.FC = () => {
                                   onChange={(event) =>
                                     updateSelectedFieldStyle(
                                       'lineHeight',
-                                      clamp(Number(event.target.value) || 0, 0.8, 2.5)
+                                      clamp(
+                                        Number(event.target.value) || 0,
+                                        0.8,
+                                        2.5
+                                      )
                                     )
                                   }
                                 />
@@ -964,11 +1174,17 @@ export const TemplateBuilder: React.FC = () => {
                                   label="Letter Spacing"
                                   type="number"
                                   step="0.1"
-                                  value={selectedField.style?.letterSpacing ?? 0}
+                                  value={
+                                    selectedField.style?.letterSpacing ?? 0
+                                  }
                                   onChange={(event) =>
                                     updateSelectedFieldStyle(
                                       'letterSpacing',
-                                      clamp(Number(event.target.value) || 0, -2, 20)
+                                      clamp(
+                                        Number(event.target.value) || 0,
+                                        -2,
+                                        20
+                                      )
                                     )
                                   }
                                 />
@@ -979,23 +1195,30 @@ export const TemplateBuilder: React.FC = () => {
                                   Text Alignment
                                 </p>
                                 <div className="flex flex-wrap gap-2">
-                                  {(['left', 'center', 'right'] as TemplateFieldTextAlign[]).map(
-                                    (alignment) => (
-                                      <button
-                                        key={alignment}
-                                        type="button"
-                                        className={getTextAlignButtonClass(
-                                          (selectedField.style?.textAlign || 'center') ===
-                                            alignment
-                                        )}
-                                        onClick={() =>
-                                          updateSelectedFieldStyle('textAlign', alignment)
-                                        }
-                                      >
-                                        {alignment}
-                                      </button>
-                                    )
-                                  )}
+                                  {(
+                                    [
+                                      'left',
+                                      'center',
+                                      'right',
+                                    ] as TemplateFieldTextAlign[]
+                                  ).map((alignment) => (
+                                    <button
+                                      key={alignment}
+                                      type="button"
+                                      className={getTextAlignButtonClass(
+                                        (selectedField.style?.textAlign ||
+                                          'center') === alignment
+                                      )}
+                                      onClick={() =>
+                                        updateSelectedFieldStyle(
+                                          'textAlign',
+                                          alignment
+                                        )
+                                      }
+                                    >
+                                      {alignment}
+                                    </button>
+                                  ))}
                                 </div>
                               </div>
 
@@ -1004,30 +1227,44 @@ export const TemplateBuilder: React.FC = () => {
                                   <input
                                     type="checkbox"
                                     className="checkbox checkbox-primary"
-                                    checked={selectedField.style?.fontStyle === 'italic'}
+                                    checked={
+                                      selectedField.style?.fontStyle ===
+                                      'italic'
+                                    }
                                     onChange={(event) =>
                                       updateSelectedFieldStyle(
                                         'fontStyle',
-                                        event.target.checked ? 'italic' : 'normal'
+                                        event.target.checked
+                                          ? 'italic'
+                                          : 'normal'
                                       )
                                     }
                                   />
-                                  <span className="label-text font-medium">Italic</span>
+                                  <span className="label-text font-medium">
+                                    Italic
+                                  </span>
                                 </label>
 
                                 <label className="label cursor-pointer justify-start gap-3 rounded border border-base-200 bg-base-100 px-4 py-3">
                                   <input
                                     type="checkbox"
                                     className="checkbox checkbox-primary"
-                                    checked={selectedField.style?.textTransform === 'uppercase'}
+                                    checked={
+                                      selectedField.style?.textTransform ===
+                                      'uppercase'
+                                    }
                                     onChange={(event) =>
                                       updateSelectedFieldStyle(
                                         'textTransform',
-                                        event.target.checked ? 'uppercase' : 'none'
+                                        event.target.checked
+                                          ? 'uppercase'
+                                          : 'none'
                                       )
                                     }
                                   />
-                                  <span className="label-text font-medium">Uppercase</span>
+                                  <span className="label-text font-medium">
+                                    Uppercase
+                                  </span>
                                 </label>
                               </div>
                             </>
@@ -1083,8 +1320,9 @@ export const TemplateBuilder: React.FC = () => {
                     <div className="flex items-start gap-3">
                       <Grip size={16} className="mt-0.5 text-primary" />
                       <p className="text-sm leading-relaxed text-base-content/65">
-                        Drag visible field chips on the canvas. Numeric inputs below fine-tune
-                        alignment for pixel-sensitive certificate layouts.
+                        Drag visible field chips on the canvas. Numeric inputs
+                        below fine-tune alignment for pixel-sensitive
+                        certificate layouts.
                       </p>
                     </div>
                   </div>
@@ -1109,8 +1347,8 @@ export const TemplateBuilder: React.FC = () => {
                           Upload a Canva-ready PNG
                         </p>
                         <p className="mt-2 max-w-sm text-sm leading-relaxed text-base-content/55">
-                          Once the background is uploaded, the field chips below become your live
-                          placement layer.
+                          Once the background is uploaded, the field chips below
+                          become your live placement layer.
                         </p>
                       </div>
                     )}
@@ -1126,18 +1364,16 @@ export const TemplateBuilder: React.FC = () => {
                             <button
                               key={field.name}
                               type="button"
-                              onPointerDown={(event) => handlePointerDown(event, field.name)}
+                              onPointerDown={(event) =>
+                                handlePointerDown(event, field.name)
+                              }
                               onClick={() => setSelectedFieldName(field.name)}
-                              className={`absolute overflow-hidden rounded border-2 bg-white/90 shadow-lg ${
-                                isSelected ? 'border-primary' : 'border-base-300'
+                              ref={(el) => setFieldStyle(el, field)}
+                              className={`template-field-image ${
+                                isSelected
+                                  ? 'border-primary'
+                                  : 'border-base-300'
                               }`}
-                              style={{
-                                left: `${field.position.x}%`,
-                                top: `${field.position.y}%`,
-                                width: `${field.size?.width ?? 18}%`,
-                                height: `${field.size?.height ?? 10}%`,
-                                transform: 'translate(-50%, -50%)',
-                              }}
                             >
                               <img
                                 src={previewValue}
@@ -1152,29 +1388,16 @@ export const TemplateBuilder: React.FC = () => {
                           <button
                             key={field.name}
                             type="button"
-                            onPointerDown={(event) => handlePointerDown(event, field.name)}
+                            onPointerDown={(event) =>
+                              handlePointerDown(event, field.name)
+                            }
                             onClick={() => setSelectedFieldName(field.name)}
-                            className={`absolute rounded border px-2 py-1 shadow-lg ${
+                            ref={(el) => setFieldStyle(el, field)}
+                            className={`template-field-text ${
                               isSelected
-                                ? 'border-primary bg-primary/10 ring-2 ring-primary/15'
-                                : 'border-base-300 bg-white/80'
+                                ? 'template-field-selected'
+                                : 'template-field-unselected'
                             }`}
-                            style={{
-                              left: `${field.position.x}%`,
-                              top: `${field.position.y}%`,
-                              width: `${field.size?.width ?? 32}%`,
-                              transform: 'translate(-50%, -50%)',
-                              fontSize: `${field.style?.fontSize ?? 24}px`,
-                              fontWeight: field.style?.fontWeight ?? 600,
-                              fontFamily: field.style?.fontFamily || 'Arial, sans-serif',
-                              color: field.style?.color || '#111827',
-                              textAlign: field.style?.textAlign || 'center',
-                              lineHeight: field.style?.lineHeight ?? 1.2,
-                              letterSpacing: `${field.style?.letterSpacing ?? 0}px`,
-                              fontStyle: field.style?.fontStyle || 'normal',
-                              textTransform: field.style?.textTransform || 'none',
-                              cursor: 'grab',
-                            }}
                           >
                             {previewValue}
                           </button>
@@ -1184,10 +1407,10 @@ export const TemplateBuilder: React.FC = () => {
                 </>
               ) : (
                 <div
-                  className="aspect-[297/210] w-full overflow-hidden rounded border border-base-300 shadow-inner"
-                  style={{
-                    background: `linear-gradient(135deg, ${form.primaryColor}, ${form.secondaryColor})`,
-                  }}
+                  ref={(el) =>
+                    setPresetStyle(el, form.primaryColor, form.secondaryColor)
+                  }
+                  className="template-preset-preview"
                 >
                   <div className="flex h-full flex-col items-center justify-center px-10 text-center text-white">
                     <p className="text-[10px] font-black uppercase tracking-[0.42em] opacity-70">
@@ -1214,15 +1437,21 @@ export const TemplateBuilder: React.FC = () => {
                 </p>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-base-content/55">Mode</span>
-                  <span className="font-black capitalize text-base-content">{form.mode}</span>
+                  <span className="font-black capitalize text-base-content">
+                    {form.mode}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-base-content/55">Category</span>
-                  <span className="font-black capitalize text-base-content">{form.category}</span>
+                  <span className="font-black capitalize text-base-content">
+                    {form.category}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-base-content/55">Visible fields</span>
-                  <span className="font-black text-base-content">{visibleFieldCount}</span>
+                  <span className="font-black text-base-content">
+                    {visibleFieldCount}
+                  </span>
                 </div>
               </div>
             </motion.div>

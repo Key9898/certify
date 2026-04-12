@@ -11,7 +11,8 @@ export const INTEGRATION_PROVIDER_GUIDES: Record<
 > = {
   google_sheets: {
     provider: 'google_sheets',
-    headline: 'Turn spreadsheet rows into repeatable certificate runs without leaving Sheets.',
+    headline:
+      'Turn spreadsheet rows into repeatable certificate runs without leaving Sheets.',
     setupLead:
       'Drive certificate issuance from Apps Script or spreadsheet automations whenever new rows appear.',
     idealFor: [
@@ -48,37 +49,59 @@ export const INTEGRATION_PROVIDER_GUIDES: Record<
       },
     ],
     fieldMappings: [
-      { source: 'Column A: Recipient Name', target: 'recipientName', example: 'Mina Patel' },
-      { source: 'Column B: Recipient Email', target: 'recipientEmail', example: 'mina@example.com' },
-      { source: 'Column C: Track / Workshop', target: 'certificateTitle', example: 'Workshop Completion' },
-      { source: 'Column D: Issue Date', target: 'issueDate', example: '2026-04-04' },
+      {
+        source: 'Column A: Recipient Name',
+        target: 'recipientName',
+        example: 'Mina Patel',
+      },
+      {
+        source: 'Column B: Recipient Email',
+        target: 'recipientEmail',
+        example: 'mina@example.com',
+      },
+      {
+        source: 'Column C: Track / Workshop',
+        target: 'certificateTitle',
+        example: 'Workshop Completion',
+      },
+      {
+        source: 'Column D: Issue Date',
+        target: 'issueDate',
+        example: '2026-04-04',
+      },
     ],
     recipes: [
       {
         id: 'sheets-roster-sync',
         name: 'Roster Sync Batch',
-        summary: 'Bundle approved rows into one batch request for training cohorts or partner lists.',
+        summary:
+          'Bundle approved rows into one batch request for training cohorts or partner lists.',
         mode: 'batch',
         recommendedTemplateCategory: 'general',
-        templateHint: 'General templates adapt well to several spreadsheet-driven certificate types.',
+        templateHint:
+          'General templates adapt well to several spreadsheet-driven certificate types.',
         keywords: ['general', 'excellence', 'versatile'],
         certificateTitle: 'Roster Completion Certificate',
         issuerName: 'Program Operations',
-        description: 'A spreadsheet-first batch workflow for cohorts reviewed in shared sheets.',
+        description:
+          'A spreadsheet-first batch workflow for cohorts reviewed in shared sheets.',
         automationHint:
           'Filter approved rows in Sheets or Apps Script, then POST them as a data array to Certify.',
       },
       {
         id: 'sheets-event-attendance',
         name: 'Event Attendance Rollup',
-        summary: 'Issue event certificates from a checked-in attendee sheet at the end of the day.',
+        summary:
+          'Issue event certificates from a checked-in attendee sheet at the end of the day.',
         mode: 'batch',
         recommendedTemplateCategory: 'event',
-        templateHint: 'Use an event layout when the certificate is tied to attendance or participation.',
+        templateHint:
+          'Use an event layout when the certificate is tied to attendance or participation.',
         keywords: ['event', 'achievement', 'attendance'],
         certificateTitle: 'Certificate of Participation',
         issuerName: 'Event Operations',
-        description: 'A batch run that converts checked-in rows into attendee certificates.',
+        description:
+          'A batch run that converts checked-in rows into attendee certificates.',
         automationHint:
           'Schedule an Apps Script trigger to gather rows marked Present and send one webhook payload.',
       },
@@ -91,7 +114,8 @@ export const INTEGRATION_PROVIDER_GUIDES: Record<
   },
   canvas: {
     provider: 'canvas',
-    headline: 'Connect Canvas achievements, mastery paths, and capstones to branded certificate delivery.',
+    headline:
+      'Connect Canvas achievements, mastery paths, and capstones to branded certificate delivery.',
     setupLead:
       'Canvas works best with Certify when assignment, module, or course completion events need a polished completion artifact.',
     idealFor: [
@@ -128,51 +152,76 @@ export const INTEGRATION_PROVIDER_GUIDES: Record<
       },
     ],
     fieldMappings: [
-      { source: 'Canvas user.name', target: 'recipientName', example: 'Nora Bennett' },
-      { source: 'Canvas user.email', target: 'recipientEmail', example: 'nora@example.com' },
-      { source: 'Course or module title', target: 'certificateTitle', example: 'Capstone Completion' },
-      { source: 'Finished at timestamp', target: 'issueDate', example: '2026-04-04T15:45:00.000Z' },
+      {
+        source: 'Canvas user.name',
+        target: 'recipientName',
+        example: 'Nora Bennett',
+      },
+      {
+        source: 'Canvas user.email',
+        target: 'recipientEmail',
+        example: 'nora@example.com',
+      },
+      {
+        source: 'Course or module title',
+        target: 'certificateTitle',
+        example: 'Capstone Completion',
+      },
+      {
+        source: 'Finished at timestamp',
+        target: 'issueDate',
+        example: '2026-04-04T15:45:00.000Z',
+      },
     ],
     recipes: [
       {
         id: 'canvas-course-completion',
         name: 'Course Completion Certificates',
-        summary: 'Issue a certificate as soon as a learner completes the full Canvas course path.',
+        summary:
+          'Issue a certificate as soon as a learner completes the full Canvas course path.',
         mode: 'single',
         recommendedTemplateCategory: 'academic',
-        templateHint: 'Academic templates are the safest default for institution-led course completions.',
+        templateHint:
+          'Academic templates are the safest default for institution-led course completions.',
         keywords: ['academic', 'classic', 'course'],
         certificateTitle: 'Course Completion Certificate',
         issuerName: 'Academic Programs Office',
-        description: 'Returned after the learner satisfies the Canvas course completion rules.',
+        description:
+          'Returned after the learner satisfies the Canvas course completion rules.',
         automationHint:
           'Trigger once the full course is marked complete, then store the returned pdfUrl in your Canvas-side workflow.',
       },
       {
         id: 'canvas-module-mastery',
         name: 'Module Mastery Certificates',
-        summary: 'Issue a certificate every time a learner completes a mastery path or key module.',
+        summary:
+          'Issue a certificate every time a learner completes a mastery path or key module.',
         mode: 'single',
         recommendedTemplateCategory: 'academic',
-        templateHint: 'Academic templates work well for high-trust student learning outcomes.',
+        templateHint:
+          'Academic templates work well for high-trust student learning outcomes.',
         keywords: ['academic', 'classic', 'module'],
         certificateTitle: 'Module Mastery Certificate',
         issuerName: 'Continuing Education Office',
-        description: 'Granted after a learner completes the defined Canvas mastery milestone.',
+        description:
+          'Granted after a learner completes the defined Canvas mastery milestone.',
         automationHint:
           'Use Canvas completion data, then push the learner record and module title into Certify.',
       },
       {
         id: 'canvas-capstone-completion',
         name: 'Capstone Completion',
-        summary: 'Create a premium completion certificate for a capstone or final program deliverable.',
+        summary:
+          'Create a premium completion certificate for a capstone or final program deliverable.',
         mode: 'single',
         recommendedTemplateCategory: 'corporate',
-        templateHint: 'Corporate or modern layouts create a polished executive education look.',
+        templateHint:
+          'Corporate or modern layouts create a polished executive education look.',
         keywords: ['modern', 'professional', 'capstone'],
         certificateTitle: 'Capstone Completion Certificate',
         issuerName: 'Executive Learning Studio',
-        description: 'A certificate for successful completion of a culminating Canvas experience.',
+        description:
+          'A certificate for successful completion of a culminating Canvas experience.',
         automationHint:
           'Trigger after the final assignment or assessment is marked complete, then call the webhook once.',
       },
@@ -185,7 +234,8 @@ export const INTEGRATION_PROVIDER_GUIDES: Record<
   },
   custom: {
     provider: 'custom',
-    headline: 'Use the Certify webhook contract from internal tools, portals, or any HTTPS-capable service.',
+    headline:
+      'Use the Certify webhook contract from internal tools, portals, or any HTTPS-capable service.',
     setupLead:
       'Custom Webhook is the fastest route when you already control the source system or need a portable integration contract.',
     idealFor: [
@@ -222,37 +272,59 @@ export const INTEGRATION_PROVIDER_GUIDES: Record<
       },
     ],
     fieldMappings: [
-      { source: 'POST body user.name', target: 'recipientName', example: 'Riley Chen' },
-      { source: 'POST body user.email', target: 'recipientEmail', example: 'riley@example.com' },
-      { source: 'POST body achievement.label', target: 'certificateTitle', example: 'Partner Certification' },
-      { source: 'POST body completedAt', target: 'issueDate', example: '2026-04-04T18:15:00.000Z' },
+      {
+        source: 'POST body user.name',
+        target: 'recipientName',
+        example: 'Riley Chen',
+      },
+      {
+        source: 'POST body user.email',
+        target: 'recipientEmail',
+        example: 'riley@example.com',
+      },
+      {
+        source: 'POST body achievement.label',
+        target: 'certificateTitle',
+        example: 'Partner Certification',
+      },
+      {
+        source: 'POST body completedAt',
+        target: 'issueDate',
+        example: '2026-04-04T18:15:00.000Z',
+      },
     ],
     recipes: [
       {
         id: 'custom-partner-portal',
         name: 'Partner Portal Badge Issue',
-        summary: 'Issue one certificate from a partner-facing admin or badge approval tool.',
+        summary:
+          'Issue one certificate from a partner-facing admin or badge approval tool.',
         mode: 'single',
         recommendedTemplateCategory: 'general',
-        templateHint: 'General templates are ideal when partners span multiple programs or award types.',
+        templateHint:
+          'General templates are ideal when partners span multiple programs or award types.',
         keywords: ['general', 'partner', 'badge'],
         certificateTitle: 'Partner Certification',
         issuerName: 'Partner Enablement Team',
-        description: 'Awarded from an internal or partner-facing tool once a reviewer approves the achievement.',
+        description:
+          'Awarded from an internal or partner-facing tool once a reviewer approves the achievement.',
         automationHint:
           'Post a simple JSON document from your portal after approval and store the returned certificate identifiers.',
       },
       {
         id: 'custom-event-scanner',
         name: 'Event Scanner Sync',
-        summary: 'Convert device check-ins or scanner exports into a scheduled batch certificate run.',
+        summary:
+          'Convert device check-ins or scanner exports into a scheduled batch certificate run.',
         mode: 'batch',
         recommendedTemplateCategory: 'event',
-        templateHint: 'Event templates work best for workshops, summits, and attendance-based programs.',
+        templateHint:
+          'Event templates work best for workshops, summits, and attendance-based programs.',
         keywords: ['event', 'attendance', 'scanner'],
         certificateTitle: 'Event Attendance Certificate',
         issuerName: 'Experience Team',
-        description: 'A batch payload for attendee lists produced by custom event systems or scanners.',
+        description:
+          'A batch payload for attendee lists produced by custom event systems or scanners.',
         automationHint:
           'Aggregate approved attendees into a data array, then send one batch webhook request after the event.',
       },
@@ -273,7 +345,9 @@ export const findBestTemplateForRecipe = (
   recipe: IntegrationRecipe,
   templates: Template[]
 ): Template | undefined => {
-  const normalizedKeywords = recipe.keywords.map((keyword) => keyword.toLowerCase());
+  const normalizedKeywords = recipe.keywords.map((keyword) =>
+    keyword.toLowerCase()
+  );
 
   const keywordMatch = templates.find((template) => {
     const haystack = `${template.name} ${template.description}`.toLowerCase();
@@ -285,7 +359,8 @@ export const findBestTemplateForRecipe = (
   }
 
   return (
-    templates.find((template) => template.category === recipe.recommendedTemplateCategory) ||
-    templates[0]
+    templates.find(
+      (template) => template.category === recipe.recommendedTemplateCategory
+    ) || templates[0]
   );
 };

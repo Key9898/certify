@@ -30,4 +30,3 @@ export const General: Story = {
 export const WithCustomClass: Story = {
   args: { template: MOCK_TEMPLATES[0], className: 'w-48' },
 };
-

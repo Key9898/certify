@@ -19,7 +19,10 @@ const HeaderPreview = ({
       <header className="navbar bg-base-100 border-b border-base-200 sticky top-0 z-30 px-4 w-full">
         <div className="navbar-start">
           {isAuthenticated && showMenuToggle && (
-            <button className="btn btn-ghost btn-sm lg:hidden mr-1" aria-label="Toggle menu">
+            <button
+              className="btn btn-ghost btn-sm lg:hidden mr-1"
+              aria-label="Toggle menu"
+            >
               <Menu size={20} />
             </button>
           )}
@@ -33,7 +36,11 @@ const HeaderPreview = ({
         <div className="navbar-end gap-2">
           {isAuthenticated && (
             <div className="dropdown dropdown-end">
-              <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-ghost btn-circle avatar"
+              >
                 <div className="w-9 rounded ring ring-primary ring-offset-base-100 ring-offset-1 bg-primary text-white flex items-center justify-center text-sm font-bold">
                   {userName.charAt(0).toUpperCase()}
                 </div>
@@ -44,8 +51,12 @@ const HeaderPreview = ({
               >
                 <li className="px-3 py-2 border-b border-base-200 mb-1">
                   <div className="flex flex-col">
-                    <span className="font-semibold text-base-content text-sm">{userName}</span>
-                    <span className="text-xs text-base-content/60">{userEmail}</span>
+                    <span className="font-semibold text-base-content text-sm">
+                      {userName}
+                    </span>
+                    <span className="text-xs text-base-content/60">
+                      {userEmail}
+                    </span>
                   </div>
                 </li>
                 <li>
@@ -77,7 +88,11 @@ export const Unauthenticated: Story = {
 };
 
 export const Authenticated: Story = {
-  args: { isAuthenticated: true, userName: 'Jane Doe', userEmail: 'jane@example.com' },
+  args: {
+    isAuthenticated: true,
+    userName: 'Jane Doe',
+    userEmail: 'jane@example.com',
+  },
 };
 
 export const AuthenticatedWithMenuToggle: Story = {
@@ -88,4 +103,3 @@ export const AuthenticatedWithMenuToggle: Story = {
     userEmail: 'john@example.com',
   },
 };
-

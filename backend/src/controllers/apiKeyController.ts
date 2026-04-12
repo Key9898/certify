@@ -9,7 +9,9 @@ export const listApiKeys = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const keys = await ApiKey.find({ createdBy: req.user!._id }).sort({ createdAt: -1 });
+    const keys = await ApiKey.find({ createdBy: req.user!._id }).sort({
+      createdAt: -1,
+    });
     const masked = keys.map((k) => ({
       _id: k._id,
       name: k.name,
@@ -41,16 +43,25 @@ export const createApiKey = async (
     if (!name?.trim()) {
       res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'API key name is required.' },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'API key name is required.',
+        },
       });
       return;
     }
 
-    const existing = await ApiKey.countDocuments({ createdBy: req.user!._id, isActive: true });
+    const existing = await ApiKey.countDocuments({
+      createdBy: req.user!._id,
+      isActive: true,
+    });
     if (existing >= 10) {
       res.status(400).json({
         success: false,
-        error: { code: 'LIMIT_EXCEEDED', message: 'Maximum of 10 active API keys allowed.' },
+        error: {
+          code: 'LIMIT_EXCEEDED',
+          message: 'Maximum of 10 active API keys allowed.',
+        },
       });
       return;
     }
@@ -63,7 +74,10 @@ export const createApiKey = async (
       name: name.trim(),
       createdBy: new mongoose.Types.ObjectId(req.user!._id.toString()),
       expiresAt,
-      rateLimit: rateLimit && rateLimit >= 1 && rateLimit <= 1000 ? rateLimit : undefined,
+      rateLimit:
+        rateLimit && rateLimit >= 1 && rateLimit <= 1000
+          ? rateLimit
+          : undefined,
     });
 
     await apiKey.save();

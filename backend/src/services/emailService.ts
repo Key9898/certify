@@ -36,11 +36,15 @@ export const sendCertificateEmail = async (
   const transporter = getTransporter();
 
   if (!transporter) {
-    console.warn('Email service not configured. Skipping certificate email to:', to);
+    console.warn(
+      'Email service not configured. Skipping certificate email to:',
+      to
+    );
     return;
   }
 
-  const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_USER || 'noreply@certify.app';
+  const fromEmail =
+    process.env.FROM_EMAIL || process.env.SMTP_USER || 'noreply@certify.app';
 
   await transporter.sendMail({
     from: `Certify <${fromEmail}>`,

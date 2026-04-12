@@ -8,17 +8,26 @@ const CATEGORY_COLORS: Record<string, string> = {
   general: 'bg-secondary/10 border-secondary',
 };
 
-export const TemplatePreview: React.FC<TemplatePreviewProps> = ({ template, className = '' }) => {
+export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
+  template,
+  className = '',
+}) => {
   return (
-    <div className={`rounded overflow-hidden border ${CATEGORY_COLORS[template.category]} ${className}`}>
+    <div
+      className={`rounded overflow-hidden border ${CATEGORY_COLORS[template.category]} ${className}`}
+    >
       <img
         src={template.thumbnail}
         alt={`${template.name} preview`}
         className="w-full object-cover"
       />
       <div className="p-3">
-        <p className="font-semibold text-sm text-base-content">{template.name}</p>
-        <p className="text-xs text-base-content/60 capitalize">{template.category}</p>
+        <p className="font-semibold text-sm text-base-content">
+          {template.name}
+        </p>
+        <p className="text-xs text-base-content/60 capitalize">
+          {template.category}
+        </p>
       </div>
     </div>
   );

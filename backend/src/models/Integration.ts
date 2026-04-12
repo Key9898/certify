@@ -1,10 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { nanoid } from 'nanoid';
 
-export type IntegrationProvider =
-  | 'google_sheets'
-  | 'canvas'
-  | 'custom';
+export type IntegrationProvider = 'google_sheets' | 'canvas' | 'custom';
 
 export type IntegrationMode = 'single' | 'batch';
 export type IntegrationStatus = 'active' | 'paused';
@@ -144,7 +141,12 @@ const IntegrationStatsSchema = new Schema<IIntegrationStats>(
 
 const IntegrationSchema = new Schema<IIntegrationDocument>(
   {
-    organizationId: { type: Schema.Types.ObjectId, ref: 'Organization', required: true, index: true },
+    organizationId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Organization',
+      required: true,
+      index: true,
+    },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     name: { type: String, required: true, trim: true },
     provider: {
@@ -163,7 +165,11 @@ const IntegrationSchema = new Schema<IIntegrationDocument>(
       enum: ['single', 'batch'],
       default: 'single',
     },
-    templateId: { type: Schema.Types.ObjectId, ref: 'Template', required: true },
+    templateId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Template',
+      required: true,
+    },
     webhookKey: {
       type: String,
       required: true,
@@ -181,4 +187,7 @@ const IntegrationSchema = new Schema<IIntegrationDocument>(
 IntegrationSchema.index({ organizationId: 1, provider: 1 });
 IntegrationSchema.index({ organizationId: 1, createdAt: -1 });
 
-export const Integration = mongoose.model<IIntegrationDocument>('Integration', IntegrationSchema);
+export const Integration = mongoose.model<IIntegrationDocument>(
+  'Integration',
+  IntegrationSchema
+);

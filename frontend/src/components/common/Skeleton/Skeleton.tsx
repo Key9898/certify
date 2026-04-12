@@ -6,7 +6,10 @@ interface SkeletonProps {
   variant?: 'text' | 'rect' | 'circle';
 }
 
-export const Skeleton: React.FC<SkeletonProps> = ({ className = '', variant = 'rect' }) => {
+export const Skeleton: React.FC<SkeletonProps> = ({
+  className = '',
+  variant = 'rect',
+}) => {
   const variantClasses = {
     text: 'h-4 w-full rounded',
     rect: 'h-24 w-full rounded',

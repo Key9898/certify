@@ -21,7 +21,12 @@ export const Compact: Story = {
 
 export const AdminUser: Story = {
   args: {
-    user: { ...MOCK_USER, role: 'admin', name: 'Admin User', email: 'admin@example.com' },
+    user: {
+      ...MOCK_USER,
+      role: 'admin',
+      name: 'Admin User',
+      email: 'admin@example.com',
+    },
     compact: false,
   },
 };
@@ -47,4 +52,3 @@ export const CompactWithAvatar: Story = {
     compact: true,
   },
 };
-

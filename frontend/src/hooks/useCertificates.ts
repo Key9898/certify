@@ -1,9 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchCertificates, deleteCertificate, generatePdf } from '@/utils/certificateApi';
+import {
+  fetchCertificates,
+  deleteCertificate,
+  generatePdf,
+} from '@/utils/certificateApi';
 import { useDemo } from '@/context/DemoContext';
 import type { Certificate } from '@/types';
 
-export const useCertificates = (params?: { search?: string; page?: number }) => {
+export const useCertificates = (params?: {
+  search?: string;
+  page?: number;
+}) => {
   const { isDemoMode, mockCertificates, setMockCertificates } = useDemo();
   const search = params?.search;
   const page = params?.page;
@@ -29,7 +36,12 @@ export const useCertificates = (params?: { search?: string; page?: number }) => 
         )
       : mockCertificates;
     setCertificates(filtered);
-    setPagination({ total: filtered.length, page: 1, limit: 12, totalPages: 1 });
+    setPagination({
+      total: filtered.length,
+      page: 1,
+      limit: 12,
+      totalPages: 1,
+    });
     setIsLoading(false);
   }, [isDemoMode, mockCertificates, search]);
 
@@ -42,7 +54,9 @@ export const useCertificates = (params?: { search?: string; page?: number }) => 
       setCertificates(result.data);
       setPagination(result.pagination);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load certificates');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load certificates'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -72,7 +86,9 @@ export const useCertificates = (params?: { search?: string; page?: number }) => 
       const result = await generatePdf(id);
       if (result.data?.pdfUrl) {
         setCertificates((prev) =>
-          prev.map((c) => (c._id === id ? { ...c, pdfUrl: result.data?.pdfUrl } : c))
+          prev.map((c) =>
+            c._id === id ? { ...c, pdfUrl: result.data?.pdfUrl } : c
+          )
         );
       }
       return result.data?.pdfUrl;

@@ -2,7 +2,12 @@ import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import type { ModalProps } from './Modal.types';
 
-const sizeMap = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-lg', xl: 'max-w-2xl' };
+const sizeMap = {
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-2xl',
+};
 
 export const Modal: React.FC<ModalProps> = ({
   isOpen,

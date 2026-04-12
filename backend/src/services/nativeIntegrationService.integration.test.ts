@@ -12,17 +12,20 @@ const { privateKey } = crypto.generateKeyPairSync('rsa', {
   modulusLength: 2048,
 });
 
-const GOOGLE_PRIVATE_KEY = privateKey.export({
-  type: 'pkcs8',
-  format: 'pem',
-}).toString();
+const GOOGLE_PRIVATE_KEY = privateKey
+  .export({
+    type: 'pkcs8',
+    format: 'pem',
+  })
+  .toString();
 
 describe('nativeIntegrationService integration', () => {
   it('writes batch completion results back to Google Sheets', async () => {
     const previousEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
     const previousKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY;
 
-    process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL = 'certify-tests@project.iam.gserviceaccount.com';
+    process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL =
+      'certify-tests@project.iam.gserviceaccount.com';
     process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY = GOOGLE_PRIVATE_KEY;
 
     const requests: Array<{ url: string; init?: RequestInit }> = [];
@@ -41,20 +44,24 @@ describe('nativeIntegrationService integration', () => {
       if (url.includes('/values/Ready%20to%20Issue!1%3A1')) {
         return new Response(
           JSON.stringify({
-            values: [[
-              'Recipient Name',
-              'Certify Status',
-              'Certify ID',
-              'Certificate PDF URL',
-              'Certify Batch ID',
-              'Processed At',
-            ]],
+            values: [
+              [
+                'Recipient Name',
+                'Certify Status',
+                'Certify ID',
+                'Certificate PDF URL',
+                'Certify Batch ID',
+                'Processed At',
+              ],
+            ],
           }),
           { status: 200 }
         );
       }
 
-      return new Response(JSON.stringify({ totalUpdatedCells: 10 }), { status: 200 });
+      return new Response(JSON.stringify({ totalUpdatedCells: 10 }), {
+        status: 200,
+      });
     }) as typeof fetch;
 
     try {
@@ -63,7 +70,7 @@ describe('nativeIntegrationService integration', () => {
           provider: 'google_sheets',
           googleSheets: {
             spreadsheetId: 'spreadsheet-id',
-            sheetName: 'Ready to Issue',
+            sheetName: 'Ready to Create',
             statusColumn: 'Certify Status',
             certificateIdColumn: 'Certify ID',
             pdfUrlColumn: 'Certificate PDF URL',
@@ -93,7 +100,10 @@ describe('nativeIntegrationService integration', () => {
       await syncBatchJobNativeResults(job);
 
       assert.match(requests[requests.length - 1].url, /values:batchUpdate$/);
-      assert.match(String(requests[requests.length - 1].init?.body), /CERT-AVA-001/);
+      assert.match(
+        String(requests[requests.length - 1].init?.body),
+        /CERT-AVA-001/
+      );
       assert.match(String(requests[requests.length - 1].init?.body), /Failed/);
     } finally {
       global.fetch = originalFetch;

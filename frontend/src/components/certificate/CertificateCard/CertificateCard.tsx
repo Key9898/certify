@@ -1,10 +1,22 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Download, Trash2, Award, Calendar, User, MoreVertical } from 'lucide-react';
+import {
+  Download,
+  Trash2,
+  Award,
+  Calendar,
+  User,
+  MoreVertical,
+} from 'lucide-react';
 import { formatDateShort } from '@/utils/formatters';
 import { Dropdown } from '@/components/common/Dropdown';
 import type { CertificateCardProps } from './CertificateCard.types';
-import { HOVER_LIFT, QUICK_SPRING, SOFT_SPRING, TAP_PRESS } from '@/utils/motion';
+import {
+  HOVER_LIFT,
+  QUICK_SPRING,
+  SOFT_SPRING,
+  TAP_PRESS,
+} from '@/utils/motion';
 
 export const CertificateCard: React.FC<CertificateCardProps> = ({
   certificate,
@@ -14,10 +26,25 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
 }) => {
   const dropdownItems = [
     ...(onDownload
-      ? [{ label: certificate.pdfUrl ? 'Download PDF' : 'Generate & Download PDF', icon: <Download size={15} />, onClick: () => onDownload(certificate) }]
+      ? [
+          {
+            label: certificate.pdfUrl
+              ? 'Download PDF'
+              : 'Generate & Download PDF',
+            icon: <Download size={15} />,
+            onClick: () => onDownload(certificate),
+          },
+        ]
       : []),
     ...(onDelete
-      ? [{ label: 'Delete', icon: <Trash2 size={15} />, onClick: () => onDelete(certificate), variant: 'error' as const }]
+      ? [
+          {
+            label: 'Delete',
+            icon: <Trash2 size={15} />,
+            onClick: () => onDelete(certificate),
+            variant: 'error' as const,
+          },
+        ]
       : []),
   ];
 
@@ -39,12 +66,14 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
               <h3 className="font-bold text-sm text-base-content truncate">
                 {certificate.certificateTitle}
               </h3>
-              <p className="text-xs text-base-content/60 font-mono">{certificate.certificateId}</p>
+              <p className="text-xs text-base-content/60 font-mono">
+                {certificate.certificateId}
+              </p>
             </div>
           </div>
           {dropdownItems.length > 0 && (
-              <Dropdown
-                trigger={
+            <Dropdown
+              trigger={
                 <motion.button
                   className="btn btn-ghost btn-circle h-11 min-h-11 w-11 min-w-11 md:btn-xs md:h-6 md:min-h-6 md:w-6 md:min-w-6"
                   aria-label="Certificate actions"
@@ -53,9 +82,9 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
                 >
                   <MoreVertical size={16} />
                 </motion.button>
-                }
-                items={dropdownItems}
-                align="end"
+              }
+              items={dropdownItems}
+              align="end"
             />
           )}
         </div>
@@ -74,7 +103,9 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
 
         {/* Footer */}
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-base-200">
-          <span className={`badge badge-sm ${certificate.pdfUrl ? 'badge-success' : 'badge-ghost'}`}>
+          <span
+            className={`badge badge-sm ${certificate.pdfUrl ? 'badge-success' : 'badge-ghost'}`}
+          >
             {certificate.pdfUrl ? 'PDF Ready' : 'No PDF'}
           </span>
           {onDownload && (
@@ -83,7 +114,11 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
               onClick={() => onDownload(certificate)}
               disabled={isGeneratingPdf}
               aria-label={`Download PDF for ${certificate.recipientName}`}
-              whileHover={isGeneratingPdf ? undefined : { y: -2, transition: QUICK_SPRING }}
+              whileHover={
+                isGeneratingPdf
+                  ? undefined
+                  : { y: -2, transition: QUICK_SPRING }
+              }
               whileTap={isGeneratingPdf ? undefined : TAP_PRESS}
             >
               {!isGeneratingPdf && <Download size={13} aria-hidden="true" />}

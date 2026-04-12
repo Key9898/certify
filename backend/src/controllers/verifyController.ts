@@ -25,21 +25,30 @@ export const verifyCertificate = async (
     if (certificate.status === 'revoked') {
       res.status(410).json({
         success: false,
-        error: { code: 'REVOKED', message: 'This certificate has been revoked by the issuer.' },
+        error: {
+          code: 'REVOKED',
+          message: 'This certificate has been revoked by the issuer.',
+        },
       });
       return;
     }
 
     const createdBy =
-      certificate.createdBy && typeof certificate.createdBy === 'object' && '_id' in certificate.createdBy
+      certificate.createdBy &&
+      typeof certificate.createdBy === 'object' &&
+      '_id' in certificate.createdBy
         ? certificate.createdBy
         : null;
 
     let organization = null;
-    if (createdBy && 'organizationId' in createdBy && createdBy.organizationId) {
-      organization = await Organization.findById(createdBy.organizationId).select(
-        'name slug whiteLabel'
-      );
+    if (
+      createdBy &&
+      'organizationId' in createdBy &&
+      createdBy.organizationId
+    ) {
+      organization = await Organization.findById(
+        createdBy.organizationId
+      ).select('name slug whiteLabel');
     }
 
     res.json({

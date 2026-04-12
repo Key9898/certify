@@ -2,7 +2,12 @@ import type { TeamWorkspace } from '@/types';
 import type { ApiKeyListItem } from '@/utils/apiKeyApi';
 import type { Webhook as WebhookType, WebhookEvent } from '@/utils/webhookApi';
 
-export type SettingsTab = 'general' | 'workspace' | 'branding' | 'developer' | 'security';
+export type SettingsTab =
+  | 'general'
+  | 'workspace'
+  | 'branding'
+  | 'developer'
+  | 'security';
 
 export interface GeneralTabProps {
   displayName: string;
@@ -31,7 +36,10 @@ export interface WorkspaceTabProps {
   inviteRole: 'admin' | 'member';
   setInviteRole: (role: 'admin' | 'member') => void;
   handleInviteMember: () => Promise<void>;
-  handleUpdateMemberRole: (userId: string, role: 'admin' | 'member') => Promise<void>;
+  handleUpdateMemberRole: (
+    userId: string,
+    role: 'admin' | 'member'
+  ) => Promise<void>;
   handleRemoveMember: (userId: string) => Promise<void>;
   handleCancelInvitation: (invitationId: string) => Promise<void>;
 }
@@ -103,4 +111,11 @@ export interface SecurityTabProps {
   deleteError: string | null;
   handleDeleteAccount: () => Promise<void>;
   setDeleteError: (error: string | null) => void;
+  pwChangeLoading: boolean;
+  pwChangeError: string | null;
+  pwChangeSuccess: boolean;
+  handleChangePassword: (
+    currentPassword: string,
+    newPassword: string
+  ) => Promise<void>;
 }

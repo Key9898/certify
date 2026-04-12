@@ -56,7 +56,12 @@ export const deleteFile = async (
 
 export const getSignedUploadUrl = async (
   folder: string
-): Promise<{ signature: string; timestamp: number; cloudName: string; apiKey: string }> => {
+): Promise<{
+  signature: string;
+  timestamp: number;
+  cloudName: string;
+  apiKey: string;
+}> => {
   const timestamp = Math.round(new Date().getTime() / 1000);
   const signature = cloudinary.utils.api_sign_request(
     { timestamp, folder: `certify/${folder}` },

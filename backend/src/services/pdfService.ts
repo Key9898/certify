@@ -1,7 +1,12 @@
 import puppeteer, { Browser } from 'puppeteer';
 import fs from 'fs';
 import path from 'path';
-import type { ITemplateField, ITemplateFieldStyle, TemplateMode } from '../models/Template';
+import QRCode from 'qrcode';
+import type {
+  ITemplateField,
+  ITemplateFieldStyle,
+  TemplateMode,
+} from '../models/Template';
 
 export interface PdfData {
   recipientName: string;
@@ -15,6 +20,7 @@ export interface PdfData {
   primaryColor?: string;
   secondaryColor?: string;
   certificateId: string;
+  verifyUrl?: string;
   [key: string]: string | undefined;
 }
 
@@ -27,19 +33,89 @@ export interface TemplateRenderSource {
 }
 
 let browserInstance: Browser | null = null;
+let browserLaunchPromise: Promise<Browser> | null = null;
+const BROWSER_TIMEOUT_MS = 30000;
+const PDF_GENERATION_TIMEOUT_MS = 60000;
+
+const isBrowserHealthy = async (browser: Browser): Promise<boolean> => {
+  try {
+    const pages = await browser.pages();
+    return pages.length >= 0;
+  } catch {
+    return false;
+  }
+};
+
+const closeBrowserInstance = async (): Promise<void> => {
+  if (browserInstance) {
+    try {
+      await browserInstance.close();
+    } catch {
+      // Browser already closed or crashed
+    }
+    browserInstance = null;
+    browserLaunchPromise = null;
+  }
+};
 
 const getBrowser = async (): Promise<Browser> => {
-  if (!browserInstance) {
-    browserInstance = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
-    });
+  if (browserInstance) {
+    const healthy = await isBrowserHealthy(browserInstance);
+    if (healthy) {
+      return browserInstance;
+    }
+    await closeBrowserInstance();
   }
-  return browserInstance;
+
+  if (browserLaunchPromise) {
+    return browserLaunchPromise;
+  }
+
+  browserLaunchPromise = (async () => {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--disable-software-rasterizer',
+        '--disable-extensions',
+      ],
+      timeout: BROWSER_TIMEOUT_MS,
+    });
+
+    browser.on('disconnected', () => {
+      browserInstance = null;
+      browserLaunchPromise = null;
+    });
+
+    browserInstance = browser;
+    return browser;
+  })();
+
+  return browserLaunchPromise;
+};
+
+const withTimeout = <T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  errorMessage: string
+): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(errorMessage)), timeoutMs)
+    ),
+  ]);
 };
 
 const loadTemplate = (templateName: string): string => {
-  const templatePath = path.join(__dirname, '../../templates', `${templateName}.html`);
+  const templatePath = path.join(
+    __dirname,
+    '../../templates',
+    `${templateName}.html`
+  );
   if (!fs.existsSync(templatePath)) {
     throw new Error(`Template ${templateName} not found`);
   }
@@ -54,13 +130,38 @@ const escapeHtml = (value: string): string =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 
-const escapeMultilineText = (value: string): string => escapeHtml(value).replace(/\n/g, '<br />');
+const escapeMultilineText = (value: string): string =>
+  escapeHtml(value).replace(/\n/g, '<br />');
 
-const injectData = (html: string, data: PdfData): string => {
+const generateQRCodeDataUrl = async (
+  certificateId: string,
+  verifyUrl?: string
+): Promise<string> => {
+  const url = verifyUrl || `https://certify.app/verify/${certificateId}`;
+  try {
+    return await QRCode.toDataURL(url, {
+      width: 150,
+      margin: 1,
+      color: { dark: '#1a1a1a', light: '#ffffff' },
+      errorCorrectionLevel: 'M',
+    });
+  } catch {
+    return '';
+  }
+};
+
+const injectData = (
+  html: string,
+  data: PdfData,
+  qrCodeDataUrl?: string
+): string => {
   return html
     .replace(/\{\{recipientName\}\}/g, escapeHtml(data.recipientName))
     .replace(/\{\{certificateTitle\}\}/g, escapeHtml(data.certificateTitle))
-    .replace(/\{\{description\}\}/g, escapeMultilineText(data.description || ''))
+    .replace(
+      /\{\{description\}\}/g,
+      escapeMultilineText(data.description || '')
+    )
     .replace(/\{\{issueDate\}\}/g, escapeHtml(data.issueDate))
     .replace(/\{\{issuerName\}\}/g, escapeHtml(data.issuerName))
     .replace(
@@ -75,9 +176,21 @@ const injectData = (html: string, data: PdfData): string => {
         ? `<img src="${escapeHtml(data.organizationLogo)}" alt="Logo" class="logo-img" />`
         : ''
     )
-    .replace(/\{\{primaryColor\}\}/g, escapeHtml(data.primaryColor || '#3B82F6'))
-    .replace(/\{\{secondaryColor\}\}/g, escapeHtml(data.secondaryColor || '#64748B'))
-    .replace(/\{\{certificateId\}\}/g, escapeHtml(data.certificateId));
+    .replace(
+      /\{\{primaryColor\}\}/g,
+      escapeHtml(data.primaryColor || '#3B82F6')
+    )
+    .replace(
+      /\{\{secondaryColor\}\}/g,
+      escapeHtml(data.secondaryColor || '#64748B')
+    )
+    .replace(/\{\{certificateId\}\}/g, escapeHtml(data.certificateId))
+    .replace(
+      /\{\{verifyQR\}\}/g,
+      qrCodeDataUrl
+        ? `<img src="${qrCodeDataUrl}" alt="Verify QR Code" class="qr-code" />`
+        : ''
+    );
 };
 
 const resolveFieldValue = (field: ITemplateField, data: PdfData): string => {
@@ -138,7 +251,11 @@ const buildImageFieldStyle = (field: ITemplateField): string => {
     .join(';');
 };
 
-const renderBackgroundTemplateHtml = (template: TemplateRenderSource, data: PdfData): string => {
+const renderBackgroundTemplateHtml = (
+  template: TemplateRenderSource,
+  data: PdfData,
+  qrCodeDataUrl?: string
+): string => {
   const textColorFallback = data.primaryColor || '#111827';
   const backgroundImageUrl = template.backgroundImageUrl || '';
   const fieldsHtml = (template.fields || [])
@@ -162,9 +279,12 @@ const renderBackgroundTemplateHtml = (template: TemplateRenderSource, data: PdfD
     })
     .join('');
 
-  // Check if user has explicitly placed a certificateId field in the template
   const hasIdField = (template.fields || []).some(
     (f) => f.name === 'certificateId' && f.visible !== false
+  );
+
+  const hasQRField = (template.fields || []).some(
+    (f) => f.name === 'verifyQR' && f.visible !== false
   );
 
   return `
@@ -201,6 +321,25 @@ const renderBackgroundTemplateHtml = (template: TemplateRenderSource, data: PdfD
           line-height: 1;
           pointer-events: none;
         }
+        .qr-stamp {
+          position: absolute;
+          bottom: 6mm;
+          left: 8mm;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2px;
+        }
+        .qr-stamp img {
+          width: 25mm;
+          height: 25mm;
+        }
+        .qr-stamp-label {
+          font-size: 6px;
+          color: rgba(0,0,0,0.5);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
       </style>
     </head>
     <body>
@@ -208,52 +347,87 @@ const renderBackgroundTemplateHtml = (template: TemplateRenderSource, data: PdfD
         ${backgroundImageUrl ? `<img src="${escapeHtml(backgroundImageUrl)}" alt="Template background" class="background-image" />` : ''}
         ${fieldsHtml}
         ${!hasIdField ? `<div class="cert-id-stamp">ID: ${escapeHtml(data.certificateId)}</div>` : ''}
+        ${!hasQRField && qrCodeDataUrl ? `<div class="qr-stamp"><img src="${qrCodeDataUrl}" alt="Verify QR" /><span class="qr-stamp-label">Scan to verify</span></div>` : ''}
       </div>
     </body>
     </html>
   `.trim();
 };
 
-const resolveTemplateHtml = (
+const resolveTemplateHtml = async (
   templateSource: string | TemplateRenderSource,
   data: PdfData
-): string => {
+): Promise<string> => {
+  const qrCodeDataUrl = await generateQRCodeDataUrl(
+    data.certificateId,
+    data.verifyUrl
+  );
+
   if (typeof templateSource === 'string') {
-    return injectData(loadTemplate(templateSource), data);
+    return injectData(loadTemplate(templateSource), data, qrCodeDataUrl);
   }
 
   const isBackgroundTemplate =
-    templateSource.mode === 'background' || templateSource.htmlContent === 'custom-background';
+    templateSource.mode === 'background' ||
+    templateSource.htmlContent === 'custom-background';
 
   if (isBackgroundTemplate) {
-    return renderBackgroundTemplateHtml(templateSource, data);
+    return renderBackgroundTemplateHtml(templateSource, data, qrCodeDataUrl);
   }
 
-  return injectData(loadTemplate(templateSource.htmlContent), data);
+  return injectData(
+    loadTemplate(templateSource.htmlContent),
+    data,
+    qrCodeDataUrl
+  );
 };
 
 export const generatePdf = async (
   templateSource: string | TemplateRenderSource,
   data: PdfData
 ): Promise<Buffer> => {
-  const browser = await getBrowser();
+  const browser = await withTimeout(
+    getBrowser(),
+    BROWSER_TIMEOUT_MS,
+    'Browser launch timed out'
+  );
   const page = await browser.newPage();
 
   try {
-    const populatedHtml = resolveTemplateHtml(templateSource, data);
+    const populatedHtml = await resolveTemplateHtml(templateSource, data);
 
-    await page.setContent(populatedHtml, { waitUntil: 'networkidle0' });
+    await withTimeout(
+      page.setContent(populatedHtml, {
+        waitUntil: 'networkidle0',
+        timeout: 15000,
+      }),
+      20000,
+      'Page content loading timed out'
+    );
 
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      landscape: true,
-      printBackground: true,
-      margin: { top: '10mm', bottom: '10mm', left: '10mm', right: '10mm' },
-    });
+    const pdfBuffer = await withTimeout(
+      page.pdf({
+        format: 'A4',
+        landscape: true,
+        printBackground: true,
+        margin: { top: '10mm', bottom: '10mm', left: '10mm', right: '10mm' },
+      }),
+      PDF_GENERATION_TIMEOUT_MS,
+      'PDF generation timed out'
+    );
 
     return Buffer.from(pdfBuffer);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('timed out')) {
+      await closeBrowserInstance();
+    }
+    throw error;
   } finally {
-    await page.close();
+    try {
+      await page.close();
+    } catch {
+      // Page already closed
+    }
   }
 };
 
@@ -261,31 +435,51 @@ export const generatePng = async (
   templateSource: string | TemplateRenderSource,
   data: PdfData
 ): Promise<Buffer> => {
-  const browser = await getBrowser();
+  const browser = await withTimeout(
+    getBrowser(),
+    BROWSER_TIMEOUT_MS,
+    'Browser launch timed out'
+  );
   const page = await browser.newPage();
 
   try {
-    const populatedHtml = resolveTemplateHtml(templateSource, data);
+    const populatedHtml = await resolveTemplateHtml(templateSource, data);
 
-    // A4 landscape at 150dpi
     await page.setViewport({ width: 1587, height: 1122, deviceScaleFactor: 2 });
-    await page.setContent(populatedHtml, { waitUntil: 'networkidle0' });
+    await withTimeout(
+      page.setContent(populatedHtml, {
+        waitUntil: 'networkidle0',
+        timeout: 15000,
+      }),
+      20000,
+      'Page content loading timed out'
+    );
 
-    const screenshotBuffer = await page.screenshot({
-      type: 'png',
-      fullPage: false,
-      clip: { x: 0, y: 0, width: 1587, height: 1122 },
-    });
+    const screenshotBuffer = await withTimeout(
+      page.screenshot({
+        type: 'png',
+        fullPage: false,
+        clip: { x: 0, y: 0, width: 1587, height: 1122 },
+      }),
+      PDF_GENERATION_TIMEOUT_MS,
+      'PNG generation timed out'
+    );
 
     return Buffer.from(screenshotBuffer);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('timed out')) {
+      await closeBrowserInstance();
+    }
+    throw error;
   } finally {
-    await page.close();
+    try {
+      await page.close();
+    } catch {
+      // Page already closed
+    }
   }
 };
 
 export const closeBrowser = async (): Promise<void> => {
-  if (browserInstance) {
-    await browserInstance.close();
-    browserInstance = null;
-  }
+  await closeBrowserInstance();
 };

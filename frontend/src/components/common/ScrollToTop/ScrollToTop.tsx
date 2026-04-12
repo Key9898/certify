@@ -42,12 +42,15 @@ export const ScrollToTop: React.FC = () => {
           transition={QUICK_SPRING}
         >
           {/* Pulse effect */}
-          <motion.div 
+          <motion.div
             className="absolute inset-0 rounded bg-primary/20"
             animate={{ scale: [1, 1.4, 1] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           />
-          <ArrowUp size={24} className="relative z-10 transition-transform group-hover:translate-y-[-2px]" />
+          <ArrowUp
+            size={24}
+            className="relative z-10 transition-transform group-hover:translate-y-[-2px]"
+          />
         </motion.button>
       )}
     </AnimatePresence>

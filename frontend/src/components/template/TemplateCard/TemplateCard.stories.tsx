@@ -30,4 +30,3 @@ export const General: Story = {
 export const Selected: Story = {
   args: { template: MOCK_TEMPLATES[0], isSelected: true },
 };
-

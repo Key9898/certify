@@ -3,7 +3,10 @@ import { Mail, Calendar } from 'lucide-react';
 import { formatDateShort } from '@/utils/formatters';
 import type { UserProfileProps } from './UserProfile.types';
 
-export const UserProfile: React.FC<UserProfileProps> = ({ user, compact = false }) => {
+export const UserProfile: React.FC<UserProfileProps> = ({
+  user,
+  compact = false,
+}) => {
   if (compact) {
     return (
       <div className="flex items-center gap-3">
@@ -48,7 +51,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, compact = false 
               <span>Member since {formatDateShort(user.createdAt)}</span>
             </div>
             <div className="mt-2">
-              <span className={`badge badge-sm ${user.role === 'admin' ? 'badge-primary' : 'badge-ghost'}`}>
+              <span
+                className={`badge badge-sm ${user.role === 'admin' ? 'badge-primary' : 'badge-ghost'}`}
+              >
                 {user.role}
               </span>
             </div>

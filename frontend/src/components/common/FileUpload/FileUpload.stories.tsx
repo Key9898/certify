@@ -40,4 +40,3 @@ export const WithError: Story = {
     error: 'File too large. Max size: 2MB',
   },
 };
-

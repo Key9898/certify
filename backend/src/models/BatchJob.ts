@@ -60,7 +60,11 @@ const BatchResultSchema = new Schema<IBatchResult>(
 
 const BatchJobSchema = new Schema<IBatchJobDocument>(
   {
-    templateId: { type: Schema.Types.ObjectId, ref: 'Template', required: true },
+    templateId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Template',
+      required: true,
+    },
     status: {
       type: String,
       enum: ['pending', 'processing', 'completed', 'failed'],
@@ -80,4 +84,7 @@ const BatchJobSchema = new Schema<IBatchJobDocument>(
 BatchJobSchema.index({ createdBy: 1, createdAt: -1 });
 BatchJobSchema.index({ status: 1 });
 
-export const BatchJob = mongoose.model<IBatchJobDocument>('BatchJob', BatchJobSchema);
+export const BatchJob = mongoose.model<IBatchJobDocument>(
+  'BatchJob',
+  BatchJobSchema
+);

@@ -67,11 +67,23 @@ const TemplateFieldSchema = new Schema<ITemplateField>(
       fontWeight: { type: Number, default: 600 },
       fontFamily: { type: String, default: 'Arial, sans-serif' },
       color: { type: String, default: '#111827' },
-      textAlign: { type: String, enum: ['left', 'center', 'right'], default: 'center' },
+      textAlign: {
+        type: String,
+        enum: ['left', 'center', 'right'],
+        default: 'center',
+      },
       lineHeight: { type: Number, default: 1.2 },
       letterSpacing: { type: Number, default: 0 },
-      fontStyle: { type: String, enum: ['normal', 'italic'], default: 'normal' },
-      textTransform: { type: String, enum: ['none', 'uppercase'], default: 'none' },
+      fontStyle: {
+        type: String,
+        enum: ['normal', 'italic'],
+        default: 'normal',
+      },
+      textTransform: {
+        type: String,
+        enum: ['none', 'uppercase'],
+        default: 'none',
+      },
     },
   },
   { _id: false }
@@ -102,4 +114,7 @@ const TemplateSchema = new Schema<ITemplateDocument>(
   { timestamps: true }
 );
 
-export const Template = mongoose.model<ITemplateDocument>('Template', TemplateSchema);
+export const Template = mongoose.model<ITemplateDocument>(
+  'Template',
+  TemplateSchema
+);

@@ -1,6 +1,10 @@
 import { useState, useCallback, useRef } from 'react';
 import { parseCsvFile } from '@/utils/csvParser';
-import { uploadBatchCsv, startBatchGeneration, fetchBatchStatus } from '@/utils/batchApi';
+import {
+  uploadBatchCsv,
+  startBatchGeneration,
+  fetchBatchStatus,
+} from '@/utils/batchApi';
 import type { BatchJob, BatchUploadPreview } from '@/types/batch';
 
 type Step = 'idle' | 'preview' | 'processing' | 'done' | 'error';
@@ -112,9 +116,17 @@ export const useBatchImport = () => {
     async (templateId: string) => {
       if (!state.preview) return;
 
-      setState((prev) => ({ ...prev, isLoading: true, error: null, step: 'processing' }));
+      setState((prev) => ({
+        ...prev,
+        isLoading: true,
+        error: null,
+        step: 'processing',
+      }));
       try {
-        const res = await startBatchGeneration({ templateId, data: state.preview.rows });
+        const res = await startBatchGeneration({
+          templateId,
+          data: state.preview.rows,
+        });
         const job = res.data!;
         setState((prev) => ({ ...prev, job, isLoading: false }));
         pollJobStatus(job._id);
@@ -123,7 +135,10 @@ export const useBatchImport = () => {
           ...prev,
           isLoading: false,
           step: 'error',
-          error: err instanceof Error ? err.message : 'Failed to start batch generation.',
+          error:
+            err instanceof Error
+              ? err.message
+              : 'Failed to start batch generation.',
         }));
       }
     },
@@ -132,7 +147,13 @@ export const useBatchImport = () => {
 
   const reset = useCallback(() => {
     stopPolling();
-    setState({ step: 'idle', preview: null, job: null, error: null, isLoading: false });
+    setState({
+      step: 'idle',
+      preview: null,
+      job: null,
+      error: null,
+      isLoading: false,
+    });
   }, [stopPolling]);
 
   return {

@@ -52,7 +52,12 @@ const sanitizeValue = (value: unknown, depth = 0): unknown => {
   return sanitized;
 };
 
-const formatLog = (level: LogLevel, context: string, message: string, data?: unknown): string => {
+const formatLog = (
+  level: LogLevel,
+  context: string,
+  message: string,
+  data?: unknown
+): string => {
   const timestamp = new Date().toISOString();
   const logEntry: Record<string, unknown> = {
     timestamp,
@@ -87,17 +92,25 @@ export const logger = {
         ? {
             name: error.name,
             message: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+            stack:
+              process.env.NODE_ENV === 'development' ? error.stack : undefined,
           }
         : error;
     console.error(formatLog('error', context, message, errorData));
   },
 };
 
-export const logRequest = (method: string, path: string, userId?: string): void => {
+export const logRequest = (
+  method: string,
+  path: string,
+  userId?: string
+): void => {
   logger.info('Request', `${method} ${path}`, userId ? { userId } : undefined);
 };
 
-export const logSecurityEvent = (event: string, details: Record<string, unknown>): void => {
+export const logSecurityEvent = (
+  event: string,
+  details: Record<string, unknown>
+): void => {
   logger.warn('Security', event, details);
 };

@@ -13,8 +13,12 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({
 
   return (
     <button
-      className={['btn', `btn-${variant}`, sizeMap[size]].filter(Boolean).join(' ')}
-      onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+      className={['btn', `btn-${variant}`, sizeMap[size]]
+        .filter(Boolean)
+        .join(' ')}
+      onClick={() =>
+        logout({ logoutParams: { returnTo: window.location.origin } })
+      }
       aria-label="Sign out"
     >
       <LogOut size={16} aria-hidden="true" />

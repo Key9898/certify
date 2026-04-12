@@ -1,4 +1,7 @@
-export const formatDate = (dateStr: string, options?: Intl.DateTimeFormatOptions): string => {
+export const formatDate = (
+  dateStr: string,
+  options?: Intl.DateTimeFormatOptions
+): string => {
   return new Date(dateStr).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -31,7 +34,9 @@ const normalizeDisplayName = (value?: string | null): string => {
   return value?.trim() || '';
 };
 
-export const getAuthProfileDisplayName = (profile?: AuthProfileLike | null): string => {
+export const getAuthProfileDisplayName = (
+  profile?: AuthProfileLike | null
+): string => {
   const explicitName =
     normalizeDisplayName(profile?.name) ||
     normalizeDisplayName(profile?.nickname) ||
@@ -49,6 +54,8 @@ export const getAuthProfileDisplayName = (profile?: AuthProfileLike | null): str
   return 'Member';
 };
 
-export const getAuthProfileInitial = (profile?: AuthProfileLike | null): string => {
+export const getAuthProfileInitial = (
+  profile?: AuthProfileLike | null
+): string => {
   return getAuthProfileDisplayName(profile).charAt(0).toUpperCase() || 'M';
 };

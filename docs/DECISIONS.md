@@ -13,6 +13,7 @@ This document records significant architecture decisions made during the develop
 ### Context
 
 Need to select a technology stack for a certificate generator web application that:
+
 - Supports PDF generation
 - Handles image uploads
 - Provides authentication
@@ -97,6 +98,7 @@ Use Prettier + ESLint + Husky + lint-staged with configuration matching myezgame
 ### Configuration
 
 **Prettier:**
+
 ```json
 {
   "semi": true,
@@ -107,6 +109,7 @@ Use Prettier + ESLint + Husky + lint-staged with configuration matching myezgame
 ```
 
 **ESLint:**
+
 - Flat config format (ESLint 9+)
 - TypeScript support
 - React Hooks rules
@@ -273,6 +276,7 @@ recharts 3.x, react-redux@9, and related packages (use-sync-external-store, @red
 ### Decision
 
 Add to `vite.config.ts`:
+
 - `resolve.dedupe: ['react', 'react-dom']` — forces Vite to resolve react and react-dom to a single instance across all packages
 - `optimizeDeps.include` — explicitly pre-bundle recharts, react-redux, @reduxjs/toolkit, use-sync-external-store and its selector variant
 
@@ -534,39 +538,40 @@ In development mode only:
 ---
 
 ---
- 
- ## ADR-016: Specialized Branding Asset Architecture
- 
- **Date:** 2026-04-07
- 
- **Status:** Accepted
- 
- ### Context
- 
- Initial branding relied on the generic Lucide `Award` icon component. This was sufficient for MVP but lacked brand unique properties when used as a favicon or in primary branding locations. Additionally, the `public/` directory lacked organization, with icons and favicons scattered.
- 
- ### Decision
- 
- Move branding assets to a specialized, file-based architecture:
- - Reorganize `public/` into subdirectories: `Logo/` for brand logos and `favicon/` for browser/mobile icons.
- - Replace React component fallback (Lucide `Award`) with a dedicated `logo.svg` derived from the award design for use in core branding containers.
- - Use a high-fidelity SVG favicon (`favicon/favicon.svg`) instead of the default browser fallback.
- 
- ### Rationale
- 
- - **Consistency**: Using a dedicated SVG file ensures the brand logo looks identical across Sidebar, Header, Footer, and Public Verification views.
- - **Organization**: Subdirectories in `public/` prevent clutter and make asset management easier for developers and designers.
- - **Performance**: Browser favicons load more reliably when stored in a dedicated path and linked correctly from `index.html`.
- - **Future Proofing**: Allows easier white-labeling or future logo changes by swapping single SVG files rather than updating icon components across the codebase.
- 
- ### Consequences
- 
- - **Positive**: Professional asset management, improved brand consistency, and better technical SEO via correct favicon implementation.
- - **Negative**: Requires manual `img` tag handling instead of simple icon component prop-drilling for branding containers.
- - **Alternative Considered**: Keep using Lucide icons (rejected - lacks brand specialization and breaks favicon consistency).
- 
- ---
- 
+
+## ADR-016: Specialized Branding Asset Architecture
+
+**Date:** 2026-04-07
+
+**Status:** Accepted
+
+### Context
+
+Initial branding relied on the generic Lucide `Award` icon component. This was sufficient for MVP but lacked brand unique properties when used as a favicon or in primary branding locations. Additionally, the `public/` directory lacked organization, with icons and favicons scattered.
+
+### Decision
+
+Move branding assets to a specialized, file-based architecture:
+
+- Reorganize `public/` into subdirectories: `Logo/` for brand logos and `favicon/` for browser/mobile icons.
+- Replace React component fallback (Lucide `Award`) with a dedicated `logo.svg` derived from the award design for use in core branding containers.
+- Use a high-fidelity SVG favicon (`favicon/favicon.svg`) instead of the default browser fallback.
+
+### Rationale
+
+- **Consistency**: Using a dedicated SVG file ensures the brand logo looks identical across Sidebar, Header, Footer, and Public Verification views.
+- **Organization**: Subdirectories in `public/` prevent clutter and make asset management easier for developers and designers.
+- **Performance**: Browser favicons load more reliably when stored in a dedicated path and linked correctly from `index.html`.
+- **Future Proofing**: Allows easier white-labeling or future logo changes by swapping single SVG files rather than updating icon components across the codebase.
+
+### Consequences
+
+- **Positive**: Professional asset management, improved brand consistency, and better technical SEO via correct favicon implementation.
+- **Negative**: Requires manual `img` tag handling instead of simple icon component prop-drilling for branding containers.
+- **Alternative Considered**: Keep using Lucide icons (rejected - lacks brand specialization and breaks favicon consistency).
+
+---
+
 ## ADR-017: Auth0 Audience in getAccessTokenSilently Only — Never in loginWithRedirect or Auth0Provider
 
 **Date:** 2026-04-09
@@ -635,7 +640,7 @@ Organizations need the ability to invalidate certificates after issuance — due
 
 ---
 
- ---
+---
 
 ## ADR-019: Standardized Corporate Design System (0.25rem Corner Radius)
 
@@ -670,6 +675,95 @@ Standardize the entire design system to a strict 0.25rem corner radius (using Ta
 
 ---
 
+## ADR-018: JWT Middleware Error Handling in Express Error Handler
+
+**Date:** 2026-04-10
+
+**Status:** Accepted
+
+### Context
+
+The `express-oauth2-jwt-bearer` library throws errors with a `status` property (e.g., 401 for unauthorized) instead of the conventional `statusCode` property used by Express. The existing error handler in `backend/src/middleware/errorHandler.ts` only checked for `statusCode`, defaulting to 500 when not found. This caused all JWT authentication errors (missing token, invalid token, expired token) to return HTTP 500 Internal Server Error instead of the correct 401 Unauthorized status.
+
+Additionally, JWT errors from the library don't include a `code` property, so the error handler was returning `INTERNAL_ERROR` as the error code even when the HTTP status was corrected.
+
+### Decision
+
+Update the error handler to:
+
+1. Check both `statusCode` and `status` properties when determining HTTP status code
+2. Add `getErrorCode` function to map JWT error names/messages to proper error codes:
+   - `UnauthorizedError` → `UNAUTHORIZED`
+   - `invalid token` → `INVALID_TOKEN`
+   - `jwt expired` → `TOKEN_EXPIRED`
+   - `jwt malformed` → `INVALID_TOKEN`
+   - `no authorization token` → `TOKEN_MISSING`
+3. Add `getErrorMessage` function to provide user-friendly error messages
+4. Add `status` property to the `AppError` interface
+
+### Rationale
+
+- **Correct HTTP Semantics**: Authentication failures should return 4xx status codes, not 500
+- **Better Client Handling**: Frontend can properly distinguish between auth errors and server errors
+- **Security Clarity**: Users understand when they need to re-authenticate vs. when the server has a problem
+- **Library Compatibility**: Handles the specific error format used by `express-oauth2-jwt-bearer`
+
+### Consequences
+
+- **Positive**: Correct HTTP status codes for all JWT errors; better error messages for API consumers; proper error code mapping
+- **Negative**: None significant; slightly more complex error handler
+- **Alternative Considered**: Wrap JWT middleware in custom error handler (rejected — adds unnecessary abstraction layer)
+
+---
+
+## ADR-019: Usage Stats Phase 1 (Simple) Before Phase 2 (Billing)
+
+**Date:** 2026-04-11
+
+**Status:** Accepted
+
+### Context
+
+Need to display usage statistics to users. The question is whether to implement billing/limits immediately or start with simple stats display.
+
+### Decision
+
+Implement usage stats in two phases:
+
+**Phase 1 (Current):**
+
+- Simple stats display in sidebar
+- Certificates created this month
+- Batch jobs completed
+- Storage used
+- No limits, no billing, no enforcement
+- Visual progress bars with soft limits (1000 certs, 5GB) for UX only
+
+**Phase 2 (Future):**
+
+- Stripe integration
+- Subscription plans (Free, Pro, Enterprise)
+- Real usage limits
+- Quota enforcement
+- Invoice generation
+
+### Rationale
+
+- **MVP Focus**: Users can see their usage without payment friction
+- **Market Validation**: Gather usage data before setting pricing
+- **Lower Barrier**: Free users can explore without commitment
+- **Iterative Approach**: Build billing when monetization is validated
+- **Technical Simplicity**: No Stripe integration complexity yet
+
+### Consequences
+
+- **Positive**: Faster time-to-market; lower user friction; usage data for pricing decisions
+- **Negative**: No revenue until Phase 2; potential abuse without limits
+- **Mitigation**: Rate limiting already in place; can fast-track Phase 2 if needed
+- **Alternative Considered**: Implement billing immediately (rejected — premature monetization)
+
+---
+
 ## Template
 
 ```markdown
@@ -697,4 +791,3 @@ Standardize the entire design system to a strict 0.25rem corner radius (using Ta
 - **Negative:** [Drawbacks]
 - **Alternative Considered:** [Other options considered]
 ```
-

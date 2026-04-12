@@ -29,8 +29,11 @@ const DemoContext = createContext<DemoContextValue>({
   setMockIntegrations: () => {},
 });
 
-export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [mockCertificates, setMockCertificates] = useState<Certificate[]>(MOCK_CERTIFICATES);
+export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [mockCertificates, setMockCertificates] =
+    useState<Certificate[]>(MOCK_CERTIFICATES);
   const [mockIntegrations, setMockIntegrations] =
     useState<Integration[]>(MOCK_INTEGRATIONS);
 

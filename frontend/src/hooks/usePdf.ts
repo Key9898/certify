@@ -5,20 +5,24 @@ export const usePdf = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const generate = useCallback(async (certificateId: string): Promise<string | null> => {
-    setIsGenerating(true);
-    setError(null);
-    try {
-      const result = await generatePdf(certificateId);
-      return result.data?.pdfUrl || null;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'PDF generation failed';
-      setError(msg);
-      return null;
-    } finally {
-      setIsGenerating(false);
-    }
-  }, []);
+  const generate = useCallback(
+    async (certificateId: string): Promise<string | null> => {
+      setIsGenerating(true);
+      setError(null);
+      try {
+        const result = await generatePdf(certificateId);
+        return result.data?.pdfUrl || null;
+      } catch (err) {
+        const msg =
+          err instanceof Error ? err.message : 'PDF generation failed';
+        setError(msg);
+        return null;
+      } finally {
+        setIsGenerating(false);
+      }
+    },
+    []
+  );
 
   const download = useCallback((pdfUrl: string, filename?: string) => {
     const link = document.createElement('a');

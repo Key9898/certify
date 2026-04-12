@@ -5,3 +5,6 @@ export * from './Loading';
 export * from './Card';
 export * from './Dropdown';
 export * from './FileUpload';
+export * from './Tooltip';
+export * from './VerifyModal';
+export * from './VerifyFAB';

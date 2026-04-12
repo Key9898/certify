@@ -14,12 +14,24 @@ type Story = StoryObj<typeof Dropdown>;
 
 export const Default: Story = {
   args: {
-    trigger: <Button variant="ghost" size="sm">Actions ▼</Button>,
+    trigger: (
+      <Button variant="ghost" size="sm">
+        Actions ▼
+      </Button>
+    ),
     items: [
-      { label: 'Download PDF', icon: <Download size={16} />, onClick: () => {} },
+      {
+        label: 'Download PDF',
+        icon: <Download size={16} />,
+        onClick: () => {},
+      },
       { label: 'Edit', icon: <Edit size={16} />, onClick: () => {} },
-      { label: 'Delete', icon: <Trash2 size={16} />, onClick: () => {}, variant: 'error' },
+      {
+        label: 'Delete',
+        icon: <Trash2 size={16} />,
+        onClick: () => {},
+        variant: 'error',
+      },
     ],
   },
 };
-

@@ -1,7 +1,9 @@
 import { del, get, patch, post } from './api';
 import type { ApiResponse, TeamWorkspace } from '@/types';
 
-export const fetchTeamWorkspace = async (): Promise<ApiResponse<TeamWorkspace>> => {
+export const fetchTeamWorkspace = async (): Promise<
+  ApiResponse<TeamWorkspace>
+> => {
   return get<TeamWorkspace>('/users/team');
 };
 
@@ -9,7 +11,12 @@ export const inviteTeamMember = async (
   email: string,
   role: 'admin' | 'member'
 ): Promise<
-  ApiResponse<{ _id: string; email: string; role: 'admin' | 'member'; status: string }>
+  ApiResponse<{
+    _id: string;
+    email: string;
+    role: 'admin' | 'member';
+    status: string;
+  }>
 > => {
   return post('/users/team/invitations', { email, role });
 };

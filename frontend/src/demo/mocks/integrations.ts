@@ -5,12 +5,14 @@ export const MOCK_INTEGRATIONS: Integration[] = [
     _id: 'integration-zapier-demo',
     name: 'Zapier Course Awards',
     provider: 'custom',
-    description: 'Create a branded certificate whenever a Typeform + CRM flow is marked complete.',
+    description:
+      'Create a branded certificate whenever a Typeform + CRM flow is marked complete.',
     status: 'active',
     mode: 'single',
     templateId: 'template-modern',
     templateName: 'Modern Excellence',
-    webhookUrl: 'https://demo.certify.app/api/integrations/hooks/ig_demo_zapier_awards',
+    webhookUrl:
+      'https://demo.certify.app/api/integrations/hooks/ig_demo_zapier_awards',
     defaults: {
       certificateTitle: 'Course Completion Certificate',
       issuerName: 'Global Academy',
@@ -33,12 +35,14 @@ export const MOCK_INTEGRATIONS: Integration[] = [
     _id: 'integration-sheets-demo',
     name: 'Google Sheets Cohort Sync',
     provider: 'google_sheets',
-    description: 'Queue a batch job from spreadsheet rows at the end of each cohort.',
+    description:
+      'Queue a batch job from spreadsheet rows at the end of each cohort.',
     status: 'paused',
     mode: 'batch',
     templateId: 'template-classic',
     templateName: 'Classic Recognition',
-    webhookUrl: 'https://demo.certify.app/api/integrations/hooks/ig_demo_sheets_batch',
+    webhookUrl:
+      'https://demo.certify.app/api/integrations/hooks/ig_demo_sheets_batch',
     defaults: {
       certificateTitle: 'Leadership Cohort Graduation',
       issuerName: 'North Ridge Learning',
@@ -71,12 +75,14 @@ export const MOCK_INTEGRATIONS: Integration[] = [
     _id: 'integration-canvas-demo',
     name: 'Canvas Capstone Returns',
     provider: 'canvas',
-    description: 'Return certificate links to Canvas assignment submissions once a learner completes a capstone.',
+    description:
+      'Return certificate links to Canvas assignment submissions once a learner completes a capstone.',
     status: 'active',
     mode: 'single',
     templateId: 'template-modern',
     templateName: 'Modern Excellence',
-    webhookUrl: 'https://demo.certify.app/api/integrations/hooks/ig_demo_canvas_single',
+    webhookUrl:
+      'https://demo.certify.app/api/integrations/hooks/ig_demo_canvas_single',
     defaults: {
       certificateTitle: 'Capstone Completion Certificate',
       issuerName: 'Summit Continuing Education',

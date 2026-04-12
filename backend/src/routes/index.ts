@@ -11,6 +11,7 @@ import v1Routes from './v1Routes';
 import webhookRoutes from './webhookRoutes';
 import analyticsRoutes from './analyticsRoutes';
 import integrationRoutes from './integrationRoutes';
+import usageRoutes from './usageRoutes';
 
 const router = Router();
 
@@ -26,5 +27,6 @@ router.use('/webhooks', webhookRoutes);
 router.use('/analytics', analyticsRoutes);
 router.use('/v1', v1Routes);
 router.use('/integrations', integrationRoutes);
+router.use('/usage', usageRoutes);
 
 export default router;

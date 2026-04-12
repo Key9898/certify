@@ -2,7 +2,11 @@ import archiver from 'archiver';
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../types';
 import { parseCsv, validateBatchData } from '../utils/csvParser';
-import { createBatchJob, processBatchJob, getBatchJob } from '../services/batchService';
+import {
+  createBatchJob,
+  processBatchJob,
+  getBatchJob,
+} from '../services/batchService';
 import { logger } from '../utils/logger';
 
 export const uploadBatch = async (
@@ -30,7 +34,8 @@ export const uploadBatch = async (
         success: false,
         error: {
           code: 'VALIDATION_ERROR',
-          message: 'Import validation failed. Please check the file format and required columns.',
+          message:
+            'Import validation failed. Please check the file format and required columns.',
           details: errors,
         },
       });
@@ -75,9 +80,11 @@ export const startBatch = async (
     const userId = req.user!._id.toString();
     const job = await createBatchJob(templateId, data, userId);
 
-    processBatchJob((job._id as { toString(): string }).toString()).catch((err: unknown) => {
-      logger.error('BatchController', 'Batch job processing error', err);
-    });
+    processBatchJob((job._id as { toString(): string }).toString()).catch(
+      (err: unknown) => {
+        logger.error('BatchController', 'Batch job processing error', err);
+      }
+    );
 
     res.status(201).json({ success: true, data: job });
   } catch (error) {
@@ -105,20 +112,28 @@ export const downloadBatchZip = async (
     if (job.status !== 'completed') {
       res.status(400).json({
         success: false,
-        error: { code: 'NOT_READY', message: 'Batch job is not completed yet.' },
+        error: {
+          code: 'NOT_READY',
+          message: 'Batch job is not completed yet.',
+        },
       });
       return;
     }
 
     const pdfEntries = job.results.filter(
       (r): r is typeof r & { pdfUrl: string } =>
-        r.status === 'success' && typeof r.pdfUrl === 'string' && r.pdfUrl.length > 0
+        r.status === 'success' &&
+        typeof r.pdfUrl === 'string' &&
+        r.pdfUrl.length > 0
     );
 
     if (pdfEntries.length === 0) {
       res.status(404).json({
         success: false,
-        error: { code: 'NO_PDFS', message: 'No generated PDFs found in this batch.' },
+        error: {
+          code: 'NO_PDFS',
+          message: 'No generated PDFs found in this batch.',
+        },
       });
       return;
     }
@@ -130,16 +145,22 @@ export const downloadBatchZip = async (
     );
 
     const archive = archiver('zip', { zlib: { level: 6 } });
-    archive.on('error', (err) => { next(err); });
+    archive.on('error', (err) => {
+      next(err);
+    });
     archive.pipe(res);
 
     await Promise.all(
       pdfEntries.map(async (entry, index) => {
         try {
-          const response = await fetch(entry.pdfUrl, { signal: AbortSignal.timeout(15000) });
+          const response = await fetch(entry.pdfUrl, {
+            signal: AbortSignal.timeout(15000),
+          });
           if (!response.ok) return;
           const buffer = Buffer.from(await response.arrayBuffer());
-          const safeName = entry.recipientName.replace(/[^a-z0-9_\- ]/gi, '_').trim();
+          const safeName = entry.recipientName
+            .replace(/[^a-z0-9_\- ]/gi, '_')
+            .trim();
           archive.append(buffer, { name: `${index + 1}-${safeName}.pdf` });
         } catch {
           // skip unreachable PDFs silently

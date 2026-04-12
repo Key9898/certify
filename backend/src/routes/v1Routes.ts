@@ -12,7 +12,10 @@ import { generalLimiter } from '../middleware/rateLimiter';
 import { validateObjectId } from '../middleware/validate';
 import { Certificate } from '../models/Certificate';
 import { Template } from '../models/Template';
-import { createCertificate, generateAndUploadPdf } from '../services/certificateService';
+import {
+  createCertificate,
+  generateAndUploadPdf,
+} from '../services/certificateService';
 import { AuthenticatedRequest } from '../types';
 import { Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
@@ -42,27 +45,41 @@ router.use(apiKeyAuth);
  *       200:
  *         description: List of certificates
  */
-router.get('/certificates', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const page = Math.max(1, parseInt((req.query.page as string) || '1'));
-    const limit = Math.min(100, Math.max(1, parseInt((req.query.limit as string) || '20')));
-    const skip = (page - 1) * limit;
-    const userId = new mongoose.Types.ObjectId(req.user!._id.toString());
+router.get(
+  '/certificates',
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const page = Math.max(1, parseInt((req.query.page as string) || '1'));
+      const limit = Math.min(
+        100,
+        Math.max(1, parseInt((req.query.limit as string) || '20'))
+      );
+      const skip = (page - 1) * limit;
+      const userId = new mongoose.Types.ObjectId(req.user!._id.toString());
 
-    const [certificates, total] = await Promise.all([
-      Certificate.find({ createdBy: userId }).sort({ createdAt: -1 }).skip(skip).limit(limit),
-      Certificate.countDocuments({ createdBy: userId }),
-    ]);
+      const [certificates, total] = await Promise.all([
+        Certificate.find({ createdBy: userId })
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit),
+        Certificate.countDocuments({ createdBy: userId }),
+      ]);
 
-    res.json({
-      success: true,
-      data: certificates,
-      pagination: { total, page, limit, totalPages: Math.ceil(total / limit) },
-    });
-  } catch (error) {
-    next(error);
+      res.json({
+        success: true,
+        data: certificates,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 /**
  * @swagger
@@ -93,7 +110,12 @@ router.get(
         createdBy: req.user!._id,
       });
       if (!certificate) {
-        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Certificate not found.' } });
+        res
+          .status(404)
+          .json({
+            success: false,
+            error: { code: 'NOT_FOUND', message: 'Certificate not found.' },
+          });
         return;
       }
       res.json({ success: true, data: certificate });
@@ -130,14 +152,20 @@ router.get(
  *       201:
  *         description: Certificate created
  */
-router.post('/certificates', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const certificate = await createCertificate(req.body, req.user!._id.toString());
-    res.status(201).json({ success: true, data: certificate });
-  } catch (error) {
-    next(error);
+router.post(
+  '/certificates',
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const certificate = await createCertificate(
+        req.body,
+        req.user!._id.toString()
+      );
+      res.status(201).json({ success: true, data: certificate });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 /**
  * @swagger
@@ -161,7 +189,10 @@ router.post(
   validateObjectId('id'),
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-      const pdfUrl = await generateAndUploadPdf(req.params.id, req.user!._id.toString());
+      const pdfUrl = await generateAndUploadPdf(
+        req.params.id,
+        req.user!._id.toString()
+      );
       res.json({ success: true, data: { pdfUrl } });
     } catch (error) {
       next(error);
@@ -183,7 +214,9 @@ router.post(
  */
 router.get('/templates', async (_req, res: Response, next: NextFunction) => {
   try {
-    const templates = await Template.find({ isPublic: true }).sort({ createdAt: -1 });
+    const templates = await Template.find({ isPublic: true }).sort({
+      createdAt: -1,
+    });
     res.json({ success: true, data: templates });
   } catch (error) {
     next(error);

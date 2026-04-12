@@ -3,7 +3,12 @@ import { motion } from 'framer-motion';
 import type { LoadingProps } from './Loading.types';
 import { MOTION_EASE } from '@/utils/motion';
 
-const sizeMap = { xs: 'loading-xs', sm: 'loading-sm', md: 'loading-md', lg: 'loading-lg' };
+const sizeMap = {
+  xs: 'loading-xs',
+  sm: 'loading-sm',
+  md: 'loading-md',
+  lg: 'loading-lg',
+};
 const variantMap = {
   spinner: 'loading-spinner',
   dots: 'loading-dots',

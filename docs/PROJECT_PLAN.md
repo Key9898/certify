@@ -38,6 +38,36 @@
 | Lucide React  | Icons             |
 | Framer Motion | Animations        |
 
+#### Bundle Optimization
+
+Heavy libraries are lazy-loaded to keep initial bundle size under 500kB:
+
+| Library   | Lazy Load Method              | Used In           |
+| --------- | ----------------------------- | ----------------- |
+| ExcelJS   | Dynamic import (`import()`)   | csvParser.ts      |
+| Recharts  | React.lazy() + Suspense       | Dashboard.tsx     |
+
+**Pattern - Dynamic Import for Utilities:**
+
+```typescript
+const parseXLSX = async (file: File) => {
+  const ExcelJS = await import('exceljs');
+  const workbook = new ExcelJS.default.Workbook();
+  // ... parsing logic
+};
+```
+
+**Pattern - React.lazy for Components:**
+
+```tsx
+const OverviewChart = React.lazy(() => import('./OverviewChart'));
+const UsageChart = React.lazy(() => import('./UsageChart'));
+
+<Suspense fallback={<LoadingSpinner />}>
+  <OverviewChart data={data} />
+</Suspense>;
+```
+
 ### Backend
 
 | Technology | Purpose        |
@@ -49,6 +79,34 @@
 | Puppeteer  | PDF Generation |
 | Auth0      | Authentication |
 | Cloudinary | File Storage   |
+
+#### PDF Generation
+
+PDF certificates are generated server-side using Puppeteer with the following features:
+
+| Feature       | Description                                                  |
+| ------------- | ------------------------------------------------------------ |
+| QR Code       | Auto-generated using `qrcode` library, embedded in PDF       |
+| certificateId | Auto-generated using `nanoid(12).toUpperCase()` on creation  |
+| Verify URL    | QR code points to `/verify/{certificateId}` for verification |
+
+**Template Placeholders:**
+
+| Placeholder         | Description                            |
+| ------------------- | -------------------------------------- |
+| `{{certificateId}}` | Unique certificate ID for verification |
+| `{{verifyQR}}`      | QR code image (base64 data URL)        |
+
+**QR Code Configuration:**
+
+```typescript
+{
+  width: 150,
+  margin: 1,
+  color: { dark: '#1a1a1a', light: '#ffffff' },
+  errorCorrectionLevel: 'M'
+}
+```
 
 ### Database
 
@@ -450,13 +508,19 @@ certify/
 | 15  | Template Categories      | Phase 2 | Low      |
 | 16  | Certificate Verification | MVP     | High     |
 | 17  | PNG Download             | Phase 2 | Low      |
-| 18  | Public REST API          | Phase 3 | High     |
-| 19  | API Documentation        | Phase 3 | High     |
-| 20  | Webhooks                 | Phase 3 | Medium   |
-| 21  | Third-party Integrations | Phase 3 | Medium   |
-| 22  | Advanced Analytics       | Phase 3 | Low      |
-| 23  | Team Collaboration       | Phase 3 | Medium   |
-| 24  | White Label              | Phase 3 | Low      |
+| 18  | Usage Stats              | Phase 1 | Medium   |
+| 19  | Stripe Integration       | Phase 2 | High     |
+| 20  | Subscription Plans       | Phase 2 | High     |
+| 21  | Usage Limits & Quotas    | Phase 2 | High     |
+| 22  | Quota Enforcement        | Phase 2 | High     |
+| 23  | Invoice Generation       | Phase 2 | Medium   |
+| 24  | Public REST API          | Phase 3 | High     |
+| 25  | API Documentation        | Phase 3 | High     |
+| 26  | Webhooks                 | Phase 3 | Medium   |
+| 27  | Third-party Integrations | Phase 3 | Medium   |
+| 28  | Advanced Analytics       | Phase 3 | Low      |
+| 29  | Team Collaboration       | Phase 3 | Medium   |
+| 30  | White Label              | Phase 3 | Low      |
 
 ---
 
@@ -464,38 +528,37 @@ certify/
 
 ### What Users Can Do in MVP
 
-| Action                | Description                                 |
-| --------------------- | ------------------------------------------- |
-| Login/Signup          | Email/Password or Social login via Auth0    |
-| View Dashboard        | See statistics and quick actions            |
-| Browse Templates      | Select from pre-built certificate templates |
-| Create Certificate    | Fill in certificate details via form        |
-| Upload Logo           | Add organization logo                       |
-| Upload Signature      | Add issuer signature                        |
-| Customize Colors      | Change template colors                      |
-| Real-time Preview     | See changes instantly                       |
-| Download PDF          | High-quality PDF download                   |
-| View All Certificates | List of all generated certificates          |
-| Search Certificates   | Find by name, date, etc.                    |
-| Re-download PDF       | Download previously generated certificates  |
-| Delete Certificate    | Remove unwanted certificates                |
-| Edit Profile          | Update user information                     |
-| Verify Certificates  | Public portal for instant certificate validation |
-
+| Action                | Description                                      |
+| --------------------- | ------------------------------------------------ |
+| Login/Signup          | Email/Password or Social login via Auth0         |
+| View Dashboard        | See statistics and quick actions                 |
+| Browse Templates      | Select from pre-built certificate templates      |
+| Create Certificate    | Fill in certificate details via form             |
+| Upload Logo           | Add organization logo                            |
+| Upload Signature      | Add issuer signature                             |
+| Customize Colors      | Change template colors                           |
+| Real-time Preview     | See changes instantly                            |
+| Download PDF          | High-quality PDF download                        |
+| View All Certificates | List of all generated certificates               |
+| Search Certificates   | Find by name, date, etc.                         |
+| Re-download PDF       | Download previously generated certificates       |
+| Delete Certificate    | Remove unwanted certificates                     |
+| Edit Profile          | Update user information                          |
+| Verify Certificates   | Public portal for instant certificate validation |
 
 ### What Users Cannot Do in MVP
 
-| Action                   | Available In |
-| ------------------------ | ------------ |
-| Batch Generation         | Phase 2      |
-| CSV Import               | Phase 2      |
-| Email Delivery           | Phase 2      |
-| Custom Template Builder  | Phase 2      |
-| PNG Download             | Phase 2      |
+| Action                  | Available In |
+| ----------------------- | ------------ |
+| Batch Generation        | Phase 2      |
+| CSV Import              | Phase 2      |
+| Email Delivery          | Phase 2      |
+| Custom Template Builder | Phase 2      |
+| PNG Download            | Phase 2      |
 
-| API Access               | Phase 3      |
-| Team Collaboration       | Phase 3      |
-| Analytics                | Phase 3      |
+| API Access | Phase 3 |
+| Team Collaboration | Phase 3 |
+| Analytics | Phase 3 |
 
 ---
 
@@ -516,6 +579,7 @@ certify/
 - Custom Branding (Logo, Colors)
 - Search & Filter
 - User Dashboard
+- Certificate Verification (Public verify page, revoke endpoint)
 
 **Target Users:**
 
@@ -527,7 +591,7 @@ certify/
 
 ---
 
-### Phase 2: Batch & Automation
+### Phase 2: Batch & Billing
 
 **Duration:** 4-6 weeks
 
@@ -539,8 +603,13 @@ certify/
 - Email Delivery
 - Custom Template Builder
 - Template Categories
-- Certificate Verification
 - PNG Download
+- **Billing & Monetization**
+  - Stripe Integration
+  - Subscription Plans (Free, Pro, Enterprise)
+  - Usage Limits & Quotas
+  - Quota Enforcement
+  - Invoice Generation
 
 **Target Users:**
 
@@ -550,6 +619,14 @@ certify/
 - Schools/Universities
 
 **Complexity:** Moderate
+
+**Subscription Plans:**
+
+| Plan       | Price  | Certificates/Month | Storage | Batch Jobs | Features                                  |
+| ---------- | ------ | ------------------ | ------- | ---------- | ----------------------------------------- |
+| Free       | $0     | 100                | 1 GB    | 5          | Basic templates, Single generation        |
+| Pro        | $29/mo | 1,000              | 5 GB    | 50         | All templates, Batch, Email delivery      |
+| Enterprise | $99/mo | Unlimited          | 50 GB   | Unlimited  | API access, White label, Priority support |
 
 ---
 
@@ -649,7 +726,13 @@ interface Integration {
   organizationId: ObjectId; // Workspace that owns the integration
   createdBy: ObjectId; // User who configured it
   name: string; // Human-readable integration name
-  provider: "zapier" | "make" | "google_sheets" | "moodle" | "canvas" | "custom";
+  provider:
+    | "zapier"
+    | "make"
+    | "google_sheets"
+    | "moodle"
+    | "canvas"
+    | "custom";
   status: "active" | "paused";
   mode: "single" | "batch";
   templateId: ObjectId; // Default certificate template
@@ -711,6 +794,20 @@ interface TemplateField {
 }
 ```
 
+**Available Template Placeholders:**
+
+| Placeholder            | Description                                      |
+| ---------------------- | ------------------------------------------------ |
+| `{{recipientName}}`    | Certificate recipient name                       |
+| `{{certificateTitle}}` | Certificate title                                |
+| `{{issueDate}}`        | Issue date                                       |
+| `{{expiryDate}}`       | Expiry date (optional)                           |
+| `{{issuerName}}`       | Issuer name                                      |
+| `{{issuerSignature}}`  | Signature image URL                              |
+| `{{organizationLogo}}` | Organization logo URL                            |
+| `{{certificateId}}`    | Auto-generated unique ID for verification        |
+| `{{verifyQR}}`         | QR code image (base64 data URL) for verification |
+
 ### Certificate Model
 
 ```typescript
@@ -728,7 +825,11 @@ interface Certificate {
   organizationLogo?: string; // Logo image URL
   customFields?: Record<string, any>; // Additional fields
   pdfUrl?: string; // Generated PDF URL
-  certificateId: string; // Unique certificate ID
+  certificateId: string; // Auto-generated unique ID using nanoid(12).toUpperCase()
+  status: "active" | "revoked"; // Certificate status for verification
+  revokedAt?: Date; // Revocation timestamp
+  revokedBy?: ObjectId; // User who revoked
+  revokeReason?: string; // Reason for revocation
   createdBy: ObjectId; // User who created
   createdAt: Date;
   updatedAt: Date;
@@ -759,6 +860,34 @@ interface BatchResult {
 }
 ```
 
+### Subscription Model (Phase 2)
+
+```typescript
+interface Subscription {
+  _id: ObjectId;
+  organizationId: ObjectId; // Workspace reference
+  plan: "free" | "pro" | "enterprise"; // Subscription tier
+  stripeCustomerId?: string; // Stripe customer ID
+  stripeSubscriptionId?: string; // Stripe subscription ID
+  status: "active" | "canceled" | "past_due" | "trialing";
+  currentPeriodStart: Date;
+  currentPeriodEnd: Date;
+  cancelAtPeriodEnd: boolean;
+  limits: {
+    certificatesPerMonth: number; // Monthly certificate limit
+    storageBytes: number; // Storage limit in bytes
+    batchJobsPerMonth: number; // Batch job limit
+  };
+  usage: {
+    certificatesThisMonth: number;
+    storageUsedBytes: number;
+    batchJobsThisMonth: number;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
 ---
 
 ## 7. API Endpoints
@@ -772,91 +901,105 @@ interface BatchResult {
 
 ### Users & Workspace
 
-| Method | Endpoint                            | Description                                |
-| ------ | ----------------------------------- | ------------------------------------------ |
-| PATCH  | `/api/users/settings`               | Update user defaults and white-label brand |
-| GET    | `/api/users/team`                   | Get workspace members and invitations      |
-| POST   | `/api/users/team/invitations`       | Invite a teammate to workspace             |
-| PATCH  | `/api/users/team/members/:userId`   | Change a teammate role                     |
-| DELETE | `/api/users/team/members/:userId`   | Remove a teammate from workspace           |
-| DELETE | `/api/users/team/invitations/:id`   | Cancel a pending invitation                |
+| Method | Endpoint                          | Description                                |
+| ------ | --------------------------------- | ------------------------------------------ |
+| PATCH  | `/api/users/settings`             | Update user defaults and white-label brand |
+| GET    | `/api/users/team`                 | Get workspace members and invitations      |
+| POST   | `/api/users/team/invitations`     | Invite a teammate to workspace             |
+| PATCH  | `/api/users/team/members/:userId` | Change a teammate role                     |
+| DELETE | `/api/users/team/members/:userId` | Remove a teammate from workspace           |
+| DELETE | `/api/users/team/invitations/:id` | Cancel a pending invitation                |
 
 ### Templates
 
-| Method | Endpoint             | Description                              |
-| ------ | -------------------- | ---------------------------------------- |
+| Method | Endpoint             | Description                                 |
+| ------ | -------------------- | ------------------------------------------- |
 | GET    | `/api/templates`     | List public and workspace-visible templates |
-| GET    | `/api/templates/:id` | Get template by ID                       |
-| POST   | `/api/templates`     | Create template                          |
-| PUT    | `/api/templates/:id` | Update workspace-owned template          |
-| DELETE | `/api/templates/:id` | Delete workspace-owned template          |
+| GET    | `/api/templates/:id` | Get template by ID                          |
+| POST   | `/api/templates`     | Create template                             |
+| PUT    | `/api/templates/:id` | Update workspace-owned template             |
+| DELETE | `/api/templates/:id` | Delete workspace-owned template             |
 
 ### Certificates
 
-| Method | Endpoint                             | Description                        |
-| ------ | ------------------------------------ | ---------------------------------- |
-| GET    | `/api/certificates`                  | List workspace certificates        |
-| GET    | `/api/certificates/:id`              | Get certificate by ID              |
-| POST   | `/api/certificates`                  | Create certificate                 |
-| POST   | `/api/certificates/generate-pdf/:id` | Generate PDF                       |
-| POST   | `/api/certificates/generate-png/:id` | Generate PNG                       |
-| DELETE | `/api/certificates/:id`              | Delete creator or admin-owned cert |
+| Method | Endpoint                             | Description                                 |
+| ------ | ------------------------------------ | ------------------------------------------- |
+| GET    | `/api/certificates`                  | List workspace certificates                 |
+| GET    | `/api/certificates/:id`              | Get certificate by ID                       |
+| POST   | `/api/certificates`                  | Create certificate                          |
+| POST   | `/api/certificates/generate-pdf/:id` | Generate PDF                                |
+| POST   | `/api/certificates/generate-png/:id` | Generate PNG                                |
+| PATCH  | `/api/certificates/:id/revoke`       | Revoke certificate (sets status to revoked) |
+| DELETE | `/api/certificates/:id`              | Delete creator or admin-owned cert          |
 
 ### Batch (Phase 2)
 
-| Method | Endpoint                | Description            |
-| ------ | ----------------------- | ---------------------- |
-| POST   | `/api/batch/upload`     | Upload CSV file        |
-| POST   | `/api/batch/generate`   | Start batch generation |
-| GET    | `/api/batch/:id/status` | Get batch status       |
+| Method | Endpoint                      | Description                        |
+| ------ | ----------------------------- | ---------------------------------- |
+| POST   | `/api/batch/upload`           | Upload CSV file                    |
+| POST   | `/api/batch/generate`         | Start batch generation             |
+| GET    | `/api/batch/:id/status`       | Get batch status                   |
 | GET    | `/api/batch/:id/download-zip` | Download all generated PDFs as ZIP |
+
+### Billing (Phase 2)
+
+| Method | Endpoint                    | Description                           |
+| ------ | --------------------------- | ------------------------------------- |
+| GET    | `/api/billing/subscription` | Get current subscription details      |
+| POST   | `/api/billing/checkout`     | Create Stripe checkout session        |
+| POST   | `/api/billing/portal`       | Create Stripe customer portal session |
+| POST   | `/api/billing/webhook`      | Stripe webhook handler                |
+| GET    | `/api/billing/plans`        | List available subscription plans     |
+| GET    | `/api/billing/usage`        | Get current usage vs limits           |
 
 ### Upload
 
-| Method | Endpoint                | Description                                 |
-| ------ | ----------------------- | ------------------------------------------- |
-| GET    | `/api/upload/signature` | Get signed Cloudinary upload parameters     |
+| Method | Endpoint                | Description                             |
+| ------ | ----------------------- | --------------------------------------- |
+| GET    | `/api/upload/signature` | Get signed Cloudinary upload parameters |
 
 ### Public Verification
 
-| Method | Endpoint                     | Description                       |
-| ------ | ---------------------------- | --------------------------------- |
-| GET    | `/api/verify/:certificateId` | Public certificate verification   |
+| Method | Endpoint                     | Description                     |
+| ------ | ---------------------------- | ------------------------------- |
+| GET    | `/api/verify/:certificateId` | Public certificate verification |
+
+**Rate Limiting:** 30 requests per 15 minutes per IP address (verifyLimiter)
 
 ### Analytics (Phase 3)
 
-| Method | Endpoint          | Description                      |
-| ------ | ----------------- | -------------------------------- |
-| GET    | `/api/analytics`  | Workspace analytics summary      |
+| Method | Endpoint         | Description                 |
+| ------ | ---------------- | --------------------------- |
+| GET    | `/api/analytics` | Workspace analytics summary |
 
 ### API Keys (Phase 3)
 
-| Method | Endpoint          | Description                      |
-| ------ | ----------------- | -------------------------------- |
-| GET    | `/api/keys`       | List masked API keys             |
-| POST   | `/api/keys`       | Create API key                   |
-| DELETE | `/api/keys/:id`   | Revoke API key                   |
+| Method | Endpoint        | Description          |
+| ------ | --------------- | -------------------- |
+| GET    | `/api/keys`     | List masked API keys |
+| POST   | `/api/keys`     | Create API key       |
+| DELETE | `/api/keys/:id` | Revoke API key       |
 
 ### Webhooks (Phase 3)
 
-| Method | Endpoint              | Description                |
-| ------ | --------------------- | -------------------------- |
-| GET    | `/api/webhooks`       | List configured webhooks   |
-| POST   | `/api/webhooks`       | Create webhook             |
-| DELETE | `/api/webhooks/:id`   | Delete webhook             |
+| Method | Endpoint            | Description              |
+| ------ | ------------------- | ------------------------ |
+| GET    | `/api/webhooks`     | List configured webhooks |
+| POST   | `/api/webhooks`     | Create webhook           |
+| DELETE | `/api/webhooks/:id` | Delete webhook           |
 
 ### Third-party Integrations (Phase 3)
 
-| Method | Endpoint                            | Description                               |
-| ------ | ----------------------------------- | ----------------------------------------- |
-| GET    | `/api/integrations/catalog`         | List supported integration providers      |
-| GET    | `/api/integrations`                 | List workspace integrations               |
-| POST   | `/api/integrations`                 | Create integration                        |
-| PATCH  | `/api/integrations/:id`             | Update integration                        |
-| POST   | `/api/integrations/:id/test`        | Generate sample payload and curl test     |
-| DELETE | `/api/integrations/:id`             | Delete integration                        |
-| GET    | `/api/integrations/hooks/:webhookKey` | Inspect public webhook contract         |
-| POST   | `/api/integrations/hooks/:webhookKey` | Receive external certificate request    |
+| Method | Endpoint                              | Description                           |
+| ------ | ------------------------------------- | ------------------------------------- |
+| GET    | `/api/integrations/catalog`           | List supported integration providers  |
+| GET    | `/api/integrations`                   | List workspace integrations           |
+| POST   | `/api/integrations`                   | Create integration                    |
+| PATCH  | `/api/integrations/:id`               | Update integration                    |
+| POST   | `/api/integrations/:id/test`          | Generate sample payload and curl test |
+| DELETE | `/api/integrations/:id`               | Delete integration                    |
+| GET    | `/api/integrations/hooks/:webhookKey` | Inspect public webhook contract       |
+| POST   | `/api/integrations/hooks/:webhookKey` | Receive external certificate request  |
 
 Integration Hub UX should also provide:
 
@@ -868,13 +1011,13 @@ Integration Hub UX should also provide:
 
 ### Public REST API (Phase 3)
 
-| Method | Endpoint                              | Description                          |
-| ------ | ------------------------------------- | ------------------------------------ |
-| GET    | `/api/v1/certificates`                | List certificates via API key        |
-| GET    | `/api/v1/certificates/:id`            | Get certificate via API key          |
-| POST   | `/api/v1/certificates`                | Create certificate via API key       |
+| Method | Endpoint                                | Description                          |
+| ------ | --------------------------------------- | ------------------------------------ |
+| GET    | `/api/v1/certificates`                  | List certificates via API key        |
+| GET    | `/api/v1/certificates/:id`              | Get certificate via API key          |
+| POST   | `/api/v1/certificates`                  | Create certificate via API key       |
 | POST   | `/api/v1/certificates/:id/generate-pdf` | Generate certificate PDF via API key |
-| GET    | `/api/v1/templates`                   | List public templates via API key    |
+| GET    | `/api/v1/templates`                     | List public templates via API key    |
 
 ---
 
@@ -1112,5 +1255,6 @@ This keeps the main product reliable even without any direct Canva API dependenc
  # # #   I n t e r a c t i o n   P r i n c i p l e s 
  -   * * S o f t   S p r i n g s * * :   B u t t o n s   a n d   m o d a l s   u s e   l o w - t e n s i o n   s p r i n g   a n i m a t i o n s   f o r   o r g a n i c   f e e d b a c k . 
  -   * * L a y o u t   T r a n s i t i o n s * * :   V i e w   s w i t c h i n g   ( l i k e   t e m p l a t e   f i l t e r i n g )   u s e s   F r a m e r   M o t i o n   \ L a y o u t G r o u p \   f o r   f l u i d   r e o r g a n i z a t i o n . 
- -   * * M i c r o - f e e d b a c k * * :   H o v e r   s t a t e s   i n c l u d e   s u b t l e   Y - a x i s   t r a n s f o r m s   a n d   b o r d e r - c o l o r   t r a n s i t i o n s   t o   s i g n i f y   i n t e r a c t i v i t y .  
+ -   * * M i c r o - f e e d b a c k * * :   H o v e r   s t a t e s   i n c l u d e   s u b t l e   Y - a x i s   t r a n s f o r m s   a n d   b o r d e r - c o l o r   t r a n s i t i o n s   t o   s i g n i f y   i n t e r a c t i v i t y . 
+ 
  

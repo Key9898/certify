@@ -7,14 +7,28 @@ import {
   createTemplate,
   updateTemplate,
   deleteTemplate,
+  getPublicTemplateCount,
 } from '../controllers/templateController';
 
 const router = Router();
 
+router.get('/public/count', getPublicTemplateCount);
 router.get('/', checkJwt, attachUser, listTemplates);
 router.get('/:id', checkJwt, attachUser, validateObjectId('id'), getTemplate);
 router.post('/', checkJwt, attachUser, createTemplate);
-router.put('/:id', checkJwt, attachUser, validateObjectId('id'), updateTemplate);
-router.delete('/:id', checkJwt, attachUser, validateObjectId('id'), deleteTemplate);
+router.put(
+  '/:id',
+  checkJwt,
+  attachUser,
+  validateObjectId('id'),
+  updateTemplate
+);
+router.delete(
+  '/:id',
+  checkJwt,
+  attachUser,
+  validateObjectId('id'),
+  deleteTemplate
+);
 
 export default router;

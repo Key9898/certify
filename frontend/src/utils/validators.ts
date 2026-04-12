@@ -12,7 +12,12 @@ export const isValidUrl = (url: string): boolean => {
 };
 
 export const isValidImageFile = (file: File): boolean => {
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'];
+  const allowedTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/svg+xml',
+    'image/webp',
+  ];
   const maxSize = 2 * 1024 * 1024;
   return allowedTypes.includes(file.type) && file.size <= maxSize;
 };

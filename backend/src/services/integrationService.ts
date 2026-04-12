@@ -1,4 +1,7 @@
-import type { IIntegrationDocument, IntegrationProvider } from '../models/Integration';
+import type {
+  IIntegrationDocument,
+  IntegrationProvider,
+} from '../models/Integration';
 import type { CreateCertificateDto } from './certificateService';
 
 export interface IntegrationCatalogItem {
@@ -18,7 +21,11 @@ export const INTEGRATION_CATALOG: IntegrationCatalogItem[] = [
     summary:
       'Turn spreadsheet rows into certificates with Apps Script plus native status write-back through the Google Sheets API.',
     recommendedMode: 'batch',
-    highlights: ['Spreadsheet source of truth', 'Apps Script starter', 'Native row write-back'],
+    highlights: [
+      'Spreadsheet source of truth',
+      'Apps Script starter',
+      'Native row write-back',
+    ],
   },
   {
     provider: 'canvas',
@@ -27,7 +34,11 @@ export const INTEGRATION_CATALOG: IntegrationCatalogItem[] = [
     summary:
       'Connect course outcomes and student milestones to certificate delivery with a native Canvas callback option.',
     recommendedMode: 'single',
-    highlights: ['Assignment milestones', 'Submission comment return', 'Institution branding'],
+    highlights: [
+      'Assignment milestones',
+      'Submission comment return',
+      'Institution branding',
+    ],
   },
   {
     provider: 'custom',
@@ -35,10 +46,13 @@ export const INTEGRATION_CATALOG: IntegrationCatalogItem[] = [
     category: 'custom',
     summary: 'Integrate any platform that can send JSON over HTTPS.',
     recommendedMode: 'single',
-    highlights: ['Portable payload contract', 'Works with internal tools', 'Flexible field overrides'],
+    highlights: [
+      'Portable payload contract',
+      'Works with internal tools',
+      'Flexible field overrides',
+    ],
   },
 ];
-
 
 const DEFAULT_CERTIFICATE_TITLE = 'Certificate of Achievement';
 const DEFAULT_ISSUER_NAME = 'Certify';
@@ -121,8 +135,10 @@ const extractColors = (
   payload: LooseRecord,
   integration: IIntegrationDocument
 ): Record<string, unknown> | undefined => {
-  const primaryColor = asString(payload.primaryColor) || integration.defaults.primaryColor;
-  const secondaryColor = asString(payload.secondaryColor) || integration.defaults.secondaryColor;
+  const primaryColor =
+    asString(payload.primaryColor) || integration.defaults.primaryColor;
+  const secondaryColor =
+    asString(payload.secondaryColor) || integration.defaults.secondaryColor;
 
   if (!primaryColor && !secondaryColor) {
     return undefined;
@@ -142,7 +158,10 @@ export const resolveIntegrationTemplateId = (
   return asString(record?.templateId) || integration.templateId.toString();
 };
 
-export const buildIntegrationWebhookUrl = (baseUrl: string, webhookKey: string): string =>
+export const buildIntegrationWebhookUrl = (
+  baseUrl: string,
+  webhookKey: string
+): string =>
   `${baseUrl.replace(/\/$/, '')}/api/integrations/hooks/${webhookKey}`;
 
 export const buildIntegrationSamplePayload = (
@@ -153,9 +172,10 @@ export const buildIntegrationSamplePayload = (
     _id?: { toString(): string };
     toString(): string;
   };
-  const templateId = templateRef && typeof templateRef === 'object' && templateRef._id
-    ? templateRef._id.toString()
-    : templateRef?.toString();
+  const templateId =
+    templateRef && typeof templateRef === 'object' && templateRef._id
+      ? templateRef._id.toString()
+      : templateRef?.toString();
 
   if (integration.mode === 'batch') {
     const batchPayload: Record<string, unknown> = {
@@ -166,27 +186,34 @@ export const buildIntegrationSamplePayload = (
         {
           recipientName: 'Ava Morgan',
           recipientEmail: 'ava@example.com',
-          certificateTitle: integration.defaults.certificateTitle || DEFAULT_CERTIFICATE_TITLE,
+          certificateTitle:
+            integration.defaults.certificateTitle || DEFAULT_CERTIFICATE_TITLE,
           issuerName: integration.defaults.issuerName || DEFAULT_ISSUER_NAME,
           issueDate: new Date().toISOString(),
-          ...(integration.provider === 'google_sheets' ? { sheetRowNumber: 2 } : {}),
+          ...(integration.provider === 'google_sheets'
+            ? { sheetRowNumber: 2 }
+            : {}),
         },
         {
           recipientName: 'Noah Bennett',
           recipientEmail: 'noah@example.com',
-          certificateTitle: integration.defaults.certificateTitle || DEFAULT_CERTIFICATE_TITLE,
+          certificateTitle:
+            integration.defaults.certificateTitle || DEFAULT_CERTIFICATE_TITLE,
           issuerName: integration.defaults.issuerName || DEFAULT_ISSUER_NAME,
           issueDate: new Date().toISOString(),
-          ...(integration.provider === 'google_sheets' ? { sheetRowNumber: 3 } : {}),
+          ...(integration.provider === 'google_sheets'
+            ? { sheetRowNumber: 3 }
+            : {}),
         },
       ],
     };
 
     if (integration.provider === 'google_sheets') {
       batchPayload.spreadsheetId =
-        integration.settings.googleSheets?.spreadsheetId || 'your-google-sheet-id';
+        integration.settings.googleSheets?.spreadsheetId ||
+        'your-google-sheet-id';
       batchPayload.sheetName =
-        integration.settings.googleSheets?.sheetName || 'Ready to Issue';
+        integration.settings.googleSheets?.sheetName || 'Ready to Create';
     }
 
     return batchPayload;
@@ -197,18 +224,22 @@ export const buildIntegrationSamplePayload = (
     templateName,
     recipientName: 'Ava Morgan',
     recipientEmail: 'ava@example.com',
-    certificateTitle: integration.defaults.certificateTitle || DEFAULT_CERTIFICATE_TITLE,
+    certificateTitle:
+      integration.defaults.certificateTitle || DEFAULT_CERTIFICATE_TITLE,
     issuerName: integration.defaults.issuerName || DEFAULT_ISSUER_NAME,
-    description: integration.defaults.description || 'Awarded for outstanding performance.',
+    description:
+      integration.defaults.description ||
+      'Awarded for outstanding performance.',
     issueDate: new Date().toISOString(),
   };
 
   if (integration.provider === 'google_sheets') {
     singlePayload.sheetRowNumber = 2;
     singlePayload.spreadsheetId =
-      integration.settings.googleSheets?.spreadsheetId || 'your-google-sheet-id';
+      integration.settings.googleSheets?.spreadsheetId ||
+      'your-google-sheet-id';
     singlePayload.sheetName =
-      integration.settings.googleSheets?.sheetName || 'Ready to Issue';
+      integration.settings.googleSheets?.sheetName || 'Ready to Create';
   }
 
   if (integration.provider === 'canvas') {
@@ -245,22 +276,31 @@ export const buildSingleIntegrationRequest = (
   };
 
   return {
-    templateId: asString(record.templateId) || integration.templateId.toString(),
+    templateId:
+      asString(record.templateId) || integration.templateId.toString(),
     recipientName,
     recipientEmail: asString(record.recipientEmail),
     certificateTitle:
       asString(record.certificateTitle) ||
       integration.defaults.certificateTitle ||
       DEFAULT_CERTIFICATE_TITLE,
-    description: asString(record.description) || integration.defaults.description,
+    description:
+      asString(record.description) || integration.defaults.description,
     issueDate,
-    expiryDate: expiryDateString ? new Date(asIsoString(expiryDateString)) : undefined,
-    issuerName: asString(record.issuerName) || integration.defaults.issuerName || DEFAULT_ISSUER_NAME,
+    expiryDate: expiryDateString
+      ? new Date(asIsoString(expiryDateString))
+      : undefined,
+    issuerName:
+      asString(record.issuerName) ||
+      integration.defaults.issuerName ||
+      DEFAULT_ISSUER_NAME,
     issuerSignature:
       asString(record.issuerSignature) || integration.defaults.issuerSignature,
     organizationLogo:
-      asString(record.organizationLogo) || integration.defaults.organizationLogo,
-    customFields: Object.keys(customFields).length > 0 ? customFields : undefined,
+      asString(record.organizationLogo) ||
+      integration.defaults.organizationLogo,
+    customFields:
+      Object.keys(customFields).length > 0 ? customFields : undefined,
   };
 };
 
@@ -280,7 +320,9 @@ export const buildBatchIntegrationRows = (
       : null;
 
   if (!rawRows || rawRows.length === 0) {
-    throw createValidationError('Batch integrations require a non-empty data array.');
+    throw createValidationError(
+      'Batch integrations require a non-empty data array.'
+    );
   }
 
   return rawRows.map((row, index) => {
@@ -301,7 +343,10 @@ export const buildBatchIntegrationRows = (
         asString(rowRecord.certificateTitle) ||
         integration.defaults.certificateTitle ||
         DEFAULT_CERTIFICATE_TITLE,
-      description: asString(rowRecord.description) || integration.defaults.description || '',
+      description:
+        asString(rowRecord.description) ||
+        integration.defaults.description ||
+        '',
       issueDate: asIsoString(rowRecord.issueDate),
       expiryDate: asString(rowRecord.expiryDate)
         ? asIsoString(rowRecord.expiryDate)
@@ -338,7 +383,8 @@ export const buildGoogleSheetsBatchSyncContext = (
   }
 
   const spreadsheetId =
-    asString(record.spreadsheetId) || integration.settings.googleSheets?.spreadsheetId;
+    asString(record.spreadsheetId) ||
+    integration.settings.googleSheets?.spreadsheetId;
   const sheetName =
     asString(record.sheetName) || integration.settings.googleSheets?.sheetName;
 
@@ -395,8 +441,11 @@ export const buildGoogleSheetsSingleSyncContext = (
   return {
     rowNumber,
     spreadsheetId:
-      asString(record.spreadsheetId) || integration.settings.googleSheets?.spreadsheetId,
-    sheetName: asString(record.sheetName) || integration.settings.googleSheets?.sheetName,
+      asString(record.spreadsheetId) ||
+      integration.settings.googleSheets?.spreadsheetId,
+    sheetName:
+      asString(record.sheetName) ||
+      integration.settings.googleSheets?.sheetName,
   };
 };
 

@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: 'Georgia', 'Times New Roman', serif; background: #fff; -webkit-print-color-adjust: exact; }
+      .certificate {
+        width: 297mm; height: 210mm;
+        position: relative; overflow: hidden;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        padding: 12mm 18mm;
+        background: linear-gradient(135deg, #fefefe 0%, #f8f6f0 50%, #fefefe 100%);
+      }
+      .border-outer {
+        position: absolute; inset: 4mm;
+        border: 3px double {{primaryColor}};
+        pointer-events: none;
+      }
+      .border-inner {
+        position: absolute; inset: 8mm;
+        border: 1px solid {{primaryColor}};
+        opacity: 0.4;
+        pointer-events: none;
+      }
+      .corner-decor {
+        position: absolute;
+        width: 20mm; height: 20mm;
+        border: 2px solid {{primaryColor}};
+        opacity: 0.3;
+      }
+      .corner-tl { top: 12mm; left: 12mm; border-right: none; border-bottom: none; }
+      .corner-tr { top: 12mm; right: 12mm; border-left: none; border-bottom: none; }
+      .corner-bl { bottom: 12mm; left: 12mm; border-right: none; border-top: none; }
+      .corner-br { bottom: 12mm; right: 12mm; border-left: none; border-top: none; }
+      .header { display: flex; flex-direction: column; align-items: center; margin-bottom: 6mm; }
+      .logo-img { max-height: 50px; max-width: 160px; object-fit: contain; margin-bottom: 3mm; }
+      .institution { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: {{primaryColor}}; font-weight: 600; }
+      .cert-type { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: {{secondaryColor}}; margin-top: 2mm; }
+      .cert-title { font-size: 42px; font-weight: 700; color: {{primaryColor}}; margin: 6mm 0 4mm; text-align: center; font-style: italic; }
+      .divider { width: 100mm; height: 1px; background: {{primaryColor}}; margin: 4mm auto; opacity: 0.5; }
+      .presented-to { font-size: 12px; color: #666; margin-bottom: 2mm; letter-spacing: 1px; }
+      .recipient-name { font-size: 36px; color: #1a1a1a; margin-bottom: 4mm; font-weight: 700; letter-spacing: 1px; }
+      .description { font-size: 13px; color: #444; text-align: center; max-width: 170mm; line-height: 1.7; margin-bottom: 6mm; }
+      .footer { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: auto; padding: 0 10mm; }
+      .footer-item { display: flex; flex-direction: column; align-items: center; }
+      .footer-label { font-size: 9px; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-top: 2mm; }
+      .footer-value { font-size: 12px; color: #333; font-weight: 600; }
+      .signature-img { max-height: 40px; max-width: 120px; object-fit: contain; }
+      .sign-line { width: 45mm; height: 1px; background: #ccc; margin-bottom: 2mm; }
+      .qr-section { display: flex; flex-direction: column; align-items: center; gap: 1mm; }
+      .qr-code { width: 22mm; height: 22mm; }
+      .qr-label { font-size: 7px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+      .cert-id { font-size: 8px; color: #aaa; font-family: monospace; }
+    </style>
+  </head>
+  <body>
+    <div class="certificate">
+      <div class="border-outer"></div>
+      <div class="border-inner"></div>
+      <div class="corner-decor corner-tl"></div>
+      <div class="corner-decor corner-tr"></div>
+      <div class="corner-decor corner-bl"></div>
+      <div class="corner-decor corner-br"></div>
+      <div class="header">
+        {{organizationLogo}}
+        <div class="institution">{{issuerName}}</div>
+        <div class="cert-type">Official Diploma</div>
+      </div>
+      <div class="cert-title">{{certificateTitle}}</div>
+      <div class="divider"></div>
+      <div class="presented-to">This diploma is conferred upon</div>
+      <div class="recipient-name">{{recipientName}}</div>
+      <div class="description">{{description}}</div>
+      <div class="footer">
+        <div class="footer-item">
+          <div class="qr-section">
+            {{verifyQR}}
+            <span class="qr-label">Scan to verify</span>
+          </div>
+        </div>
+        <div class="footer-item">
+          <div class="footer-value">{{issueDate}}</div>
+          <div class="footer-label">Date of Issue</div>
+        </div>
+        <div class="footer-item">
+          <div class="sign-line"></div>
+          {{issuerSignature}}
+          <div class="footer-value">{{issuerName}}</div>
+          <div class="footer-label">Authorized Signature</div>
+        </div>
+        <div class="footer-item">
+          <div class="cert-id">ID: {{certificateId}}</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

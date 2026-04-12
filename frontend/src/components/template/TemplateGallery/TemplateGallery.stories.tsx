@@ -30,4 +30,3 @@ export const Loading: Story = {
 export const Empty: Story = {
   args: { templates: [], isLoading: false },
 };
-

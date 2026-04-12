@@ -21,7 +21,11 @@ export const Dropdown: React.FC<DropdownProps> = ({
             <button
               onClick={item.onClick}
               disabled={item.disabled}
-              className={item.variant === 'error' ? 'text-error hover:bg-error hover:text-error-content' : ''}
+              className={
+                item.variant === 'error'
+                  ? 'text-error hover:bg-error hover:text-error-content'
+                  : ''
+              }
             >
               {item.icon && <span>{item.icon}</span>}
               {item.label}

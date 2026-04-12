@@ -1,9 +1,16 @@
 import { Response, NextFunction } from 'express';
 import { User } from '../models/User';
 import { AuthenticatedRequest } from '../types';
-import { buildAppUser, ensureUserWorkspace } from '../services/workspaceService';
+import {
+  buildAppUser,
+  ensureUserWorkspace,
+} from '../services/workspaceService';
 
-const deriveDisplayName = (name?: string, email?: string, auth0Id?: string): string => {
+const deriveDisplayName = (
+  name?: string,
+  email?: string,
+  auth0Id?: string
+): string => {
   const explicitName = name?.trim();
   if (explicitName) {
     return explicitName;

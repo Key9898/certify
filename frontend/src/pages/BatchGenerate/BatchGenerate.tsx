@@ -23,11 +23,20 @@ type Step = 'upload' | 'select-template' | 'preview' | 'generating' | 'done';
 
 export const BatchGenerate: React.FC = () => {
   const { templates, isLoading: templatesLoading } = useTemplates();
-  const { preview, job, error, isLoading, parseLocalFile, startGeneration, reset } =
-    useBatchImport();
+  const {
+    preview,
+    job,
+    error,
+    isLoading,
+    parseLocalFile,
+    startGeneration,
+    reset,
+  } = useBatchImport();
 
   const [step, setStep] = useState<Step>('upload');
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(
+    null
+  );
 
   const handleFileParsed = (rows: Record<string, string>[]) => {
     if (rows.length > 0) {
@@ -79,15 +88,20 @@ export const BatchGenerate: React.FC = () => {
   return (
     <MainLayout>
       <div className="mx-auto max-w-6xl">
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
           <div className="mb-2 flex items-center gap-3">
             <div className="h-6 w-1.5 rounded bg-primary" />
             <h1 className="text-3xl font-black tracking-tighter text-base-content">
-              Batch Generation
+              Bulk Generation
             </h1>
           </div>
           <p className="font-medium text-base-content/50">
-            Issue hundreds of professional certificates instantly via CSV or Excel automation.
+            Create hundreds of professional certificates instantly via CSV or
+            Excel integration.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <div className="rounded border border-base-200 bg-base-100 px-4 py-2 text-xs font-black uppercase tracking-widest text-base-content/45 shadow-sm">
@@ -141,13 +155,17 @@ export const BatchGenerate: React.FC = () => {
                       </motion.div>
                       <span
                         className={`relative z-10 text-xs font-black uppercase tracking-widest ${
-                          isCurrent ? 'text-base-content' : 'text-base-content/40'
+                          isCurrent
+                            ? 'text-base-content'
+                            : 'text-base-content/40'
                         }`}
                       >
                         {item.label}
                       </span>
                     </motion.div>
-                    {index < STEPS.length - 1 && <div className="mx-1 h-6 w-px bg-base-300" />}
+                    {index < STEPS.length - 1 && (
+                      <div className="mx-1 h-6 w-px bg-base-300" />
+                    )}
                   </React.Fragment>
                 );
               })}
@@ -220,7 +238,11 @@ export const BatchGenerate: React.FC = () => {
                               ? 'border-primary bg-primary/5 shadow-md ring-1 ring-primary/20'
                               : 'border-base-200 bg-base-100 hover:border-primary/40'
                           }`}
-                          whileHover={{ y: -6, scale: 1.01, transition: SOFT_SPRING }}
+                          whileHover={{
+                            y: -6,
+                            scale: 1.01,
+                            transition: SOFT_SPRING,
+                          }}
                           whileTap={TAP_PRESS}
                         >
                           <div className="relative aspect-[4/3] overflow-hidden bg-base-200">
@@ -229,11 +251,17 @@ export const BatchGenerate: React.FC = () => {
                                 src={template.thumbnail}
                                 alt={template.name}
                                 className="h-full w-full object-cover"
-                                whileHover={{ scale: 1.06, transition: SOFT_SPRING }}
+                                whileHover={{
+                                  scale: 1.06,
+                                  transition: SOFT_SPRING,
+                                }}
                               />
                             ) : (
                               <div className="flex h-full items-center justify-center">
-                                <Award size={48} className="text-base-content/10" />
+                                <Award
+                                  size={48}
+                                  className="text-base-content/10"
+                                />
                               </div>
                             )}
                             {isSelected && (
@@ -303,7 +331,10 @@ export const BatchGenerate: React.FC = () => {
                         Review Queue
                       </h2>
                       <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-base-content/30">
-                        Template: <span className="text-primary">{selectedTemplate?.name}</span>
+                        Template:{' '}
+                        <span className="text-primary">
+                          {selectedTemplate?.name}
+                        </span>
                       </p>
                     </div>
                   </div>
@@ -335,7 +366,9 @@ export const BatchGenerate: React.FC = () => {
                       {preview.preview.map((row, rowIndex) => (
                         <motion.tr
                           key={rowIndex}
-                          whileHover={{ backgroundColor: 'rgba(226,232,240,0.35)' }}
+                          whileHover={{
+                            backgroundColor: 'rgba(226,232,240,0.35)',
+                          }}
                           transition={QUICK_SPRING}
                         >
                           {Object.values(row).map((value, valueIndex) => (
@@ -402,7 +435,7 @@ export const BatchGenerate: React.FC = () => {
                     className="h-auto rounded border-2 px-12 py-6 text-lg font-black shadow-xl shadow-base-200 hover:border-primary hover:bg-primary hover:text-primary-content"
                     onClick={handleReset}
                   >
-                    Generate Another Batch
+                    Generate Another Job
                   </Button>
                 </div>
               )}

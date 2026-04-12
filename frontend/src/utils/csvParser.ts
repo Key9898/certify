@@ -1,5 +1,3 @@
-import ExcelJS from 'exceljs';
-
 const COLUMN_ALIASES: Record<string, string> = {
   name: 'recipientName',
   recipient: 'recipientName',
@@ -73,7 +71,17 @@ export const parseCsvText = (text: string): Record<string, string>[] => {
   });
 };
 
-const parseCellValue = (value: ExcelJS.CellValue): string => {
+type CellValue =
+  | null
+  | undefined
+  | number
+  | string
+  | boolean
+  | Date
+  | { result: CellValue }
+  | { richText: Array<{ text: string }> };
+
+const parseCellValue = (value: CellValue): string => {
   if (value === null || value === undefined) {
     return '';
   }
@@ -95,15 +103,16 @@ const parseCellValue = (value: ExcelJS.CellValue): string => {
   }
 
   if (typeof value === 'object' && 'richText' in value) {
-    return (value as ExcelJS.CellRichTextValue)
-      .richText.map((rt: ExcelJS.RichText) => rt.text)
-      .join('');
+    return value.richText.map((rt) => rt.text).join('');
   }
 
   return String(value).trim();
 };
 
-const parseXlsxArrayBuffer = async (buffer: ArrayBuffer): Promise<Record<string, string>[]> => {
+const parseXlsxArrayBuffer = async (
+  buffer: ArrayBuffer
+): Promise<Record<string, string>[]> => {
+  const ExcelJS = await import('exceljs');
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(buffer);
 
@@ -116,8 +125,8 @@ const parseXlsxArrayBuffer = async (buffer: ArrayBuffer): Promise<Record<string,
   let headers: string[] = [];
   let headerRowFound = false;
 
-  worksheet.eachRow((row: ExcelJS.Row) => {
-    const values = row.values as ExcelJS.CellValue[];
+  worksheet.eachRow((row) => {
+    const values = row.values as CellValue[];
 
     if (!headerRowFound) {
       const rawHeaders = values.slice(1).map((value) => parseCellValue(value));
@@ -126,7 +135,9 @@ const parseXlsxArrayBuffer = async (buffer: ArrayBuffer): Promise<Record<string,
       return;
     }
 
-    const hasContent = values.slice(1).some((value) => parseCellValue(value).length > 0);
+    const hasContent = values
+      .slice(1)
+      .some((value) => parseCellValue(value).length > 0);
     if (!hasContent) {
       return;
     }

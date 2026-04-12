@@ -23,7 +23,9 @@ export const createBatchJob = async (
     $or: [{ isPublic: true }, { createdBy: { $in: workspaceUserIds } }],
   });
   if (!template) {
-    const error = new Error('Template not found') as Error & { statusCode: number };
+    const error = new Error('Template not found') as Error & {
+      statusCode: number;
+    };
     error.statusCode = 404;
     throw error;
   }
@@ -133,7 +135,10 @@ export const processBatchJob = async (jobId: string): Promise<void> => {
     }
 
     const hasFailed = allResults.some((r) => r.status === 'failed');
-    job.status = hasFailed && allResults.every((r) => r.status === 'failed') ? 'failed' : 'completed';
+    job.status =
+      hasFailed && allResults.every((r) => r.status === 'failed')
+        ? 'failed'
+        : 'completed';
     await job.save();
 
     await syncBatchJobNativeResults(job).catch((error) => {
@@ -148,7 +153,8 @@ export const processBatchJob = async (jobId: string): Promise<void> => {
     }).catch(() => {});
   } catch (err) {
     job.status = 'failed';
-    job.errorMessage = err instanceof Error ? err.message : 'Unexpected error during processing';
+    job.errorMessage =
+      err instanceof Error ? err.message : 'Unexpected error during processing';
     await job.save();
 
     triggerWebhooks(userId, 'batch.failed', {

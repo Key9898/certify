@@ -1,4 +1,12 @@
-import { User, Shield, Building2, Lock, Users, ChevronRight, Key } from 'lucide-react';
+import {
+  User,
+  Shield,
+  Building2,
+  Lock,
+  Users,
+  ChevronRight,
+  Key,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { SOFT_SPRING, QUICK_SPRING } from '@/utils/motion';
 import type { SettingsTab } from './types';
@@ -8,13 +16,41 @@ interface SettingsSidebarProps {
   setActiveTab: (tab: SettingsTab) => void;
 }
 
-export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeTab, setActiveTab }) => {
+export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
+  activeTab,
+  setActiveTab,
+}) => {
   const menuItems = [
-    { id: 'general', label: 'Account Identity', icon: User, detail: 'Profile & issuance defaults' },
-    { id: 'workspace', label: 'Team Ensemble', icon: Users, detail: 'Collaboration & seat management' },
-    { id: 'branding', label: 'White Labeling', icon: Building2, detail: 'Custom brand parameters' },
-    { id: 'developer', label: 'Developer Core', icon: Key, detail: 'Secured API & delivery routes' },
-    { id: 'security', label: 'System Security', icon: Lock, detail: 'Login & data integrity' },
+    {
+      id: 'general',
+      label: 'Profile',
+      icon: User,
+      detail: 'Personal info & preferences',
+    },
+    {
+      id: 'workspace',
+      label: 'Team Members',
+      icon: Users,
+      detail: 'Manage team & roles',
+    },
+    {
+      id: 'branding',
+      label: 'White Labeling',
+      icon: Building2,
+      detail: 'Custom brand settings',
+    },
+    {
+      id: 'developer',
+      label: 'API & Integrations',
+      icon: Key,
+      detail: 'API keys & webhooks',
+    },
+    {
+      id: 'security',
+      label: 'Security',
+      icon: Lock,
+      detail: 'Password & account safety',
+    },
   ] as const;
 
   return (
@@ -32,28 +68,40 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeTab, set
               key={item.id}
               onClick={() => setActiveTab(item.id as SettingsTab)}
               className={`w-full group relative flex items-center gap-4 rounded p-4 transition-all border ${
-                isActive 
-                  ? 'bg-primary/5 border-primary/20 shadow-sm shadow-primary/5' 
+                isActive
+                  ? 'bg-primary/5 border-primary/20 shadow-sm shadow-primary/5'
                   : 'bg-transparent border-transparent hover:bg-base-200/50 grayscale hover:grayscale-0'
               }`}
               whileHover={{ x: 4 }}
               transition={QUICK_SPRING}
             >
-              <div className={`flex h-12 w-12 items-center justify-center rounded transition-all ${
-                isActive ? 'bg-primary text-primary-content shadow-lg shadow-primary/20 scale-110' : 'bg-base-200 text-base-content/40'
-              }`}>
+              <div
+                className={`flex h-12 w-12 items-center justify-center rounded transition-all ${
+                  isActive
+                    ? 'bg-primary text-primary-content shadow-lg shadow-primary/20 scale-110'
+                    : 'bg-base-200 text-base-content/40'
+                }`}
+              >
                 <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
               </div>
 
-              <div className="flex-1 text-left">
-                <p className={`text-sm font-black tracking-tight transition-colors ${
-                  isActive ? 'text-base-content' : 'text-base-content/50 group-hover:text-base-content'
-                }`}>
+              <div className="flex-1 text-left min-w-0">
+                <p
+                  className={`text-sm font-black tracking-tight transition-colors truncate ${
+                    isActive
+                      ? 'text-base-content'
+                      : 'text-base-content/50 group-hover:text-base-content'
+                  }`}
+                >
                   {item.label}
                 </p>
-                <p className={`text-[10px] font-bold uppercase tracking-widest transition-opacity ${
-                  isActive ? 'text-primary/60' : 'text-base-content/30 group-hover:text-base-content/40'
-                }`}>
+                <p
+                  className={`text-[10px] font-bold uppercase tracking-widest transition-opacity truncate ${
+                    isActive
+                      ? 'text-primary/60'
+                      : 'text-base-content/30 group-hover:text-base-content/40'
+                  }`}
+                >
                   {item.detail}
                 </p>
               </div>
@@ -65,9 +113,12 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeTab, set
                   transition={SOFT_SPRING}
                 />
               )}
-              
+
               {!isActive && (
-                <ChevronRight size={14} className="text-base-content/20 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2" />
+                <ChevronRight
+                  size={14}
+                  className="text-base-content/20 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2"
+                />
               )}
             </motion.button>
           );
@@ -79,8 +130,13 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeTab, set
           <Shield size={100} />
         </div>
         <div className="relative z-10">
-          <p className="text-[9px] font-black uppercase tracking-[0.3em] text-primary mb-3">Service Health</p>
-          <p className="text-xs font-black text-base-content tracking-tight leading-relaxed">Your global workspace configuration is backed by Enterprise-grade AES-256 encryption.</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.3em] text-primary mb-3">
+            Service Health
+          </p>
+          <p className="text-xs font-black text-base-content tracking-tight leading-relaxed">
+            Your global workspace configuration is backed by Enterprise-grade
+            AES-256 encryption.
+          </p>
         </div>
       </div>
     </div>

@@ -1,6 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { MemoryRouter } from 'react-router-dom';
-import { LayoutDashboard, FileText, Plus, Settings, X, Award, LogOut } from 'lucide-react';
+import {
+  LayoutDashboard,
+  FileText,
+  Plus,
+  Settings,
+  X,
+  Award,
+  LogOut,
+} from 'lucide-react';
 
 // Static preview — avoids useAuth0() and NavLink active-state in Storybook
 const SidebarPreview = ({
@@ -22,7 +30,10 @@ const SidebarPreview = ({
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-4 py-3 border-b border-base-200 lg:hidden">
         <span className="font-bold text-lg">Menu</span>
-        <button className="btn btn-ghost btn-sm btn-circle" aria-label="Close menu">
+        <button
+          className="btn btn-ghost btn-sm btn-circle"
+          aria-label="Close menu"
+        >
           <X size={18} />
         </button>
       </div>
@@ -90,5 +101,6 @@ type Story = StoryObj<typeof SidebarPreview>;
 export const Default: Story = { args: { activeRoute: '/dashboard' } };
 export const TemplatesActive: Story = { args: { activeRoute: '/templates' } };
 export const SettingsActive: Story = { args: { activeRoute: '/settings' } };
-export const MobileOpen: Story = { args: { isOpen: true, activeRoute: '/dashboard' } };
-
+export const MobileOpen: Story = {
+  args: { isOpen: true, activeRoute: '/dashboard' },
+};

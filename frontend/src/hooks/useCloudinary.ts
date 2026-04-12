@@ -25,7 +25,9 @@ export const useCloudinary = () => {
       setIsUploading(true);
       setError(null);
       try {
-        const sigResult = await apiRequest<UploadSignature>(`/upload/signature?folder=${folder}`);
+        const sigResult = await apiRequest<UploadSignature>(
+          `/upload/signature?folder=${folder}`
+        );
         if (!sigResult.data) throw new Error('Failed to get upload signature');
 
         const { signature, timestamp, cloudName, apiKey } = sigResult.data;
@@ -37,10 +39,13 @@ export const useCloudinary = () => {
         formData.append('api_key', apiKey);
         formData.append('folder', `certify/${folder}`);
 
-        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-          method: 'POST',
-          body: formData,
-        });
+        const response = await fetch(
+          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+          {
+            method: 'POST',
+            body: formData,
+          }
+        );
 
         if (!response.ok) throw new Error('Upload failed');
         return (await response.json()) as UploadResult;

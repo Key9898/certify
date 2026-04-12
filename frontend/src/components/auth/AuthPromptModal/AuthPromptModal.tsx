@@ -20,7 +20,9 @@ export const AuthPromptModal: React.FC<AuthPromptModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isSignupMode ? 'Create your Certify account' : 'Sign in to Certify'}
+      title={
+        isSignupMode ? 'Create your Certify account' : 'Sign in to Certify'
+      }
       size="md"
     >
       <div className="space-y-5">
@@ -90,10 +92,12 @@ export const AuthPromptModal: React.FC<AuthPromptModalProps> = ({
         ) : null}
 
         <div className="rounded border border-base-200 bg-base-200/50 px-4 py-3 text-xs leading-relaxed text-base-content/55">
-          Your email/password form is hosted by Auth0 for security. For local development, add
-          the exact current origin to Auth0:
+          Your email/password form is hosted by Auth0 for security. For local
+          development, add the exact current origin to Auth0:
           <span className="mt-2 block rounded bg-base-100 px-2 py-1 font-mono text-[11px] text-base-content/70">
-            {typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5174'}
+            {typeof window !== 'undefined'
+              ? window.location.origin
+              : 'http://localhost:5174'}
           </span>
         </div>
       </div>

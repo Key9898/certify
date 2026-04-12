@@ -1,26 +1,26 @@
 import React from 'react';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "@/components/ui/Chart"
+} from '@/components/ui/Chart';
 
 export interface UsageChartPoint {
-  template: string
-  count: number
+  template: string;
+  count: number;
 }
 
 const chartConfig = {
   count: {
-    label: "Usage",
-    color: "var(--color-primary)",
+    label: 'Usage',
+    color: 'var(--color-primary)',
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 interface UsageChartProps {
-  data: UsageChartPoint[]
+  data: UsageChartPoint[];
 }
 
 export const UsageChart: React.FC<UsageChartProps> = ({ data }) => {
@@ -29,7 +29,7 @@ export const UsageChart: React.FC<UsageChartProps> = ({ data }) => {
       <div className="flex h-[250px] items-center justify-center rounded border border-dashed border-base-200 text-sm font-medium text-base-content/50">
         No template usage data yet.
       </div>
-    )
+    );
   }
 
   return (
@@ -41,18 +41,15 @@ export const UsageChart: React.FC<UsageChartProps> = ({ data }) => {
           left: 48,
           right: 24,
           top: 10,
-          bottom: 10
+          bottom: 10,
         }}
       >
-        <CartesianGrid 
-          horizontal={false} 
+        <CartesianGrid
+          horizontal={false}
           vertical={false}
-          className="stroke-base-300" 
+          className="stroke-base-300"
         />
-        <XAxis 
-          type="number" 
-          hide 
-        />
+        <XAxis type="number" hide />
         <YAxis
           dataKey="template"
           type="category"
@@ -73,5 +70,5 @@ export const UsageChart: React.FC<UsageChartProps> = ({ data }) => {
         />
       </BarChart>
     </ChartContainer>
-  )
-}
+  );
+};

@@ -20,7 +20,10 @@ export interface CreatedApiKey {
 export const listApiKeys = (): Promise<ApiResponse<ApiKeyListItem[]>> =>
   get<ApiKeyListItem[]>('/keys');
 
-export const createApiKey = (name: string): Promise<ApiResponse<CreatedApiKey>> =>
+export const createApiKey = (
+  name: string
+): Promise<ApiResponse<CreatedApiKey>> =>
   post<CreatedApiKey>('/keys', { name });
 
-export const revokeApiKey = (id: string): Promise<ApiResponse<void>> => del<void>(`/keys/${id}`);
+export const revokeApiKey = (id: string): Promise<ApiResponse<void>> =>
+  del<void>(`/keys/${id}`);

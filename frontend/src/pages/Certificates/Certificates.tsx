@@ -29,9 +29,18 @@ export const Certificates: React.FC = () => {
 
   const debouncedSearch = useDebounce(searchInput, 400);
 
-  const { certificates, isLoading, error, pagination, reload, remove, generateCertificatePdf } =
-    useCertificates({ search: debouncedSearch || undefined, page });
-  const readyCount = certificates.filter((certificate) => Boolean(certificate.pdfUrl)).length;
+  const {
+    certificates,
+    isLoading,
+    error,
+    pagination,
+    reload,
+    remove,
+    generateCertificatePdf,
+  } = useCertificates({ search: debouncedSearch || undefined, page });
+  const readyCount = certificates.filter((certificate) =>
+    Boolean(certificate.pdfUrl)
+  ).length;
 
   const handleDownload = useCallback(
     async (cert: Certificate) => {
@@ -81,23 +90,27 @@ export const Certificates: React.FC = () => {
             <div>
               <div className="mb-4 inline-flex items-center gap-2 rounded border border-primary/20 bg-primary/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.24em] text-primary">
                 <Sparkles size={14} />
-                Immutable Ledger
+                Certificate Records
               </div>
               <h1 className="text-4xl font-black tracking-tight text-base-content md:text-5xl">
                 Records Repository
               </h1>
               <p className="mt-4 max-w-2xl text-lg font-medium leading-relaxed text-base-content/60">
-                Manage, verify, and export individual issuance records. Every certificate is hashed
-                and indexed for rapid retrieval.
+                Manage, verify, and export individual certificate records. Every
+                certificate is hashed and indexed for rapid retrieval.
               </p>
             </div>
-            <motion.div whileHover={{ y: -3 }} whileTap={TAP_PRESS} transition={QUICK_SPRING}>
+            <motion.div
+              whileHover={{ y: -3 }}
+              whileTap={TAP_PRESS}
+              transition={QUICK_SPRING}
+            >
               <Link
                 to={ROUTES.TEMPLATES}
                 className="btn btn-primary h-14 rounded px-10 text-[13px] font-black uppercase tracking-widest shadow-xl shadow-primary/20"
               >
                 <Plus size={20} className="mr-2" />
-                New Issuance
+                Create New
               </Link>
             </motion.div>
           </div>
@@ -155,7 +168,7 @@ export const Certificates: React.FC = () => {
               <Filter size={14} />
               <span>{pagination.total} Records</span>
             </div>
-            <div className="rounded border border-success/20 bg-success/5 px-4 py-3 text-xs font-black uppercase tracking-widest text-success shadow-sm">
+            <div className="flex items-center justify-center rounded border border-success/20 bg-success/5 px-4 py-3 text-xs font-black uppercase tracking-widest text-success shadow-sm">
               {readyCount} Ready On This Page
             </div>
             {pagination.totalPages > 1 && (
@@ -223,7 +236,10 @@ export const Certificates: React.FC = () => {
           transition={{ ...SOFT_SPRING, delay: 1 }}
           className="fixed bottom-8 right-8 z-40 lg:hidden"
         >
-          <Link to={ROUTES.TEMPLATES} className="btn btn-primary h-14 w-14 rounded p-0 shadow-2xl">
+          <Link
+            to={ROUTES.TEMPLATES}
+            className="btn btn-primary h-14 w-14 rounded p-0 shadow-2xl"
+          >
             <Plus size={24} />
           </Link>
         </motion.div>
@@ -261,7 +277,10 @@ export const Certificates: React.FC = () => {
             </h3>
             <p className="mt-4 text-center text-sm font-medium leading-relaxed text-base-content/60">
               Are you sure you want to remove the record for{' '}
-              <span className="font-black text-base-content">{deleteTarget?.recipientName}</span>?
+              <span className="font-black text-base-content">
+                {deleteTarget?.recipientName}
+              </span>
+              ?
               <br />
               This data will be purged from the dashboard immutable history.
             </p>

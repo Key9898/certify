@@ -22,7 +22,9 @@ export const Card: React.FC<CardProps> = ({
         'card bg-base-100',
         bordered ? 'border border-base-200' : 'shadow-md',
         compact ? 'card-compact' : '',
-        hoverable || onClick ? 'cursor-pointer hover:shadow-lg transition-shadow duration-200' : '',
+        hoverable || onClick
+          ? 'cursor-pointer hover:shadow-lg transition-shadow duration-200'
+          : '',
         className,
       ]
         .filter(Boolean)
@@ -33,18 +35,26 @@ export const Card: React.FC<CardProps> = ({
     >
       {image && (
         <figure>
-          <img src={image} alt={imageAlt || title || 'Card image'} className="w-full object-cover" />
+          <img
+            src={image}
+            alt={imageAlt || title || 'Card image'}
+            className="w-full object-cover"
+          />
         </figure>
       )}
       <div className="card-body">
         {(title || subtitle) && (
           <div>
             {title && <h2 className="card-title text-base-content">{title}</h2>}
-            {subtitle && <p className="text-sm text-base-content/60">{subtitle}</p>}
+            {subtitle && (
+              <p className="text-sm text-base-content/60">{subtitle}</p>
+            )}
           </div>
         )}
         {children}
-        {actions && <div className="card-actions justify-end mt-2">{actions}</div>}
+        {actions && (
+          <div className="card-actions justify-end mt-2">{actions}</div>
+        )}
       </div>
     </motion.div>
   );

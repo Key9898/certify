@@ -39,7 +39,8 @@ export const checkJwt = (
       success: false,
       error: {
         code: 'AUTH_NOT_CONFIGURED',
-        message: 'Auth0 is not configured. Set AUTH0_AUDIENCE and AUTH0_DOMAIN in your .env file.',
+        message:
+          'Auth0 is not configured. Set AUTH0_AUDIENCE and AUTH0_DOMAIN in your .env file.',
       },
     });
     return;

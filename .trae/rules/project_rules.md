@@ -433,7 +433,126 @@ CLOUDINARY_API_SECRET=your-api-secret
 
 ---
 
-## 18. Error Handling
+## 18. Critical Implementation Notes
+
+### Auth0 Audience Strategy (DO NOT MODIFY)
+
+**Problem:** Passing `audience` in `loginWithRedirect` causes "Client not authorized to access resource server" error.
+
+**Solution:**
+
+- `audience` is passed **ONLY** inside `getAccessTokenSilently({ authorizationParams: { audience } })`
+- Located in `AuthContext.tsx` and `useAuth.ts`
+- Routes through `/oauth/token` refresh-token exchange path (governed by Client Grant)
+- Backend receives correctly-scoped JWT access tokens without re-triggering authorization flow
+
+**Files to NOT modify:**
+
+- `frontend/src/contexts/AuthContext.tsx` - audience in `getAccessTokenSilently` only
+- `frontend/src/hooks/useAuth.ts` - audience in `getAccessTokenSilently` only
+- `backend/src/middleware/auth.ts` - `audience: process.env.AUTH0_AUDIENCE` is REQUIRED
+
+### MongoDB Duplicate Key Handling (DO NOT REMOVE)
+
+**Problem:** Race conditions during organization creation cause `E11000 duplicate key error`.
+
+**Solution:**
+
+- Retry logic with exponential backoff in `workspaceService.ts`
+- Handles concurrent requests attempting to create the same workspace
+
+**Files to NOT modify:**
+
+- `backend/src/services/workspaceService.ts` - retry logic must remain
+
+### Sidebar Navigation Labels (Current Names)
+
+The sidebar uses user-friendly labels. Do NOT revert to technical names:
+
+| Current Label | Do NOT Revert To |
+| ------------- | ---------------- |
+| Overview      | -                |
+| Certificates  | Ledger           |
+| Templates     | Library          |
+| Quick Create  | Instant Issue    |
+| Bulk Create   | Batch Flow       |
+| Integrations  | Automation       |
+| Settings      | Admin Tools      |
+
+### Component Architecture: Filtering Logic (DO NOT DUPLICATE)
+
+**Problem:** Child components implementing their own filtering logic causes duplicate UI and double-filtering.
+
+**Solution:**
+
+- Filtering logic lives in **parent pages**, not child components
+- Child components receive pre-filtered data via props
+- This prevents duplicate category tabs and inconsistent state
+
+**Example - Templates Page:**
+
+- `Templates.tsx` (page): Manages `activeCategory` state, filters templates, passes `filteredTemplates` to child
+- `TemplateGallery.tsx` (component): Receives `templates` prop, renders directly without additional filtering
+
+**Files pattern to follow:**
+
+- Pages (`src/pages/*`): Own state, filtering, and category UI
+- Components (`src/components/*`): Receive filtered props, render without additional state logic
+
+### Category Tab Animation Pattern (Framer Motion)
+
+**Problem:** Default spring transitions cause jarring color shifts and slow pill movements.
+
+**Solution - Use faster spring physics for layoutId animations:**
+
+```tsx
+// Pill background animation (layoutId)
+transition={{ type: 'spring', stiffness: 400, damping: 30, mass: 0.8 }}
+
+// Text color transition (CSS)
+className="transition-colors duration-200"
+
+// Hover background (flat transition, not spring)
+transition={{ duration: 0.15 }}
+```
+
+**Key patterns:**
+
+- Use conditional rendering `{isActive && ...}` instead of ternary for cleaner animations
+- Add `initial={false}` to layoutId elements to prevent initial animation
+- Hover states should use primary color tint: `rgba(59,130,246,0.12)` for background, `text-primary` for text
+- Text transitions via Tailwind `transition-colors duration-200` for smooth color changes
+
+### UI Naming Consistency (DO NOT USE LEGACY NAMES)
+
+**Problem:** Legacy technical names still appear in UI text, buttons, and descriptions.
+
+**Solution - Always use user-friendly names:**
+
+| Legacy Name (DO NOT USE) | Current Name (USE THIS) |
+| ------------------------ | ----------------------- |
+| ledger / Ledger          | registry / Registry     |
+| library / Library        | templates / Templates   |
+| automation / Automation  | integration / Integration |
+| Design Library           | Template Gallery        |
+| Automation Center        | Integration Center      |
+| Automations (label)      | Sync Runs               |
+| Excel automation         | Excel integration       |
+| automation health        | integration health      |
+| automation sequences     | integration sequences   |
+| issuance / Issuance      | creation / Creation     |
+| New Issuance             | Create New              |
+| Begin Issuance           | Create New              |
+| issuance records         | certificate records     |
+
+**Files to check when adding new UI text:**
+- `src/pages/` - All page components
+- `src/components/` - All shared components
+- Run grep search before committing: `grep -r "ledger\|Library\|automation\|issuance" src/`
+
+---
+
+## 19. Error Handling
 
 ### Frontend Error Handling
 
@@ -470,6 +589,28 @@ export class ErrorBoundary extends Component {
 - Log errors with context
 - Never expose internal errors to clients
 
+### JWT Middleware Error Handling (express-oauth2-jwt-bearer)
+
+The `express-oauth2-jwt-bearer` library throws errors with `status` property (not `statusCode`). The error handler must check both properties:
+
+```typescript
+// Error handler must check both statusCode and status
+const statusCode = err.statusCode || err.status || 500;
+
+// JWT errors need code mapping
+const getErrorCode = (err: AppError): string => {
+  if (err.code) return err.code;
+  if (err.name === 'UnauthorizedError') return 'UNAUTHORIZED';
+  if (err.message?.includes('invalid token')) return 'INVALID_TOKEN';
+  if (err.message?.includes('jwt expired')) return 'TOKEN_EXPIRED';
+  if (err.message?.includes('jwt malformed')) return 'INVALID_TOKEN';
+  if (err.message?.includes('no authorization token')) return 'TOKEN_MISSING';
+  return 'INTERNAL_ERROR';
+};
+```
+
+**Important**: Without checking `status` property, JWT auth errors return HTTP 500 instead of 401.
+
 ### Error Response Format
 
 ```json
@@ -485,7 +626,7 @@ export class ErrorBoundary extends Component {
 
 ---
 
-## 19. State Management
+## 20. State Management
 
 ### React Context
 
@@ -512,7 +653,7 @@ export class ErrorBoundary extends Component {
 
 ---
 
-## 20. Performance
+## 21. Performance
 
 ### React Optimization
 
@@ -537,6 +678,35 @@ function App() {
 }
 ```
 
+### Library Lazy Loading (Heavy Libraries)
+
+Heavy libraries (>500kB) must be lazy-loaded to avoid Vite chunk warnings:
+
+| Library   | Lazy Load Method              | Used In           |
+| --------- | ----------------------------- | ----------------- |
+| ExcelJS   | Dynamic import (`import()`)   | csvParser.ts      |
+| Recharts  | React.lazy() + Suspense       | Dashboard.tsx     |
+
+**Pattern - Dynamic Import for Utilities:**
+
+```typescript
+const parseXLSX = async (file: File) => {
+  const ExcelJS = await import('exceljs');
+  const workbook = new ExcelJS.default.Workbook();
+  // ... parsing logic
+};
+```
+
+**Pattern - React.lazy for Components:**
+
+```tsx
+const OverviewChart = React.lazy(() => import('./OverviewChart'));
+
+<Suspense fallback={<div className="loading loading-spinner" />}>
+  <OverviewChart data={data} />
+</Suspense>;
+```
+
 ### Bundle Optimization
 
 - Use dynamic imports for large libraries
@@ -547,6 +717,7 @@ function App() {
 ### Performance Checklist
 
 - [ ] Lazy load routes
+- [ ] Lazy load heavy libraries (ExcelJS, Recharts)
 - [ ] Memoize expensive computations
 - [ ] Optimize re-renders
 - [ ] Use proper key props in lists
@@ -554,7 +725,7 @@ function App() {
 
 ---
 
-## 21. Accessibility (a11y)
+## 22. Accessibility (a11y)
 
 ### WCAG Compliance
 
@@ -590,7 +761,7 @@ function App() {
 
 ---
 
-## 22. Responsive Design
+## 23. Responsive Design
 
 ### Mobile-First Approach
 
@@ -628,7 +799,7 @@ function App() {
 
 ---
 
-## 23. File Upload
+## 24. File Upload
 
 ### Cloudinary Integration
 
@@ -666,7 +837,7 @@ const handleUpload = async (file: File) => {
 
 ---
 
-## 24. PDF Generation
+## 25. PDF Generation
 
 ### Puppeteer Usage
 
@@ -714,7 +885,7 @@ const pdfOptions = {
 
 ---
 
-## 25. Component-Specific Responsive Patterns
+## 26. Component-Specific Responsive Patterns
 
 ### Navigation Components
 
@@ -762,7 +933,7 @@ const pdfOptions = {
 
 ---
 
-## 26. Typography Scaling
+## 27. Typography Scaling
 
 ### Font Size Scale
 
@@ -812,7 +983,7 @@ const pdfOptions = {
 
 ---
 
-## 27. Navigation Patterns
+## 28. Navigation Patterns
 
 ### Mobile Navigation (< 768px)
 
@@ -882,7 +1053,7 @@ const pdfOptions = {
 
 ---
 
-## 28. Image & Media Responsiveness
+## 29. Image & Media Responsiveness
 
 ### Cloudinary Transformations
 
@@ -967,7 +1138,7 @@ const ResponsiveImage = ({ publicId, alt }) => (
 
 ---
 
-## 29. Spacing System
+## 30. Spacing System
 
 ### Spacing Scale (Tailwind Default)
 
@@ -1018,7 +1189,7 @@ const ResponsiveImage = ({ publicId, alt }) => (
 
 ---
 
-## 30. Form UX Patterns
+## 31. Form UX Patterns
 
 ### Input Sizing
 
@@ -1100,7 +1271,7 @@ const ResponsiveImage = ({ publicId, alt }) => (
 
 ---
 
-## 31. Performance for Mobile
+## 32. Performance for Mobile
 
 ### Image Optimization
 
@@ -1157,7 +1328,7 @@ const CertificateEditor = lazy(() => import("@/components/CertificateEditor"));
 
 ---
 
-## 32. Testing Checklist
+## 33. Testing Checklist
 
 ### Device Testing
 
@@ -1214,3 +1385,152 @@ const CertificateEditor = lazy(() => import("@/components/CertificateEditor"));
 | Accessibility  | > 95   |
 | Best Practices | > 90   |
 | SEO            | > 90   |
+
+---
+
+## 34. Accessibility Form Elements (REQUIRED)
+
+**Problem:** Form elements without labels cause accessibility errors in VS Code diagnostics.
+
+**Solution - All form elements MUST have accessible names:**
+
+### Select Elements
+
+```tsx
+// CORRECT - Both aria-label AND title required
+<select
+  aria-label="Provider"
+  title="Provider"
+  value={form.provider}
+  onChange={handleChange}
+>
+  <option value="google_sheets">Google Sheets</option>
+  <option value="canvas">Canvas</option>
+</select>
+
+// WRONG - Missing accessible name
+<select value={form.provider} onChange={handleChange}>
+```
+
+### Checkbox/Toggle Inputs
+
+```tsx
+// CORRECT - aria-label required
+<input
+  type="checkbox"
+  aria-label="Enable Google Sheets sync"
+  checked={form.googleSheetsEnabled}
+  onChange={handleChange}
+/>
+
+// WRONG - Missing aria-label
+<input type="checkbox" checked={form.enabled} onChange={handleChange} />
+```
+
+### Required Attributes Summary
+
+| Element Type | Required Attributes |
+| ------------ | ------------------- |
+| `<select>` | `aria-label` + `title` |
+| `<input type="checkbox">` | `aria-label` |
+| `<input type="radio">` | `aria-label` |
+| `<input type="text">` | `placeholder` or wrapped `<label>` |
+
+### Files to Check
+
+- `src/pages/Integrations/Integrations.tsx` - Multiple form elements
+- `src/pages/Settings/Settings.tsx` - Settings forms
+- `src/components/` - Any component with form inputs
+
+---
+
+## 35. 502 Bad Gateway Troubleshooting
+
+**Problem:** Frontend shows 502 Bad Gateway errors when making API calls.
+
+**Root Cause:** Backend server is not running on port 3000.
+
+**Solution:**
+
+### Check Backend Status
+
+```powershell
+# Check if backend is running
+Set-Location backend; npm run dev
+```
+
+### Expected Output
+
+```
+✅ MongoDB connected successfully
+✅ Cloudinary configured
+🚀 Server running on http://localhost:3000
+```
+
+### Common Issues
+
+| Issue | Solution |
+| ----- | -------- |
+| Port 3000 in use | Kill existing process or change PORT in .env |
+| MongoDB not running | Start MongoDB service |
+| Missing .env | Copy .env.example to .env and fill values |
+
+### When Making Frontend Changes
+
+- Backend server MUST be running before testing frontend
+- If 502 errors appear, check backend terminal first
+- Do NOT modify frontend code when backend is down - errors are backend-related
+
+---
+
+## 36. Landing Page Dynamic Elements (DO NOT HARDCODE)
+
+The following elements on public-facing pages must remain dynamic. Do NOT replace with hardcoded values:
+
+### Home.tsx (Landing Page)
+
+| Element | Location | Dynamic Implementation |
+| ------- | -------- | ---------------------- |
+| Certificate Preview Date | Carousel footer | `formatPreviewDate()` - `new Date().toLocaleDateString()` |
+| Template Count | Stats section | API call to `/api/templates/count` |
+| Social Proof Text | Hero section | "Join Early Adopters" (no badge) |
+
+### About.tsx
+
+| Element | Location | Dynamic Implementation |
+| ------- | -------- | ---------------------- |
+| "Since" Year | Hero section | `new Date().getFullYear()` |
+
+### Privacy.tsx & Terms.tsx
+
+| Element | Location | Dynamic Implementation |
+| ------- | -------- | ---------------------- |
+| Last Updated Date | Document header | `new Date().toLocaleDateString()` |
+
+### Footer.tsx
+
+| Element | Location | Dynamic Implementation |
+| ------- | -------- | ---------------------- |
+| Copyright Year | Footer bottom | `new Date().getFullYear()` |
+
+### formatPreviewDate Function (Home.tsx)
+
+```tsx
+const formatPreviewDate = () => {
+  return new Date().toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
+```
+
+### Files to Check Before Committing
+
+Run this grep to catch hardcoded dates:
+
+```bash
+grep -rn "202[4-9]" frontend/src/pages/ --include="*.tsx"
+```
+
+Exclude test files and sample/mock data (TemplateBuilder.tsx, *.test.tsx)

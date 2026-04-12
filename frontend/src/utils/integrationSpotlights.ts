@@ -82,7 +82,8 @@ export const INTEGRATION_SPOTLIGHTS: Record<
     provider: 'canvas',
     tier: 'primary',
     eyebrow: 'Primary Workflow',
-    headline: 'Connect Canvas completion moments to branded certificate delivery.',
+    headline:
+      'Connect Canvas completion moments to branded certificate delivery.',
     summary:
       'Great for learning teams that need course completion, module mastery, or capstone completion to return a trustworthy certificate link.',
     highlights: [
@@ -233,7 +234,9 @@ Content-Type: application/json
 }`;
 };
 
-export const buildCertificateReturnSnippet = (provider: IntegrationProvider): string => {
+export const buildCertificateReturnSnippet = (
+  provider: IntegrationProvider
+): string => {
   if (provider === 'canvas') {
     return `{
   "success": true,

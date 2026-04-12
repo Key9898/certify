@@ -25,7 +25,10 @@ const withCanvasEnv = async (callback: () => Promise<void>) => {
 
 describe('canvasService', () => {
   it('normalizes the Canvas base URL and builds certificate messages', () => {
-    assert.equal(normalizeCanvasBaseUrl('https://canvas.school.edu/'), 'https://canvas.school.edu');
+    assert.equal(
+      normalizeCanvasBaseUrl('https://canvas.school.edu/'),
+      'https://canvas.school.edu'
+    );
   });
 
   it('includes verification links when a frontend URL is configured', async () => {
@@ -62,7 +65,11 @@ describe('canvasService', () => {
         });
 
         return new Response(
-          JSON.stringify({ id: 42, name: 'Executive Leadership', course_code: 'LEAD-500' }),
+          JSON.stringify({
+            id: 42,
+            name: 'Executive Leadership',
+            course_code: 'LEAD-500',
+          }),
           { status: 200 }
         );
       };
@@ -111,7 +118,10 @@ describe('canvasService', () => {
           : undefined,
         'application/x-www-form-urlencoded'
       );
-      assert.match(String(requests[0].init?.body), /comment%5Btext_comment%5D=Certificate\+ready/);
+      assert.match(
+        String(requests[0].init?.body),
+        /comment%5Btext_comment%5D=Certificate\+ready/
+      );
     });
   });
 });

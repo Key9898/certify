@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { findBestTemplateForRecipe, getIntegrationGuide } from './integrationGuides';
+import {
+  findBestTemplateForRecipe,
+  getIntegrationGuide,
+} from './integrationGuides';
 import type { Template } from '@/types';
 
 const templates: Template[] = [
@@ -37,15 +40,21 @@ describe('integrationGuides', () => {
   it('exposes the new Canvas course completion playbook', () => {
     const guide = getIntegrationGuide('canvas');
 
-    expect(guide.recipes.some((recipe) => recipe.id === 'canvas-course-completion')).toBe(true);
+    expect(
+      guide.recipes.some((recipe) => recipe.id === 'canvas-course-completion')
+    ).toBe(true);
     expect(guide.qaChecks.length).toBeGreaterThan(0);
   });
 
   it('matches recipes with the best template from the workspace library', () => {
     const guide = getIntegrationGuide('canvas');
-    const recipe = guide.recipes.find((item) => item.id === 'canvas-course-completion');
+    const recipe = guide.recipes.find(
+      (item) => item.id === 'canvas-course-completion'
+    );
 
     expect(recipe).toBeDefined();
-    expect(findBestTemplateForRecipe(recipe!, templates)?._id).toBe('template-academic');
+    expect(findBestTemplateForRecipe(recipe!, templates)?._id).toBe(
+      'template-academic'
+    );
   });
 });

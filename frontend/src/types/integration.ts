@@ -1,9 +1,6 @@
 import type { Template } from './template';
 
-export type IntegrationProvider =
-  | 'google_sheets'
-  | 'canvas'
-  | 'custom';
+export type IntegrationProvider = 'google_sheets' | 'canvas' | 'custom';
 
 export type IntegrationMode = 'single' | 'batch';
 export type IntegrationStatus = 'active' | 'paused';

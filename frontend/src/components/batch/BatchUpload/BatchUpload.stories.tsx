@@ -12,7 +12,8 @@ type Story = StoryObj<typeof BatchUpload>;
 
 export const Default: Story = {
   args: {
-    onParsed: (rows, file) => console.log('Parsed', rows.length, 'rows from', file.name),
+    onParsed: (rows, file) =>
+      console.log('Parsed', rows.length, 'rows from', file.name),
   },
 };
 
@@ -33,7 +34,7 @@ export const WithError: Story = {
 export const WithServerError: Story = {
   args: {
     onParsed: () => {},
-    error: 'Server error: Failed to process the uploaded file. Please try again.',
+    error:
+      'Server error: Failed to process the uploaded file. Please try again.',
   },
 };
-

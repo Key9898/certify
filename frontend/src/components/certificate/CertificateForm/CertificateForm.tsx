@@ -4,11 +4,20 @@ import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import { FileUpload } from '@/components/common/FileUpload';
 import { useCloudinary } from '@/hooks/useCloudinary';
-import { DEFAULT_PRIMARY_COLOR, DEFAULT_SECONDARY_COLOR } from '@/utils/constants';
-import type { CertificateFormProps, CertificateFormData } from './CertificateForm.types';
+import {
+  DEFAULT_PRIMARY_COLOR,
+  DEFAULT_SECONDARY_COLOR,
+} from '@/utils/constants';
+import type {
+  CertificateFormProps,
+  CertificateFormData,
+} from './CertificateForm.types';
 import type { CreateCertificateDto } from '@/types';
 
-const getInitialState = (templateId: string, initial?: Partial<CertificateFormData>): CertificateFormData => ({
+const getInitialState = (
+  templateId: string,
+  initial?: Partial<CertificateFormData>
+): CertificateFormData => ({
   templateId,
   recipientName: '',
   recipientEmail: '',
@@ -32,27 +41,38 @@ export const CertificateForm: React.FC<CertificateFormProps> = ({
   onChange,
   isSubmitting = false,
 }) => {
-  const [form, setForm] = useState<CertificateFormData>(getInitialState(templateId, initialData));
-  const [errors, setErrors] = useState<Partial<Record<keyof CertificateFormData, string>>>({});
+  const [form, setForm] = useState<CertificateFormData>(
+    getInitialState(templateId, initialData)
+  );
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof CertificateFormData, string>>
+  >({});
   const { upload, isUploading } = useCloudinary();
   const isBackgroundTemplate =
-    template?.mode === 'background' || template?.htmlContent === 'custom-background';
+    template?.mode === 'background' ||
+    template?.htmlContent === 'custom-background';
 
-  const set = useCallback((key: keyof CertificateFormData, value: string) => {
-    setForm((prev) => {
-      const next = { ...prev, [key]: value };
-      onChange?.({ [key]: value } as Partial<CertificateFormData>);
-      return next;
-    });
-    setErrors((prev) => ({ ...prev, [key]: undefined }));
-  }, [onChange]);
+  const set = useCallback(
+    (key: keyof CertificateFormData, value: string) => {
+      setForm((prev) => {
+        const next = { ...prev, [key]: value };
+        onChange?.({ [key]: value } as Partial<CertificateFormData>);
+        return next;
+      });
+      setErrors((prev) => ({ ...prev, [key]: undefined }));
+    },
+    [onChange]
+  );
 
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof CertificateFormData, string>> = {};
-    if (!form.recipientName.trim()) newErrors.recipientName = 'Recipient name is required';
-    if (!form.certificateTitle.trim()) newErrors.certificateTitle = 'Certificate title is required';
+    if (!form.recipientName.trim())
+      newErrors.recipientName = 'Recipient name is required';
+    if (!form.certificateTitle.trim())
+      newErrors.certificateTitle = 'Certificate title is required';
     if (!form.issueDate) newErrors.issueDate = 'Issue date is required';
-    if (!form.issuerName.trim()) newErrors.issuerName = 'Issuer name is required';
+    if (!form.issuerName.trim())
+      newErrors.issuerName = 'Issuer name is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -142,7 +162,9 @@ export const CertificateForm: React.FC<CertificateFormProps> = ({
           />
           <div className="form-control w-full">
             <label className="label" htmlFor="description">
-              <span className="label-text font-bold text-base-content/70">Description</span>
+              <span className="label-text font-bold text-base-content/70">
+                Description
+              </span>
             </label>
             <textarea
               id="description"
@@ -178,12 +200,12 @@ export const CertificateForm: React.FC<CertificateFormProps> = ({
             <Shield size={20} className="text-success" />
           </div>
           <h3 className="text-lg font-black text-base-content tracking-tight">
-            Issuer & Branding
+            Program
           </h3>
         </div>
         <div className="space-y-6">
           <Input
-            label="Issuer Name *"
+            label="Program Name *"
             placeholder="e.g. Acme Academy"
             value={form.issuerName}
             onChange={(e) => set('issuerName', e.target.value)}
@@ -199,7 +221,7 @@ export const CertificateForm: React.FC<CertificateFormProps> = ({
               isUploading={isUploading}
             />
             <FileUpload
-              label="Issuer Signature"
+              label="Signature"
               accept="image/png"
               onFileSelect={handleSignatureUpload}
               previewUrl={form.issuerSignature || undefined}
@@ -207,10 +229,12 @@ export const CertificateForm: React.FC<CertificateFormProps> = ({
               isUploading={isUploading}
             />
           </div>
-          
+
           {!isBackgroundTemplate ? (
             <div className="p-4 bg-base-200/50 rounded">
-              <p className="text-xs font-black uppercase tracking-widest text-base-content/40 mb-4">Template Colors</p>
+              <p className="text-xs font-black uppercase tracking-widest text-base-content/40 mb-4">
+                Template Colors
+              </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex items-center justify-between p-3 bg-base-100 rounded border border-base-200">
                   <div className="flex items-center gap-3">
@@ -222,8 +246,15 @@ export const CertificateForm: React.FC<CertificateFormProps> = ({
                       className="w-10 h-10 rounded cursor-pointer border-none p-0 bg-transparent overflow-hidden"
                     />
                     <div>
-                      <label htmlFor="primaryColor" className="text-sm font-bold text-base-content block">Primary Color</label>
-                      <span className="text-xs font-mono text-base-content/50 uppercase">{form.primaryColor}</span>
+                      <label
+                        htmlFor="primaryColor"
+                        className="text-sm font-bold text-base-content block"
+                      >
+                        Primary Color
+                      </label>
+                      <span className="text-xs font-mono text-base-content/50 uppercase">
+                        {form.primaryColor}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -237,8 +268,15 @@ export const CertificateForm: React.FC<CertificateFormProps> = ({
                       className="w-10 h-10 rounded cursor-pointer border-none p-0 bg-transparent overflow-hidden"
                     />
                     <div>
-                      <label htmlFor="secondaryColor" className="text-sm font-bold text-base-content block">Secondary Color</label>
-                      <span className="text-xs font-mono text-base-content/50 uppercase">{form.secondaryColor}</span>
+                      <label
+                        htmlFor="secondaryColor"
+                        className="text-sm font-bold text-base-content block"
+                      >
+                        Secondary Color
+                      </label>
+                      <span className="text-xs font-mono text-base-content/50 uppercase">
+                        {form.secondaryColor}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -250,8 +288,9 @@ export const CertificateForm: React.FC<CertificateFormProps> = ({
                 Background Template Mode
               </p>
               <p className="mt-2 text-sm text-base-content/60">
-                Layout colors and positions come from the imported background template. The form
-                values below will be injected into the fields you configured in Template Builder.
+                Layout colors and positions come from the imported background
+                template. The form values below will be injected into the fields
+                you configured in Template Builder.
               </p>
             </div>
           )}

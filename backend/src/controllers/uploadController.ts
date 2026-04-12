@@ -16,7 +16,8 @@ export const getUploadSignature = async (
         success: false,
         error: {
           code: 'VALIDATION_ERROR',
-          message: 'Invalid folder. Use: logos, signatures, or template-backgrounds',
+          message:
+            'Invalid folder. Use: logos, signatures, or template-backgrounds',
         },
       });
       return;

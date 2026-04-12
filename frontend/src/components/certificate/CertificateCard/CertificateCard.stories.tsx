@@ -41,4 +41,3 @@ export const NoPdfReady: Story = {
     onDownload: (cert) => alert(`Generate PDF: ${cert.certificateTitle}`),
   },
 };
-

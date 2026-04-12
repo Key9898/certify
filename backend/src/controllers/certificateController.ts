@@ -69,7 +69,10 @@ export const createCertificateHandler = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const certificate = await createCertificate(req.body, req.user!._id.toString());
+    const certificate = await createCertificate(
+      req.body,
+      req.user!._id.toString()
+    );
     res.status(201).json({ success: true, data: certificate });
   } catch (error) {
     next(error);
@@ -82,7 +85,10 @@ export const generatePdfHandler = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const pdfUrl = await generateAndUploadPdf(req.params.id, req.user!._id.toString());
+    const pdfUrl = await generateAndUploadPdf(
+      req.params.id,
+      req.user!._id.toString()
+    );
     res.json({ success: true, data: { pdfUrl } });
   } catch (error) {
     next(error);
@@ -129,8 +135,10 @@ export const generatePngHandler = async (
       issuerName: certificate.issuerName,
       issuerSignature: certificate.issuerSignature,
       organizationLogo: certificate.organizationLogo,
-      primaryColor: (certificate.customFields?.primaryColor as string) || '#3B82F6',
-      secondaryColor: (certificate.customFields?.secondaryColor as string) || '#64748B',
+      primaryColor:
+        (certificate.customFields?.primaryColor as string) || '#3B82F6',
+      secondaryColor:
+        (certificate.customFields?.secondaryColor as string) || '#64748B',
       certificateId: certificate.certificateId,
     };
 
@@ -167,11 +175,17 @@ export const revokeCertificate = async (
       return;
     }
 
-    const canManage = await canManageWorkspaceResource(req.user!, certificate.createdBy);
+    const canManage = await canManageWorkspaceResource(
+      req.user!,
+      certificate.createdBy
+    );
     if (!canManage) {
       res.status(403).json({
         success: false,
-        error: { code: 'FORBIDDEN', message: 'You cannot revoke this team certificate.' },
+        error: {
+          code: 'FORBIDDEN',
+          message: 'You cannot revoke this team certificate.',
+        },
       });
       return;
     }
@@ -179,7 +193,10 @@ export const revokeCertificate = async (
     certificate.status = 'revoked';
     await certificate.save();
 
-    res.json({ success: true, data: { message: 'Certificate revoked successfully' } });
+    res.json({
+      success: true,
+      data: { message: 'Certificate revoked successfully' },
+    });
   } catch (error) {
     next(error);
   }
@@ -205,18 +222,27 @@ export const deleteCertificate = async (
       return;
     }
 
-    const canManage = await canManageWorkspaceResource(req.user!, certificate.createdBy);
+    const canManage = await canManageWorkspaceResource(
+      req.user!,
+      certificate.createdBy
+    );
     if (!canManage) {
       res.status(403).json({
         success: false,
-        error: { code: 'FORBIDDEN', message: 'You cannot delete this team certificate.' },
+        error: {
+          code: 'FORBIDDEN',
+          message: 'You cannot delete this team certificate.',
+        },
       });
       return;
     }
 
     await certificate.deleteOne();
 
-    res.json({ success: true, data: { message: 'Certificate deleted successfully' } });
+    res.json({
+      success: true,
+      data: { message: 'Certificate deleted successfully' },
+    });
   } catch (error) {
     next(error);
   }

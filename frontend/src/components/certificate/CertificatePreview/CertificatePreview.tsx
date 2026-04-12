@@ -2,7 +2,10 @@ import React from 'react';
 import { formatDate } from '@/utils/formatters';
 import type { CertificatePreviewProps } from './CertificatePreview.types';
 
-const getTemplateMode = (templateName?: string, explicitMode?: string): 'preset' | 'background' => {
+const getTemplateMode = (
+  templateName?: string,
+  explicitMode?: string
+): 'preset' | 'background' => {
   if (explicitMode === 'background' || templateName === 'custom-background') {
     return 'background';
   }
@@ -17,12 +20,18 @@ const resolveFieldValue = (
   const valueMap: Record<string, string> = {
     recipientName: data.recipientName || 'Recipient Name',
     certificateTitle: data.certificateTitle || 'Certificate of Achievement',
-    description: data.description || 'Describe the achievement or completion details here.',
+    description:
+      data.description ||
+      'Describe the achievement or completion details here.',
     issueDate: formattedIssueDate,
     expiryDate: data.expiryDate
-      ? formatDate(data.expiryDate, { year: 'numeric', month: 'long', day: 'numeric' })
+      ? formatDate(data.expiryDate, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
       : 'No expiry date',
-    issuerName: data.issuerName || 'Issuer Name',
+    issuerName: data.issuerName || 'Program Name',
     certificateId: data.certificateId || 'CERT-2026-001',
     issuerSignature: data.issuerSignature || '',
     organizationLogo: data.organizationLogo || '',
@@ -31,7 +40,11 @@ const resolveFieldValue = (
   return valueMap[name] || '';
 };
 
-export const CertificatePreview: React.FC<CertificatePreviewProps> = ({ data, template, templateName }) => {
+export const CertificatePreview: React.FC<CertificatePreviewProps> = ({
+  data,
+  template,
+  templateName,
+}) => {
   const {
     recipientName,
     certificateTitle,
@@ -46,7 +59,10 @@ export const CertificatePreview: React.FC<CertificatePreviewProps> = ({ data, te
   const formattedDate = issueDate
     ? formatDate(issueDate, { year: 'numeric', month: 'long', day: 'numeric' })
     : 'Date not set';
-  const templateMode = getTemplateMode(templateName || template?.htmlContent, template?.mode);
+  const templateMode = getTemplateMode(
+    templateName || template?.htmlContent,
+    template?.mode
+  );
 
   if (templateMode === 'background' && template?.backgroundImageUrl) {
     return (
@@ -59,8 +75,12 @@ export const CertificatePreview: React.FC<CertificatePreviewProps> = ({ data, te
         {(template.fields || [])
           .filter((field) => field.visible !== false)
           .map((field) => {
-            const value = resolveFieldValue(field.name, data, formattedDate) || field.defaultValue || '';
-            const width = field.size?.width ?? (field.type === 'image' ? 18 : 32);
+            const value =
+              resolveFieldValue(field.name, data, formattedDate) ||
+              field.defaultValue ||
+              '';
+            const width =
+              field.size?.width ?? (field.type === 'image' ? 18 : 32);
 
             if (field.type === 'image') {
               return value ? (
@@ -68,14 +88,17 @@ export const CertificatePreview: React.FC<CertificatePreviewProps> = ({ data, te
                   key={field.name}
                   src={value}
                   alt={field.label}
-                  className="absolute object-contain"
-                  style={{
-                    left: `${field.position.x}%`,
-                    top: `${field.position.y}%`,
-                    width: `${width}%`,
-                    height: field.size?.height ? `${field.size.height}%` : undefined,
-                    transform: 'translate(-50%, -50%)',
-                  }}
+                  className="certificate-template-field-image"
+                  style={
+                    {
+                      '--field-x': `${field.position.x}%`,
+                      '--field-y': `${field.position.y}%`,
+                      '--field-width': `${width}%`,
+                      '--field-height': field.size?.height
+                        ? `${field.size.height}%`
+                        : 'auto',
+                    } as React.CSSProperties
+                  }
                 />
               ) : null;
             }
@@ -87,22 +110,25 @@ export const CertificatePreview: React.FC<CertificatePreviewProps> = ({ data, te
             return (
               <div
                 key={field.name}
-                className="absolute break-words whitespace-pre-wrap"
-                style={{
-                  left: `${field.position.x}%`,
-                  top: `${field.position.y}%`,
-                  width: `${width}%`,
-                  transform: 'translate(-50%, -50%)',
-                  fontSize: `${field.style?.fontSize ?? 24}px`,
-                  fontWeight: field.style?.fontWeight ?? 600,
-                  fontFamily: field.style?.fontFamily || 'Arial, sans-serif',
-                  color: field.style?.color || primaryColor,
-                  textAlign: field.style?.textAlign || 'center',
-                  lineHeight: field.style?.lineHeight ?? 1.2,
-                  letterSpacing: `${field.style?.letterSpacing ?? 0}px`,
-                  fontStyle: field.style?.fontStyle || 'normal',
-                  textTransform: field.style?.textTransform || 'none',
-                }}
+                className="certificate-template-field-text"
+                style={
+                  {
+                    '--field-x': `${field.position.x}%`,
+                    '--field-y': `${field.position.y}%`,
+                    '--field-width': `${width}%`,
+                    '--field-font-size': `${field.style?.fontSize ?? 24}px`,
+                    '--field-font-weight': field.style?.fontWeight ?? 600,
+                    '--field-font-family':
+                      field.style?.fontFamily || 'Arial, sans-serif',
+                    '--field-color': field.style?.color || primaryColor,
+                    '--field-text-align': field.style?.textAlign || 'center',
+                    '--field-line-height': field.style?.lineHeight ?? 1.2,
+                    '--field-letter-spacing': `${field.style?.letterSpacing ?? 0}px`,
+                    '--field-font-style': field.style?.fontStyle || 'normal',
+                    '--field-text-transform':
+                      field.style?.textTransform || 'none',
+                  } as React.CSSProperties
+                }
               >
                 {value}
               </div>
@@ -114,67 +140,64 @@ export const CertificatePreview: React.FC<CertificatePreviewProps> = ({ data, te
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded border-4 bg-white aspect-[297/210]"
-      style={{ borderColor: primaryColor }}
+      className="certificate-preview-container"
+      style={{ '--preview-primary': primaryColor } as React.CSSProperties}
     >
-      {/* Inner border */}
-      <div
-        className="absolute inset-3 border rounded opacity-20 pointer-events-none"
-        style={{ borderColor: primaryColor }}
-      />
+      <div className="certificate-preview-inner-border" />
 
-      {/* Content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
-        {/* Logo */}
         {organizationLogo && (
-          <img src={organizationLogo} alt="Organization logo" className="h-10 max-w-[120px] object-contain mb-3" />
+          <img
+            src={organizationLogo}
+            alt="Organization logo"
+            className="h-10 max-w-[120px] object-contain mb-3"
+          />
         )}
 
-        {/* Certificate Label */}
-        <p
-          className="text-xs font-bold tracking-[0.3em] uppercase mb-2"
-          style={{ color: primaryColor }}
-        >
-          Certificate of Achievement
-        </p>
+        <p className="certificate-preview-label">Certificate of Achievement</p>
 
-        {/* Title */}
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           {certificateTitle || 'Certificate Title'}
         </h2>
 
-        {/* Divider */}
-        <div
-          className="w-24 h-0.5 mb-4 rounded"
-          style={{ background: `linear-gradient(to right, transparent, ${primaryColor}, transparent)` }}
-        />
+        <div className="certificate-preview-divider" />
 
-        {/* Recipient */}
-        <p className="text-sm text-gray-500 mb-1">This certificate is proudly presented to</p>
-        <p
-          className="text-3xl font-bold italic mb-3 font-serif"
-          style={{ color: primaryColor }}
-        >
+        <p className="text-sm text-gray-500 mb-1">
+          This certificate is proudly presented to
+        </p>
+        <p className="certificate-preview-recipient">
           {recipientName || 'Recipient Name'}
         </p>
 
-        {/* Description */}
         {description && (
-          <p className="text-xs text-gray-500 max-w-sm leading-relaxed mb-4">{description}</p>
+          <p className="text-xs text-gray-500 max-w-sm leading-relaxed mb-4">
+            {description}
+          </p>
         )}
 
-        {/* Footer */}
         <div className="flex justify-between items-end w-full mt-auto">
           <div className="text-left">
-            <p className="text-xs font-semibold text-gray-700">{formattedDate}</p>
-            <p className="text-[10px] text-gray-400 uppercase tracking-wide">Date of Issue</p>
+            <p className="text-xs font-semibold text-gray-700">
+              {formattedDate}
+            </p>
+            <p className="text-[10px] text-gray-400 uppercase tracking-wide">
+              Date of Issue
+            </p>
           </div>
           <div className="text-right">
             {issuerSignature && (
-              <img src={issuerSignature} alt="Signature" className="h-8 max-w-[100px] object-contain mb-1 ml-auto" />
+              <img
+                src={issuerSignature}
+                alt="Signature"
+                className="h-8 max-w-[100px] object-contain mb-1 ml-auto"
+              />
             )}
-            <p className="text-xs font-semibold text-gray-700">{issuerName || 'Issuer Name'}</p>
-            <p className="text-[10px] text-gray-400 uppercase tracking-wide">Authorized Signatory</p>
+            <p className="text-xs font-semibold text-gray-700">
+              {issuerName || 'Program Name'}
+            </p>
+            <p className="text-[10px] text-gray-400 uppercase tracking-wide">
+              Presented by
+            </p>
           </div>
         </div>
       </div>

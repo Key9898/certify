@@ -66,8 +66,13 @@ export const validateMimeType = (mimetype: string): boolean => {
   return ALLOWED_MIME_TYPES.includes(mimetype);
 };
 
-export const validateFileSignature = (buffer: Buffer, extension: string): boolean => {
-  const ext = extension.toLowerCase().replace('.', '') as keyof typeof FILE_SIGNATURES;
+export const validateFileSignature = (
+  buffer: Buffer,
+  extension: string
+): boolean => {
+  const ext = extension
+    .toLowerCase()
+    .replace('.', '') as keyof typeof FILE_SIGNATURES;
 
   if (ext === 'csv') {
     return true;
@@ -99,11 +104,15 @@ export const validateUpload = (
   const sanitizedFilename = sanitizeFilename(file.originalname);
 
   if (!validateFileSize(file.size)) {
-    errors.push(`File size must be between 1 byte and ${MAX_FILE_SIZE / 1024 / 1024}MB`);
+    errors.push(
+      `File size must be between 1 byte and ${MAX_FILE_SIZE / 1024 / 1024}MB`
+    );
   }
 
   if (!validateFileExtension(file.originalname)) {
-    errors.push('Invalid or dangerous file extension. Only .csv and .xlsx are allowed.');
+    errors.push(
+      'Invalid or dangerous file extension. Only .csv and .xlsx are allowed.'
+    );
     logSecurityEvent('Blocked dangerous file extension', {
       originalName: file.originalname,
       size: file.size,
@@ -114,7 +123,13 @@ export const validateUpload = (
     errors.push('Invalid MIME type. Only CSV and XLSX files are allowed.');
   }
 
-  if (file.buffer && !validateFileSignature(file.buffer, file.originalname.slice(file.originalname.lastIndexOf('.')))) {
+  if (
+    file.buffer &&
+    !validateFileSignature(
+      file.buffer,
+      file.originalname.slice(file.originalname.lastIndexOf('.'))
+    )
+  ) {
     errors.push('File signature does not match the claimed file type.');
     logSecurityEvent('File signature mismatch', {
       originalName: file.originalname,

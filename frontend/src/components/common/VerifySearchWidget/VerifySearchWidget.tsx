@@ -8,9 +8,9 @@ interface VerifySearchWidgetProps {
   placeholder?: string;
 }
 
-export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({ 
+export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({
   variant = 'compact',
-  placeholder = 'Enter Certificate ID (e.g., CERT-12345)' 
+  placeholder = 'Enter Certificate ID (e.g., CERT-12345)',
 }) => {
   const [id, setId] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -31,20 +31,27 @@ export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({
   return (
     <div className={`w-full ${variant === 'large' ? 'max-w-2xl' : 'max-w-lg'}`}>
       <form onSubmit={handleSearch} className="relative group">
-        <div className={`
+        <div
+          className={`
           relative flex items-center transition-all duration-300
           bg-white border-2 rounded shadow-xl overflow-hidden
           ${variant === 'large' ? 'h-16 md:h-20 border-primary/20' : 'h-14 border-base-200'}
           group-focus-within:border-primary group-focus-within:ring-4 group-focus-within:ring-primary/10
-        `}>
-          <div className={`flex items-center justify-center ${variant === 'large' ? 'w-16 md:w-20' : 'w-14'} text-primary/40 group-focus-within:text-primary transition-colors`}>
+        `}
+        >
+          <div
+            className={`flex items-center justify-center ${variant === 'large' ? 'w-16 md:w-20' : 'w-14'} text-primary/40 group-focus-within:text-primary transition-colors`}
+          >
             {isSearching ? (
-              <Loader2 className="animate-spin" size={variant === 'large' ? 28 : 20} />
+              <Loader2
+                className="animate-spin"
+                size={variant === 'large' ? 28 : 20}
+              />
             ) : (
               <Search size={variant === 'large' ? 28 : 20} />
             )}
           </div>
-          
+
           <input
             type="text"
             value={id}
@@ -66,7 +73,11 @@ export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({
               ${id.trim() ? 'bg-primary text-white hover:bg-primary/90' : 'bg-base-200 text-base-content/30 cursor-not-allowed'}
             `}
           >
-            <span className={variant === 'large' ? 'hidden md:inline' : 'hidden'}>Verify</span>
+            <span
+              className={variant === 'large' ? 'hidden md:inline' : 'hidden'}
+            >
+              Verify
+            </span>
             <ArrowRight size={variant === 'large' ? 20 : 16} />
           </button>
         </div>

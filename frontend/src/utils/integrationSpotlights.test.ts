@@ -14,10 +14,12 @@ describe('integrationSpotlights', () => {
       mapping: GOOGLE_SHEETS_DEFAULT_MAPPING,
     });
 
-    expect(snippet).toContain("sheetRowNumber: index + 2");
+    expect(snippet).toContain('sheetRowNumber: index + 2');
     expect(snippet).toContain('spreadsheetId');
     expect(snippet).toContain('template-123');
-    expect(snippet).toContain('https://certify.app/api/integrations/hooks/ig_google');
+    expect(snippet).toContain(
+      'https://certify.app/api/integrations/hooks/ig_google'
+    );
   });
 
   it('builds a Canvas payload snippet with user, course, and assignment identifiers', () => {
@@ -46,7 +48,11 @@ describe('integrationSpotlights', () => {
   });
 
   it('returns the right response contract snippets for single and batch providers', () => {
-    expect(buildCertificateReturnSnippet('canvas')).toContain('publicCertificateId');
-    expect(buildCertificateReturnSnippet('google_sheets')).toContain('batchJobId');
+    expect(buildCertificateReturnSnippet('canvas')).toContain(
+      'publicCertificateId'
+    );
+    expect(buildCertificateReturnSnippet('google_sheets')).toContain(
+      'batchJobId'
+    );
   });
 });

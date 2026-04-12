@@ -10,7 +10,10 @@ const meta: Meta<typeof LoginButton> = {
 export default meta;
 type Story = StoryObj<typeof LoginButton>;
 
-export const Primary: Story = { args: { label: 'Get Started Free', variant: 'primary' } };
-export const Outline: Story = { args: { label: 'Sign In', variant: 'outline' } };
+export const Primary: Story = {
+  args: { label: 'Get Started Free', variant: 'primary' },
+};
+export const Outline: Story = {
+  args: { label: 'Sign In', variant: 'outline' },
+};
 export const Large: Story = { args: { label: 'Get Started Free', size: 'lg' } };
-

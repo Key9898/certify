@@ -25,7 +25,9 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         this.props.fallback ?? (
-          <div className="alert alert-error text-sm">Failed to render this section.</div>
+          <div className="alert alert-error text-sm">
+            Failed to render this section.
+          </div>
         )
       );
     }

@@ -12,4 +12,3 @@ type Story = StoryObj<typeof Footer>;
 
 export const Default: Story = { args: { minimal: false } };
 export const Minimal: Story = { args: { minimal: true } };
-

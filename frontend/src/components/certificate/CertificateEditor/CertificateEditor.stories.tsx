@@ -44,4 +44,3 @@ export const Submitting: Story = {
     isSubmitting: true,
   },
 };
-

@@ -32,7 +32,9 @@ export const createCertificate = async (
     $or: [{ isPublic: true }, { createdBy: { $in: workspaceUserIds } }],
   });
   if (!template) {
-    const error = new Error('Template not found') as Error & { statusCode: number };
+    const error = new Error('Template not found') as Error & {
+      statusCode: number;
+    };
     error.statusCode = 404;
     throw error;
   }
@@ -66,7 +68,9 @@ export const generateAndUploadPdf = async (
   }).populate('templateId');
 
   if (!certificate) {
-    const error = new Error('Certificate not found') as Error & { statusCode: number };
+    const error = new Error('Certificate not found') as Error & {
+      statusCode: number;
+    };
     error.statusCode = 404;
     throw error;
   }
@@ -91,13 +95,18 @@ export const generateAndUploadPdf = async (
     issuerName: certificate.issuerName,
     issuerSignature: certificate.issuerSignature,
     organizationLogo: certificate.organizationLogo,
-    primaryColor: (certificate.customFields?.primaryColor as string) || '#3B82F6',
-    secondaryColor: (certificate.customFields?.secondaryColor as string) || '#64748B',
+    primaryColor:
+      (certificate.customFields?.primaryColor as string) || '#3B82F6',
+    secondaryColor:
+      (certificate.customFields?.secondaryColor as string) || '#64748B',
     certificateId: certificate.certificateId,
   };
 
   const pdfBuffer = await generatePdf(template, pdfData);
-  const uploadResult = await uploadPdf(pdfBuffer, `certificate-${certificate.certificateId}`);
+  const uploadResult = await uploadPdf(
+    pdfBuffer,
+    `certificate-${certificate.certificateId}`
+  );
 
   certificate.pdfUrl = uploadResult.secure_url;
   await certificate.save();
@@ -119,7 +128,9 @@ export const getCertificates = async (
   const skip = (page - 1) * limit;
 
   const workspaceUserIds = await getWorkspaceMemberIdsForUserId(userId);
-  const filter: Record<string, unknown> = { createdBy: { $in: workspaceUserIds } };
+  const filter: Record<string, unknown> = {
+    createdBy: { $in: workspaceUserIds },
+  };
 
   if (search) {
     filter.$text = { $search: search };

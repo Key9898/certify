@@ -23,7 +23,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     (file: File) => {
       setLocalError(null);
       if (file.size > maxSizeBytes) {
-        setLocalError(`File too large. Max size: ${Math.round(maxSizeBytes / 1024 / 1024)}MB`);
+        setLocalError(
+          `File too large. Max size: ${Math.round(maxSizeBytes / 1024 / 1024)}MB`
+        );
         return;
       }
       onFileSelect(file);
@@ -53,14 +55,19 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       <motion.div
         className={[
           'border-2 border-dashed rounded p-4 text-center cursor-pointer transition-colors',
-          dragOver ? 'border-primary bg-primary/5' : 'border-base-300 hover:border-primary',
+          dragOver
+            ? 'border-primary bg-primary/5'
+            : 'border-base-300 hover:border-primary',
           disabled ? 'opacity-50 cursor-not-allowed' : '',
           displayError ? 'border-error' : '',
         ]
           .filter(Boolean)
           .join(' ')}
         onDrop={handleDrop}
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
         onDragLeave={() => setDragOver(false)}
         onClick={() => !disabled && inputRef.current?.click()}
         animate={{
@@ -81,7 +88,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               className="max-h-24 max-w-full rounded object-contain"
               whileHover={{ scale: 1.04, transition: QUICK_SPRING }}
             />
-            <span className="text-xs text-base-content/60">Click to change</span>
+            <span className="text-xs text-base-content/60">
+              Click to change
+            </span>
           </motion.div>
         ) : isUploading ? (
           <div className="flex flex-col items-center gap-2">
@@ -95,7 +104,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             className="flex flex-col items-center gap-2 py-2"
           >
             <motion.div
-              animate={{ scale: dragOver ? 1.08 : 1, rotate: dragOver ? -4 : 0 }}
+              animate={{
+                scale: dragOver ? 1.08 : 1,
+                rotate: dragOver ? -4 : 0,
+              }}
               transition={QUICK_SPRING}
             >
               {dragOver ? (
@@ -105,7 +117,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               )}
             </motion.div>
             <p className="text-sm text-base-content/60">
-              <span className="text-primary font-medium">Click to upload</span> or drag & drop
+              <span className="text-primary font-medium">Click to upload</span>{' '}
+              or drag & drop
             </p>
             {hint && <p className="text-xs text-base-content/40">{hint}</p>}
           </motion.div>

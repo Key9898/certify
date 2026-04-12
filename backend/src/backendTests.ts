@@ -25,10 +25,12 @@ const { privateKey } = crypto.generateKeyPairSync('rsa', {
   modulusLength: 2048,
 });
 
-const GOOGLE_PRIVATE_KEY = privateKey.export({
-  type: 'pkcs8',
-  format: 'pem',
-}).toString();
+const GOOGLE_PRIVATE_KEY = privateKey
+  .export({
+    type: 'pkcs8',
+    format: 'pem',
+  })
+  .toString();
 
 type AsyncTestCase = {
   name: string;
@@ -40,7 +42,9 @@ const withEnv = async (
   values: Record<string, string>,
   callback: () => Promise<void>
 ): Promise<void> => {
-  const previousEntries = Object.entries(values).map(([key]) => [key, process.env[key]] as const);
+  const previousEntries = Object.entries(values).map(
+    ([key]) => [key, process.env[key]] as const
+  );
 
   Object.entries(values).forEach(([key, value]) => {
     process.env[key] = value;
@@ -88,7 +92,7 @@ const tests: AsyncTestCase[] = [
     run: async () => {
       const config: GoogleSheetsResolvedConfig = {
         spreadsheetId: 'sheet-id',
-        sheetName: 'Ready to Issue',
+        sheetName: 'Ready to Create',
         statusColumn: 'Certify Status',
         certificateIdColumn: 'Certify ID',
         pdfUrlColumn: 'Certificate PDF URL',
@@ -110,7 +114,7 @@ const tests: AsyncTestCase[] = [
         [
           {
             rowNumber: 4,
-            status: 'Issued',
+            status: 'Created',
             certificateId: 'CERT-001',
             pdfUrl: 'https://example.com/certificate.pdf',
             batchJobId: 'batch-123',
@@ -120,14 +124,14 @@ const tests: AsyncTestCase[] = [
       );
 
       assert.deepEqual(updates, [
-        { range: 'Ready to Issue!C4', values: [['Issued']] },
-        { range: 'Ready to Issue!D4', values: [['CERT-001']] },
+        { range: 'Ready to Create!C4', values: [['Created']] },
+        { range: 'Ready to Create!D4', values: [['CERT-001']] },
         {
-          range: 'Ready to Issue!E4',
+          range: 'Ready to Create!E4',
           values: [['https://example.com/certificate.pdf']],
         },
-        { range: 'Ready to Issue!F4', values: [['batch-123']] },
-        { range: 'Ready to Issue!G4', values: [['2026-04-05T10:00:00.000Z']] },
+        { range: 'Ready to Create!F4', values: [['batch-123']] },
+        { range: 'Ready to Create!G4', values: [['2026-04-05T10:00:00.000Z']] },
       ]);
     },
   },
@@ -148,7 +152,8 @@ const tests: AsyncTestCase[] = [
     run: async () => {
       await withEnv(
         {
-          GOOGLE_SERVICE_ACCOUNT_EMAIL: 'certify-tests@project.iam.gserviceaccount.com',
+          GOOGLE_SERVICE_ACCOUNT_EMAIL:
+            'certify-tests@project.iam.gserviceaccount.com',
           GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY: GOOGLE_PRIVATE_KEY,
         },
         async () => {
@@ -159,22 +164,27 @@ const tests: AsyncTestCase[] = [
 
             if (url.includes('oauth2.googleapis.com/token')) {
               return new Response(
-                JSON.stringify({ access_token: 'google-token', expires_in: 3600 }),
+                JSON.stringify({
+                  access_token: 'google-token',
+                  expires_in: 3600,
+                }),
                 { status: 200 }
               );
             }
 
-            if (url.includes('/values/Ready%20to%20Issue!1%3A1')) {
+            if (url.includes('/values/Ready%20to%20Create!1%3A1')) {
               return new Response(
                 JSON.stringify({
-                  values: [[
-                    'Recipient Name',
-                    'Certify Status',
-                    'Certify ID',
-                    'Certificate PDF URL',
-                    'Certify Batch ID',
-                    'Processed At',
-                  ]],
+                  values: [
+                    [
+                      'Recipient Name',
+                      'Certify Status',
+                      'Certify ID',
+                      'Certificate PDF URL',
+                      'Certify Job ID',
+                      'Processed At',
+                    ],
+                  ],
                 }),
                 { status: 200 }
               );
@@ -188,17 +198,17 @@ const tests: AsyncTestCase[] = [
           const result = await syncGoogleSheetsRows(
             {
               spreadsheetId: 'spreadsheet-id',
-              sheetName: 'Ready to Issue',
+              sheetName: 'Ready to Create',
               statusColumn: 'Certify Status',
               certificateIdColumn: 'Certify ID',
               pdfUrlColumn: 'Certificate PDF URL',
-              batchJobIdColumn: 'Certify Batch ID',
+              batchJobIdColumn: 'Certify Job ID',
               processedAtColumn: 'Processed At',
             },
             [
               {
                 rowNumber: 5,
-                status: 'Issued',
+                status: 'Created',
                 certificateId: 'CERT-5',
                 pdfUrl: 'https://example.com/5.pdf',
                 batchJobId: 'batch-5',
@@ -209,8 +219,14 @@ const tests: AsyncTestCase[] = [
           );
 
           assert.equal(result.updatedCells, 5);
-          assert.match(requests[requests.length - 1].url, /values:batchUpdate$/);
-          assert.match(String(requests[requests.length - 1].init?.body), /CERT-5/);
+          assert.match(
+            requests[requests.length - 1].url,
+            /values:batchUpdate$/
+          );
+          assert.match(
+            String(requests[requests.length - 1].init?.body),
+            /CERT-5/
+          );
         }
       );
     },
@@ -297,7 +313,8 @@ const tests: AsyncTestCase[] = [
     run: async () => {
       await withEnv(
         {
-          GOOGLE_SERVICE_ACCOUNT_EMAIL: 'certify-tests@project.iam.gserviceaccount.com',
+          GOOGLE_SERVICE_ACCOUNT_EMAIL:
+            'certify-tests@project.iam.gserviceaccount.com',
           GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY: GOOGLE_PRIVATE_KEY,
         },
         async () => {
@@ -308,22 +325,27 @@ const tests: AsyncTestCase[] = [
 
             if (url.includes('oauth2.googleapis.com/token')) {
               return new Response(
-                JSON.stringify({ access_token: 'google-token', expires_in: 3600 }),
+                JSON.stringify({
+                  access_token: 'google-token',
+                  expires_in: 3600,
+                }),
                 { status: 200 }
               );
             }
 
-            if (url.includes('/values/Ready%20to%20Issue!1%3A1')) {
+            if (url.includes('/values/Ready%20to%20Create!1%3A1')) {
               return new Response(
                 JSON.stringify({
-                  values: [[
-                    'Recipient Name',
-                    'Certify Status',
-                    'Certify ID',
-                    'Certificate PDF URL',
-                    'Certify Batch ID',
-                    'Processed At',
-                  ]],
+                  values: [
+                    [
+                      'Recipient Name',
+                      'Certify Status',
+                      'Certify ID',
+                      'Certificate PDF URL',
+                      'Certify Batch ID',
+                      'Processed At',
+                    ],
+                  ],
                 }),
                 { status: 200 }
               );
@@ -340,7 +362,7 @@ const tests: AsyncTestCase[] = [
                 provider: 'google_sheets',
                 googleSheets: {
                   spreadsheetId: 'spreadsheet-id',
-                  sheetName: 'Ready to Issue',
+                  sheetName: 'Ready to Create',
                   statusColumn: 'Certify Status',
                   certificateIdColumn: 'Certify ID',
                   pdfUrlColumn: 'Certificate PDF URL',
@@ -369,9 +391,18 @@ const tests: AsyncTestCase[] = [
 
             await syncBatchJobNativeResults(job);
 
-            assert.match(requests[requests.length - 1].url, /values:batchUpdate$/);
-            assert.match(String(requests[requests.length - 1].init?.body), /CERT-AVA-001/);
-            assert.match(String(requests[requests.length - 1].init?.body), /Failed/);
+            assert.match(
+              requests[requests.length - 1].url,
+              /values:batchUpdate$/
+            );
+            assert.match(
+              String(requests[requests.length - 1].init?.body),
+              /CERT-AVA-001/
+            );
+            assert.match(
+              String(requests[requests.length - 1].init?.body),
+              /Failed/
+            );
           });
         }
       );
@@ -423,7 +454,10 @@ const tests: AsyncTestCase[] = [
               },
             });
 
-            assert.match(requests[0].url, /assignments\/8\/submissions\/12345$/);
+            assert.match(
+              requests[0].url,
+              /assignments\/8\/submissions\/12345$/
+            );
             assert.match(String(requests[0].init?.body), /CERT-CANVAS-001/);
           });
         }
@@ -433,7 +467,9 @@ const tests: AsyncTestCase[] = [
 ];
 
 const integrationOnly = process.argv.includes('--integration-only');
-const selectedTests = integrationOnly ? tests.filter((test) => test.integration) : tests;
+const selectedTests = integrationOnly
+  ? tests.filter((test) => test.integration)
+  : tests;
 
 const main = async () => {
   let completed = 0;
@@ -444,7 +480,9 @@ const main = async () => {
     console.log(`PASS ${test.name}`);
   }
 
-  console.log(`Completed ${completed} backend test${completed === 1 ? '' : 's'}.`);
+  console.log(
+    `Completed ${completed} backend test${completed === 1 ? '' : 's'}.`
+  );
 };
 
 main().catch((error) => {

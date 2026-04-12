@@ -6,7 +6,12 @@ import { CertificateCard } from '../CertificateCard';
 import { Skeleton } from '@/components/common/Skeleton';
 import { ROUTES } from '@/utils/constants';
 import type { CertificateListProps } from './CertificateList.types';
-import { QUICK_SPRING, SOFT_SPRING, STAGGER_CONTAINER, REVEAL_ITEM } from '@/utils/motion';
+import {
+  QUICK_SPRING,
+  SOFT_SPRING,
+  STAGGER_CONTAINER,
+  REVEAL_ITEM,
+} from '@/utils/motion';
 
 export const CertificateList: React.FC<CertificateListProps> = ({
   certificates,
@@ -19,7 +24,10 @@ export const CertificateList: React.FC<CertificateListProps> = ({
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {[...Array(8)].map((_, i) => (
-          <div key={i} className="card bg-base-100 border border-base-200 p-0 overflow-hidden shadow-sm">
+          <div
+            key={i}
+            className="card bg-base-100 border border-base-200 p-0 overflow-hidden shadow-sm"
+          >
             <Skeleton className="h-48 w-full rounded-none" />
             <div className="p-6 space-y-4">
               <Skeleton variant="text" className="w-2/3 h-6" />
@@ -37,7 +45,7 @@ export const CertificateList: React.FC<CertificateListProps> = ({
 
   if (certificates.length === 0) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={SOFT_SPRING}
@@ -55,16 +63,22 @@ export const CertificateList: React.FC<CertificateListProps> = ({
             <Plus size={16} />
           </motion.div>
         </div>
-        
-        <h3 className="text-3xl font-black text-base-content mb-4 tracking-tight text-center">Records Missing</h3>
+
+        <h3 className="text-3xl font-black text-base-content mb-4 tracking-tight text-center">
+          Records Missing
+        </h3>
         <p className="text-base-content/40 font-medium max-w-sm mb-10 leading-relaxed text-center">
-          The registry hasn&apos;t indexed any credentials yet. Start your first issuance to populate this ledger.
+          The registry hasn&apos;t indexed any credentials yet. Start your first
+          creation to populate this registry.
         </p>
 
         <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }}>
-          <Link to={ROUTES.TEMPLATES} className="btn btn-primary h-14 rounded px-10 font-black uppercase tracking-widest shadow-xl shadow-primary/20 gap-2">
+          <Link
+            to={ROUTES.TEMPLATES}
+            className="btn btn-primary h-14 rounded px-10 font-black uppercase tracking-widest shadow-xl shadow-primary/20 gap-2"
+          >
             <Plus size={20} />
-            Begin Issuance
+            Create New
           </Link>
         </motion.div>
       </motion.div>
@@ -72,7 +86,7 @@ export const CertificateList: React.FC<CertificateListProps> = ({
   }
 
   return (
-    <motion.div 
+    <motion.div
       variants={STAGGER_CONTAINER}
       initial="hidden"
       animate="visible"

@@ -39,6 +39,7 @@ export interface Template {
   fields: TemplateField[];
   isPublic: boolean;
   createdBy: string;
+  creatorId?: string;
   createdAt: string;
   updatedAt: string;
 }

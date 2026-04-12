@@ -2,7 +2,12 @@ import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 import type { TemplateCardProps } from './TemplateCard.types';
-import { HOVER_LIFT, QUICK_SPRING, SOFT_SPRING, TAP_PRESS } from '@/utils/motion';
+import {
+  HOVER_LIFT,
+  QUICK_SPRING,
+  SOFT_SPRING,
+  TAP_PRESS,
+} from '@/utils/motion';
 
 const CATEGORY_BADGE: Record<string, string> = {
   academic: 'badge-info',
@@ -42,26 +47,26 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
           className="w-full h-full object-cover"
           whileHover={{ scale: 1.08, transition: SOFT_SPRING }}
         />
-        
+
         {/* Selection Overlay */}
         <AnimatePresence>
           {isSelected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] z-10 flex items-center justify-center"
-          >
             <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.6, opacity: 0 }}
-              transition={SOFT_SPRING}
-              className="bg-white rounded p-2 shadow-xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] z-10 flex items-center justify-center"
             >
-              <CheckCircle size={32} className="text-primary" />
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.6, opacity: 0 }}
+                transition={SOFT_SPRING}
+                className="bg-white rounded p-2 shadow-xl"
+              >
+                <CheckCircle size={32} className="text-primary" />
+              </motion.div>
             </motion.div>
-          </motion.div>
           )}
         </AnimatePresence>
 
@@ -83,15 +88,21 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
           </motion.div>
         )}
 
-        <span className={`badge ${CATEGORY_BADGE[template.category]} absolute top-3 left-3 capitalize font-bold border-none px-3 py-3 z-20 shadow-md`}>
+        <span
+          className={`badge ${CATEGORY_BADGE[template.category]} absolute top-3 left-3 capitalize font-bold border-none px-3 py-3 z-20 shadow-md`}
+        >
           {template.category}
         </span>
       </figure>
-      
+
       <motion.div layout className="card-body relative z-20 bg-base-100 p-5">
         <motion.h3
           className="text-lg font-black tracking-tight text-base-content"
-          animate={{ color: isSelected ? 'var(--color-primary)' : 'var(--color-base-content)' }}
+          animate={{
+            color: isSelected
+              ? 'var(--color-primary)'
+              : 'var(--color-base-content)',
+          }}
           transition={QUICK_SPRING}
         >
           {template.name}

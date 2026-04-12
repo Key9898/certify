@@ -1,7 +1,15 @@
 import type { ReactNode } from 'react';
 import type { HTMLMotionProps } from 'framer-motion';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'ghost' | 'error' | 'success' | 'warning' | 'outline';
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'accent'
+  | 'ghost'
+  | 'error'
+  | 'success'
+  | 'warning'
+  | 'outline';
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends HTMLMotionProps<'button'> {

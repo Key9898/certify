@@ -1,6 +1,6 @@
 # Session Summary
 
-**Last Updated:** 2026-04-06
+**Last Updated:** 2026-04-12
 
 ---
 
@@ -48,6 +48,13 @@
 
 ## This Session
 
+- Fixed all hardcoded dates and values in public-facing landing pages (Home, About, Privacy, Terms)
+- Added `formatPreviewDate()` function in Home.tsx for dynamic certificate preview dates
+- Changed "Since 2026" to dynamic year in About.tsx
+- Updated PrivacyPolicy and TermsOfService with dynamic last-updated dates
+- Changed social proof text from "Join 500+ organizations" to "Join Early Adopters" for accurate pre-launch messaging
+- Fixed template count to use API-based count instead of hardcoded value
+- Added Section 36 "Landing Page Dynamic Elements (DO NOT HARDCODE)" to project_rules.md with grep pre-commit check
 - Fixed frontend/backend API contract drift for API keys and webhook list responses
 - Persisted settings color preferences through the backend and wired them into certificate defaults
 - Restored true live certificate preview updates while editing

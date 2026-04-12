@@ -28,18 +28,20 @@ const getEnvValue = (value?: string): string | undefined => {
   return trimmed ? trimmed : undefined;
 };
 
-const getCanvasToken = (): string | undefined => getEnvValue(process.env.CANVAS_API_TOKEN);
+const getCanvasToken = (): string | undefined =>
+  getEnvValue(process.env.CANVAS_API_TOKEN);
 
-export const normalizeCanvasBaseUrl = (value: string): string => value.replace(/\/+$/, '');
+export const normalizeCanvasBaseUrl = (value: string): string =>
+  value.replace(/\/+$/, '');
 
 export const isCanvasNativeSyncReady = (
   settings?: ICanvasSettings | null
 ): settings is CanvasResolvedConfig =>
   Boolean(
     settings?.enabled &&
-      getEnvValue(settings.baseUrl) &&
-      getEnvValue(settings.courseId) &&
-      getCanvasToken()
+    getEnvValue(settings.baseUrl) &&
+    getEnvValue(settings.courseId) &&
+    getCanvasToken()
   );
 
 export const resolveCanvasConfig = (
@@ -65,7 +67,9 @@ export const buildCanvasApiUrl = (baseUrl: string, path: string): string =>
 const getCanvasHeaders = (): Record<string, string> => {
   const token = getCanvasToken();
   if (!token) {
-    throw new Error('Canvas native sync is not configured. Set CANVAS_API_TOKEN in the backend environment.');
+    throw new Error(
+      'Canvas native sync is not configured. Set CANVAS_API_TOKEN in the backend environment.'
+    );
   }
 
   return {
@@ -90,7 +94,7 @@ export const buildCanvasCertificateMessage = ({
     : undefined;
 
   const lines = [
-    `Certificate issued for ${recipientName}.`,
+    `Certificate created for ${recipientName}.`,
     `${certificateTitle} (${publicCertificateId})`,
   ];
 
@@ -110,7 +114,10 @@ export const fetchCanvasCourse = async (
   fetchImpl: typeof fetch = fetch
 ): Promise<CanvasCourseResponse> => {
   const response = await fetchImpl(
-    buildCanvasApiUrl(config.baseUrl, `/api/v1/courses/${encodeURIComponent(config.courseId)}`),
+    buildCanvasApiUrl(
+      config.baseUrl,
+      `/api/v1/courses/${encodeURIComponent(config.courseId)}`
+    ),
     {
       headers: getCanvasHeaders(),
       signal: AbortSignal.timeout(10_000),
@@ -135,7 +142,9 @@ export const postCanvasSubmissionComment = async (
   const courseId = input.courseId || config.courseId;
 
   if (!assignmentId) {
-    throw new Error('Canvas assignmentId is required to return certificate links as submission comments.');
+    throw new Error(
+      'Canvas assignmentId is required to return certificate links as submission comments.'
+    );
   }
 
   const response = await fetchImpl(

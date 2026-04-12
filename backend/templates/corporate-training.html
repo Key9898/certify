@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: 'Arial', 'Helvetica', sans-serif; background: #fff; -webkit-print-color-adjust: exact; }
+      .certificate {
+        width: 297mm; height: 210mm;
+        position: relative; overflow: hidden;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        padding: 14mm 20mm;
+        background: #fff;
+      }
+      .border-top {
+        position: absolute; top: 0; left: 0; right: 0;
+        height: 8mm;
+        background: {{primaryColor}};
+      }
+      .border-bottom {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        height: 8mm;
+        background: {{primaryColor}};
+      }
+      .content { display: flex; flex-direction: column; align-items: center; width: 100%; }
+      .header { display: flex; flex-direction: column; align-items: center; margin-bottom: 5mm; }
+      .logo-img { max-height: 45px; max-width: 150px; object-fit: contain; margin-bottom: 3mm; }
+      .cert-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: {{secondaryColor}}; font-weight: 600; }
+      .cert-title { font-size: 34px; font-weight: 700; color: {{primaryColor}}; margin: 4mm 0 2mm; text-align: center; }
+      .divider { width: 60mm; height: 2px; background: {{primaryColor}}; margin: 4mm auto; }
+      .presented-to { font-size: 11px; color: #666; margin-bottom: 2mm; }
+      .recipient-name { font-size: 30px; color: #1a1a1a; margin-bottom: 3mm; font-weight: 700; }
+      .has-completed { font-size: 10px; color: #888; margin-bottom: 2mm; text-transform: uppercase; letter-spacing: 1px; }
+      .course-name { font-size: 18px; color: {{primaryColor}}; margin-bottom: 4mm; font-weight: 600; text-align: center; }
+      .description { font-size: 11px; color: #444; text-align: center; max-width: 160mm; line-height: 1.6; margin-bottom: 4mm; }
+      .footer { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: auto; }
+      .footer-item { display: flex; flex-direction: column; align-items: center; }
+      .footer-label { font-size: 8px; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-top: 2mm; }
+      .footer-value { font-size: 11px; color: #333; font-weight: 600; }
+      .signature-img { max-height: 35px; max-width: 100px; object-fit: contain; }
+      .sign-line { width: 40mm; height: 1px; background: #ccc; margin-bottom: 2mm; }
+      .qr-section { display: flex; flex-direction: column; align-items: center; gap: 1mm; }
+      .qr-code { width: 18mm; height: 18mm; }
+      .qr-label { font-size: 6px; color: #888; text-transform: uppercase; }
+      .cert-id { font-size: 7px; color: #bbb; font-family: monospace; }
+    </style>
+  </head>
+  <body>
+    <div class="certificate">
+      <div class="border-top"></div>
+      <div class="border-bottom"></div>
+      <div class="content">
+        <div class="header">
+          {{organizationLogo}}
+          <div class="cert-label">Training Completion</div>
+        </div>
+        <div class="cert-title">{{certificateTitle}}</div>
+        <div class="divider"></div>
+        <div class="presented-to">Awarded to</div>
+        <div class="recipient-name">{{recipientName}}</div>
+        <div class="has-completed">Has successfully completed</div>
+        <div class="course-name">{{description}}</div>
+        <div class="footer">
+          <div class="footer-item">
+            <div class="qr-section">
+              {{verifyQR}}
+              <span class="qr-label">Verify</span>
+            </div>
+          </div>
+          <div class="footer-item">
+            <div class="footer-value">{{issueDate}}</div>
+            <div class="footer-label">Completion Date</div>
+          </div>
+          <div class="footer-item">
+            <div class="sign-line"></div>
+            {{issuerSignature}}
+            <div class="footer-value">{{issuerName}}</div>
+            <div class="footer-label">Instructor</div>
+          </div>
+          <div class="footer-item">
+            <div class="cert-id">ID: {{certificateId}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

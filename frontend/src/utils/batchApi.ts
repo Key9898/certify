@@ -1,8 +1,14 @@
 import { apiRequest, fetchWithAuth, post } from './api';
 import type { ApiResponse } from '@/types/api';
-import type { BatchJob, BatchUploadPreview, StartBatchDto } from '@/types/batch';
+import type {
+  BatchJob,
+  BatchUploadPreview,
+  StartBatchDto,
+} from '@/types/batch';
 
-export const uploadBatchCsv = async (file: File): Promise<ApiResponse<BatchUploadPreview>> => {
+export const uploadBatchCsv = async (
+  file: File
+): Promise<ApiResponse<BatchUploadPreview>> => {
   const formData = new FormData();
   formData.append('file', file);
 
@@ -14,7 +20,9 @@ export const uploadBatchCsv = async (file: File): Promise<ApiResponse<BatchUploa
   const data: ApiResponse<BatchUploadPreview> = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error?.message || `HTTP error! status: ${response.status}`);
+    throw new Error(
+      data.error?.message || `HTTP error! status: ${response.status}`
+    );
   }
 
   return data;
@@ -26,7 +34,9 @@ export const startBatchGeneration = async (
   return post<BatchJob>('/batch/generate', dto);
 };
 
-export const fetchBatchStatus = async (jobId: string): Promise<ApiResponse<BatchJob>> => {
+export const fetchBatchStatus = async (
+  jobId: string
+): Promise<ApiResponse<BatchJob>> => {
   return apiRequest<BatchJob>(`/batch/${jobId}/status`);
 };
 

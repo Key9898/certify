@@ -1,15 +1,25 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronRight, Home, Search, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useAppUser } from '@/context/AuthContext';
 import { useCloudinary } from '@/hooks/useCloudinary';
 import { patch, del } from '@/utils/api';
-import { DEFAULT_PRIMARY_COLOR, DEFAULT_SECONDARY_COLOR } from '@/utils/constants';
+import {
+  DEFAULT_PRIMARY_COLOR,
+  DEFAULT_SECONDARY_COLOR,
+} from '@/utils/constants';
 import { getAuthProfileDisplayName } from '@/utils/formatters';
 import { SOFT_SPRING } from '@/utils/motion';
 import { listApiKeys, createApiKey, revokeApiKey } from '@/utils/apiKeyApi';
-import { listWebhooks, createWebhook, deleteWebhook, ALL_WEBHOOK_EVENTS } from '@/utils/webhookApi';
+import {
+  listWebhooks,
+  createWebhook,
+  deleteWebhook,
+  ALL_WEBHOOK_EVENTS,
+} from '@/utils/webhookApi';
 import {
   fetchTeamWorkspace,
   inviteTeamMember,
@@ -58,7 +68,9 @@ export const Settings: React.FC = () => {
   // Webhooks state
   const [webhooks, setWebhooks] = useState<WebhookType[]>([]);
   const [newWebhookUrl, setNewWebhookUrl] = useState('');
-  const [newWebhookEvents, setNewWebhookEvents] = useState<WebhookEvent[]>([...ALL_WEBHOOK_EVENTS]);
+  const [newWebhookEvents, setNewWebhookEvents] = useState<WebhookEvent[]>([
+    ...ALL_WEBHOOK_EVENTS,
+  ]);
   const [webhookLoading, setWebhookLoading] = useState(false);
   const [webhookError, setWebhookError] = useState<string | null>(null);
   const [createdSecret, setCreatedSecret] = useState<string | null>(null);
@@ -73,9 +85,15 @@ export const Settings: React.FC = () => {
   const [inviteRole, setInviteRole] = useState<'admin' | 'member'>('member');
 
   // Branding state
-  const [organizationName, setOrganizationName] = useState(appUser?.organization?.name || '');
-  const [brandName, setBrandName] = useState(appUser?.organization?.whiteLabel.brandName || '');
-  const [brandLogoUrl, setBrandLogoUrl] = useState(appUser?.organization?.whiteLabel.logoUrl || '');
+  const [organizationName, setOrganizationName] = useState(
+    appUser?.organization?.name || ''
+  );
+  const [brandName, setBrandName] = useState(
+    appUser?.organization?.whiteLabel.brandName || ''
+  );
+  const [brandLogoUrl, setBrandLogoUrl] = useState(
+    appUser?.organization?.whiteLabel.logoUrl || ''
+  );
   const [brandPrimaryColor, setBrandPrimaryColor] = useState(
     appUser?.organization?.whiteLabel.primaryColor || DEFAULT_PRIMARY_COLOR
   );
@@ -96,12 +114,20 @@ export const Settings: React.FC = () => {
   const [isSavingWhiteLabel, setIsSavingWhiteLabel] = useState(false);
 
   const canManageWorkspace =
-    appUser?.organizationRole === 'owner' || appUser?.organizationRole === 'admin';
+    appUser?.organizationRole === 'owner' ||
+    appUser?.organizationRole === 'admin';
   const isEmailPasswordUser = user?.sub?.startsWith('auth0|') ?? false;
 
   // Password reset state
   const [pwResetLoading, setPwResetLoading] = useState(false);
-  const [pwResetStatus, setPwResetStatus] = useState<'sent' | 'error' | null>(null);
+  const [pwResetStatus, setPwResetStatus] = useState<'sent' | 'error' | null>(
+    null
+  );
+
+  // Password change state
+  const [pwChangeLoading, setPwChangeLoading] = useState(false);
+  const [pwChangeError, setPwChangeError] = useState<string | null>(null);
+  const [pwChangeSuccess, setPwChangeSuccess] = useState(false);
 
   // Delete account state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -135,7 +161,9 @@ export const Settings: React.FC = () => {
       setTeamData(res.data ?? null);
     } catch (err) {
       setTeamData(null);
-      setTeamError(err instanceof Error ? err.message : 'Failed to load workspace.');
+      setTeamError(
+        err instanceof Error ? err.message : 'Failed to load workspace.'
+      );
     } finally {
       setTeamLoading(false);
     }
@@ -149,13 +177,21 @@ export const Settings: React.FC = () => {
 
   useEffect(() => {
     if (!appUser) return;
-    setPrimaryColor(appUser.settings.defaultColors.primary || DEFAULT_PRIMARY_COLOR);
-    setSecondaryColor(appUser.settings.defaultColors.secondary || DEFAULT_SECONDARY_COLOR);
+    setPrimaryColor(
+      appUser.settings.defaultColors.primary || DEFAULT_PRIMARY_COLOR
+    );
+    setSecondaryColor(
+      appUser.settings.defaultColors.secondary || DEFAULT_SECONDARY_COLOR
+    );
     setOrganizationName(appUser.organization?.name || '');
     setBrandName(appUser.organization?.whiteLabel.brandName || '');
     setBrandLogoUrl(appUser.organization?.whiteLabel.logoUrl || '');
-    setBrandPrimaryColor(appUser.organization?.whiteLabel.primaryColor || DEFAULT_PRIMARY_COLOR);
-    setBrandSecondaryColor(appUser.organization?.whiteLabel.secondaryColor || DEFAULT_SECONDARY_COLOR);
+    setBrandPrimaryColor(
+      appUser.organization?.whiteLabel.primaryColor || DEFAULT_PRIMARY_COLOR
+    );
+    setBrandSecondaryColor(
+      appUser.organization?.whiteLabel.secondaryColor || DEFAULT_SECONDARY_COLOR
+    );
     setSupportEmail(appUser.organization?.whiteLabel.supportEmail || '');
     setCustomDomain(appUser.organization?.whiteLabel.customDomain || '');
     setHidePoweredBy(appUser.organization?.whiteLabel.hidePoweredBy || false);
@@ -172,7 +208,9 @@ export const Settings: React.FC = () => {
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Failed to save preferences.');
+      setSaveError(
+        err instanceof Error ? err.message : 'Failed to save preferences.'
+      );
     } finally {
       setIsSavingColors(false);
     }
@@ -188,19 +226,26 @@ export const Settings: React.FC = () => {
       setInviteRole('member');
       await loadTeamWorkspace();
     } catch (err) {
-      setTeamError(err instanceof Error ? err.message : 'Failed to invite teammate.');
+      setTeamError(
+        err instanceof Error ? err.message : 'Failed to invite teammate.'
+      );
     } finally {
       setTeamActionId(null);
     }
   };
 
-  const handleUpdateMemberRole = async (userId: string, role: 'admin' | 'member') => {
+  const handleUpdateMemberRole = async (
+    userId: string,
+    role: 'admin' | 'member'
+  ) => {
     setTeamActionId(userId);
     try {
       await updateWorkspaceRole(userId, role);
       await loadTeamWorkspace();
     } catch (err) {
-      setTeamError(err instanceof Error ? err.message : 'Failed to update member role.');
+      setTeamError(
+        err instanceof Error ? err.message : 'Failed to update member role.'
+      );
     } finally {
       setTeamActionId(null);
     }
@@ -212,7 +257,9 @@ export const Settings: React.FC = () => {
       await removeWorkspaceMember(userId);
       await loadTeamWorkspace();
     } catch (err) {
-      setTeamError(err instanceof Error ? err.message : 'Failed to remove member.');
+      setTeamError(
+        err instanceof Error ? err.message : 'Failed to remove member.'
+      );
     } finally {
       setTeamActionId(null);
     }
@@ -224,7 +271,9 @@ export const Settings: React.FC = () => {
       await cancelWorkspaceInvitation(invitationId);
       await loadTeamWorkspace();
     } catch (err) {
-      setTeamError(err instanceof Error ? err.message : 'Failed to cancel invitation.');
+      setTeamError(
+        err instanceof Error ? err.message : 'Failed to cancel invitation.'
+      );
     } finally {
       setTeamActionId(null);
     }
@@ -256,7 +305,9 @@ export const Settings: React.FC = () => {
       setWhiteLabelSaved(true);
       setTimeout(() => setWhiteLabelSaved(false), 2500);
     } catch (err) {
-      setWhiteLabelError(err instanceof Error ? err.message : 'Failed to save white label.');
+      setWhiteLabelError(
+        err instanceof Error ? err.message : 'Failed to save white label.'
+      );
     } finally {
       setIsSavingWhiteLabel(false);
     }
@@ -284,7 +335,9 @@ export const Settings: React.FC = () => {
     try {
       await revokeApiKey(id);
       await fetchApiKeys();
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   };
 
   const handleCopyKey = () => {
@@ -308,7 +361,9 @@ export const Settings: React.FC = () => {
         await fetchWebhooks();
       }
     } catch (err) {
-      setWebhookError(err instanceof Error ? err.message : 'Failed to create webhook');
+      setWebhookError(
+        err instanceof Error ? err.message : 'Failed to create webhook'
+      );
     } finally {
       setWebhookLoading(false);
     }
@@ -318,7 +373,9 @@ export const Settings: React.FC = () => {
     try {
       await deleteWebhook(id);
       await fetchWebhooks();
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   };
 
   const handleCopySecret = () => {
@@ -331,7 +388,9 @@ export const Settings: React.FC = () => {
 
   const toggleEvent = (event: WebhookEvent) => {
     setNewWebhookEvents((prev: WebhookEvent[]) =>
-      prev.includes(event) ? prev.filter((e: WebhookEvent) => e !== event) : [...prev, event]
+      prev.includes(event)
+        ? prev.filter((e: WebhookEvent) => e !== event)
+        : [...prev, event]
     );
   };
 
@@ -342,20 +401,42 @@ export const Settings: React.FC = () => {
     try {
       const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN as string;
       const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID as string;
-      const response = await fetch(`https://${auth0Domain}/dbconnections/change_password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          client_id: auth0ClientId,
-          email: user.email,
-          connection: 'Username-Password-Authentication',
-        }),
-      });
+      const response = await fetch(
+        `https://${auth0Domain}/dbconnections/change_password`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            client_id: auth0ClientId,
+            email: user.email,
+            connection: 'Username-Password-Authentication',
+          }),
+        }
+      );
       setPwResetStatus(response.ok ? 'sent' : 'error');
     } catch {
       setPwResetStatus('error');
     } finally {
       setPwResetLoading(false);
+    }
+  };
+
+  const handleChangePassword = async (
+    currentPassword: string,
+    newPassword: string
+  ) => {
+    setPwChangeLoading(true);
+    setPwChangeError(null);
+    setPwChangeSuccess(false);
+    try {
+      await patch('/users/change-password', { currentPassword, newPassword });
+      setPwChangeSuccess(true);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to change password.';
+      setPwChangeError(message);
+    } finally {
+      setPwChangeLoading(false);
     }
   };
 
@@ -366,7 +447,9 @@ export const Settings: React.FC = () => {
       await del('/users/account');
       logout({ logoutParams: { returnTo: window.location.origin } });
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : 'Failed to delete account.');
+      setDeleteError(
+        err instanceof Error ? err.message : 'Failed to delete account.'
+      );
       setDeleteLoading(false);
     }
   };
@@ -375,8 +458,155 @@ export const Settings: React.FC = () => {
     logout({ logoutParams: { returnTo: window.location.origin } });
   };
 
+  const tabLabels: Record<SettingsTab, string> = useMemo(
+    () => ({
+      general: 'Profile',
+      workspace: 'Team Members',
+      branding: 'White Labeling',
+      developer: 'API & Integrations',
+      security: 'Security',
+    }),
+    []
+  );
+
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredTabs = useMemo(() => {
+    if (!searchQuery.trim()) return null;
+    const query = searchQuery.toLowerCase();
+    const results: { tab: SettingsTab; matches: string[] }[] = [];
+
+    const searchableContent: Record<SettingsTab, string[]> = {
+      general: [
+        'profile',
+        'name',
+        'email',
+        'colors',
+        'primary',
+        'secondary',
+        'preferences',
+        'avatar',
+      ],
+      workspace: [
+        'team',
+        'members',
+        'invite',
+        'role',
+        'admin',
+        'collaboration',
+        'workspace',
+      ],
+      branding: [
+        'brand',
+        'logo',
+        'colors',
+        'white label',
+        'domain',
+        'support email',
+        'organization',
+      ],
+      developer: ['api', 'key', 'webhook', 'integration', 'secret', 'endpoint'],
+      security: [
+        'password',
+        'security',
+        'logout',
+        'delete account',
+        'danger',
+        'session',
+      ],
+    };
+
+    Object.entries(searchableContent).forEach(([tab, keywords]) => {
+      const matches = keywords.filter(
+        (kw) => kw.includes(query) || query.includes(kw)
+      );
+      if (matches.length > 0) {
+        results.push({ tab: tab as SettingsTab, matches });
+      }
+    });
+
+    return results.length > 0 ? results : null;
+  }, [searchQuery]);
+
   return (
     <MainLayout>
+      <div className="max-w-[1440px] mx-auto">
+        <div className="flex items-center gap-2 text-sm text-base-content/60 mb-6 px-1">
+          <Link
+            to="/dashboard"
+            className="flex items-center gap-1 hover:text-primary transition-colors"
+          >
+            <Home size={14} />
+            <span>Dashboard</span>
+          </Link>
+          <ChevronRight size={14} className="text-base-content/30" />
+          <span className="text-base-content font-medium">Settings</span>
+          <ChevronRight size={14} className="text-base-content/30" />
+          <span className="text-primary font-medium">
+            {tabLabels[activeTab]}
+          </span>
+        </div>
+
+        <div className="relative mb-6">
+          <div className="relative">
+            <Search
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40"
+            />
+            <input
+              type="text"
+              placeholder="Search settings..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="input input-bordered w-full h-12 pl-12 pr-10 rounded-lg bg-base-100 border-base-200 focus:border-primary focus:ring-1 focus:ring-primary/20"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/40 hover:text-base-content transition-colors"
+                title="Clear search"
+                aria-label="Clear search"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+
+          {filteredTabs && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="absolute top-full left-0 right-0 mt-2 bg-base-100 border border-base-200 rounded-lg shadow-lg z-50 overflow-hidden"
+            >
+              {filteredTabs.map((result, idx) => (
+                <button
+                  key={result.tab}
+                  onClick={() => {
+                    setActiveTab(result.tab);
+                    setSearchQuery('');
+                  }}
+                  className={`w-full px-4 py-3 flex items-center justify-between hover:bg-base-200/50 transition-colors ${
+                    idx !== filteredTabs.length - 1
+                      ? 'border-b border-base-200'
+                      : ''
+                  }`}
+                >
+                  <div className="text-left">
+                    <p className="font-bold text-base-content">
+                      {tabLabels[result.tab]}
+                    </p>
+                    <p className="text-xs text-base-content/50">
+                      Matches: {result.matches.slice(0, 3).join(', ')}
+                    </p>
+                  </div>
+                  <ChevronRight size={16} className="text-base-content/30" />
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </div>
+      </div>
+
       <div className="flex flex-col lg:flex-row gap-12 max-w-[1440px] mx-auto min-h-[calc(100vh-140px)]">
         {/* Navigation Sidebar */}
         <div className="w-full lg:w-72 shrink-0">
@@ -501,6 +731,10 @@ export const Settings: React.FC = () => {
                   deleteError={deleteError}
                   handleDeleteAccount={handleDeleteAccount}
                   setDeleteError={setDeleteError}
+                  pwChangeLoading={pwChangeLoading}
+                  pwChangeError={pwChangeError}
+                  pwChangeSuccess={pwChangeSuccess}
+                  handleChangePassword={handleChangePassword}
                 />
               )}
             </motion.div>

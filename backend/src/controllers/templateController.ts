@@ -1,12 +1,29 @@
 import { Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import { getTemplateById } from '../services/templateService';
-import { Template, type ITemplateField, type TemplateMode } from '../models/Template';
+import {
+  Template,
+  type ITemplateField,
+  type TemplateMode,
+} from '../models/Template';
 import { AuthenticatedRequest } from '../types';
 import {
   canManageWorkspaceResource,
   getWorkspaceMemberIds,
 } from '../services/workspaceService';
+
+export const getPublicTemplateCount = async (
+  _req: unknown,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const count = await Template.countDocuments({ isPublic: true });
+    res.json({ success: true, data: { count } });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const listTemplates = async (
   req: AuthenticatedRequest,
@@ -42,11 +59,16 @@ export const getTemplate = async (
     const workspaceUserIds = await getWorkspaceMemberIds(req.user!);
     const canAccess =
       template.isPublic ||
-      workspaceUserIds.some((memberId) => memberId.toString() === template.createdBy.toString());
+      workspaceUserIds.some(
+        (memberId) => memberId.toString() === template.createdBy.toString()
+      );
     if (!canAccess) {
       res.status(403).json({
         success: false,
-        error: { code: 'FORBIDDEN', message: 'You do not have access to this template.' },
+        error: {
+          code: 'FORBIDDEN',
+          message: 'You do not have access to this template.',
+        },
       });
       return;
     }
@@ -57,7 +79,11 @@ export const getTemplate = async (
 };
 
 const VALID_CATEGORIES = ['academic', 'corporate', 'event', 'general'];
-const VALID_PRESET_TEMPLATES = ['certificate-modern', 'certificate-classic', 'certificate-base'];
+const VALID_PRESET_TEMPLATES = [
+  'certificate-modern',
+  'certificate-classic',
+  'certificate-base',
+];
 const TEMPLATE_MODE_BACKGROUND = 'background';
 const TEMPLATE_MODE_PRESET = 'preset';
 const VALID_TEMPLATE_FIELD_NAMES = [
@@ -72,7 +98,10 @@ const VALID_TEMPLATE_FIELD_NAMES = [
   'certificateId',
 ] as const;
 
-const FIELD_TYPE_BY_NAME: Record<(typeof VALID_TEMPLATE_FIELD_NAMES)[number], ITemplateField['type']> = {
+const FIELD_TYPE_BY_NAME: Record<
+  (typeof VALID_TEMPLATE_FIELD_NAMES)[number],
+  ITemplateField['type']
+> = {
   recipientName: 'text',
   certificateTitle: 'text',
   description: 'text',
@@ -84,7 +113,12 @@ const FIELD_TYPE_BY_NAME: Record<(typeof VALID_TEMPLATE_FIELD_NAMES)[number], IT
   certificateId: 'text',
 };
 
-const REQUIRED_FIELD_NAMES = new Set(['recipientName', 'certificateTitle', 'issueDate', 'issuerName']);
+const REQUIRED_FIELD_NAMES = new Set([
+  'recipientName',
+  'certificateTitle',
+  'issueDate',
+  'issuerName',
+]);
 
 type TemplatePayload = {
   name?: string;
@@ -105,15 +139,21 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
 const sanitizeString = (value: unknown): string | undefined =>
-  typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
+  typeof value === 'string' && value.trim().length > 0
+    ? value.trim()
+    : undefined;
 
 const sanitizeHexColor = (value: unknown, fallback: string): string => {
   const candidate = sanitizeString(value);
-  return candidate && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(candidate) ? candidate : fallback;
+  return candidate && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(candidate)
+    ? candidate
+    : fallback;
 };
 
 const sanitizeTemplateMode = (value: unknown): TemplateMode =>
-  value === TEMPLATE_MODE_BACKGROUND ? TEMPLATE_MODE_BACKGROUND : TEMPLATE_MODE_PRESET;
+  value === TEMPLATE_MODE_BACKGROUND
+    ? TEMPLATE_MODE_BACKGROUND
+    : TEMPLATE_MODE_PRESET;
 
 const sanitizeTemplateFields = (fields: unknown): ITemplateField[] => {
   if (!Array.isArray(fields)) {
@@ -128,7 +168,12 @@ const sanitizeTemplateFields = (fields: unknown): ITemplateField[] => {
     }
 
     const rawName = sanitizeString(field.name);
-    if (!rawName || !VALID_TEMPLATE_FIELD_NAMES.includes(rawName as (typeof VALID_TEMPLATE_FIELD_NAMES)[number])) {
+    if (
+      !rawName ||
+      !VALID_TEMPLATE_FIELD_NAMES.includes(
+        rawName as (typeof VALID_TEMPLATE_FIELD_NAMES)[number]
+      )
+    ) {
       throw new Error(`Field ${index + 1} uses an unsupported source key.`);
     }
 
@@ -137,7 +182,8 @@ const sanitizeTemplateFields = (fields: unknown): ITemplateField[] => {
     }
     usedNames.add(rawName);
 
-    const resolvedType = FIELD_TYPE_BY_NAME[rawName as keyof typeof FIELD_TYPE_BY_NAME];
+    const resolvedType =
+      FIELD_TYPE_BY_NAME[rawName as keyof typeof FIELD_TYPE_BY_NAME];
     const position = isRecord(field.position) ? field.position : {};
     const size = isRecord(field.size) ? field.size : {};
     const style = isRecord(field.style) ? field.style : {};
@@ -154,7 +200,11 @@ const sanitizeTemplateFields = (fields: unknown): ITemplateField[] => {
         y: clamp(Number(position.y) || 50, 0, 100),
       },
       size: {
-        width: clamp(Number(size.width) || (resolvedType === 'image' ? 18 : 32), 8, 100),
+        width: clamp(
+          Number(size.width) || (resolvedType === 'image' ? 18 : 32),
+          8,
+          100
+        ),
         height:
           resolvedType === 'image' && Number(size.height)
             ? clamp(Number(size.height), 5, 60)
@@ -166,14 +216,18 @@ const sanitizeTemplateFields = (fields: unknown): ITemplateField[] => {
           : {
               fontSize: clamp(Number(style.fontSize) || 24, 10, 96),
               fontWeight: clamp(Number(style.fontWeight) || 600, 300, 900),
-              fontFamily: sanitizeString(style.fontFamily) || 'Arial, sans-serif',
+              fontFamily:
+                sanitizeString(style.fontFamily) || 'Arial, sans-serif',
               color: sanitizeHexColor(style.color, '#111827'),
               textAlign:
-                style.textAlign === 'left' || style.textAlign === 'right' ? style.textAlign : 'center',
+                style.textAlign === 'left' || style.textAlign === 'right'
+                  ? style.textAlign
+                  : 'center',
               lineHeight: clamp(Number(style.lineHeight) || 1.2, 0.8, 2.5),
               letterSpacing: clamp(Number(style.letterSpacing) || 0, -2, 20),
               fontStyle: style.fontStyle === 'italic' ? 'italic' : 'normal',
-              textTransform: style.textTransform === 'uppercase' ? 'uppercase' : 'none',
+              textTransform:
+                style.textTransform === 'uppercase' ? 'uppercase' : 'none',
             },
     });
 
@@ -181,7 +235,10 @@ const sanitizeTemplateFields = (fields: unknown): ITemplateField[] => {
   }, []);
 };
 
-const buildPresetStyles = (primaryColor: string, secondaryColor: string): string =>
+const buildPresetStyles = (
+  primaryColor: string,
+  secondaryColor: string
+): string =>
   `--primary-color: ${primaryColor}; --secondary-color: ${secondaryColor};`;
 
 const buildTemplateThumbnail = (
@@ -222,7 +279,8 @@ export const createTemplate = async (
   try {
     const payload = req.body as TemplatePayload;
     const name = sanitizeString(payload.name);
-    const description = typeof payload.description === 'string' ? payload.description.trim() : '';
+    const description =
+      typeof payload.description === 'string' ? payload.description.trim() : '';
     const category = sanitizeString(payload.category);
     const mode = sanitizeTemplateMode(payload.mode);
     const primaryColor = sanitizeHexColor(payload.primaryColor, '#3B82F6');
@@ -231,7 +289,10 @@ export const createTemplate = async (
     if (!name || !category) {
       res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'name and category are required.' },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'name and category are required.',
+        },
       });
       return;
     }
@@ -239,7 +300,10 @@ export const createTemplate = async (
     if (!VALID_CATEGORIES.includes(category)) {
       res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: `Invalid category. Use: ${VALID_CATEGORIES.join(', ')}` },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: `Invalid category. Use: ${VALID_CATEGORIES.join(', ')}`,
+        },
       });
       return;
     }
@@ -270,7 +334,10 @@ export const createTemplate = async (
           success: false,
           error: {
             code: 'VALIDATION_ERROR',
-            message: error instanceof Error ? error.message : 'Invalid template fields.',
+            message:
+              error instanceof Error
+                ? error.message
+                : 'Invalid template fields.',
           },
         });
         return;
@@ -281,7 +348,8 @@ export const createTemplate = async (
           success: false,
           error: {
             code: 'VALIDATION_ERROR',
-            message: 'At least one visible field is required for a background template.',
+            message:
+              'At least one visible field is required for a background template.',
           },
         });
         return;
@@ -333,7 +401,10 @@ export const updateTemplate = async (
     if (!template) {
       res.status(404).json({
         success: false,
-        error: { code: 'NOT_FOUND', message: 'Template not found or cannot be modified.' },
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Template not found or cannot be modified.',
+        },
       });
       return;
     }
@@ -341,16 +412,25 @@ export const updateTemplate = async (
     if (template.isPublic) {
       res.status(400).json({
         success: false,
-        error: { code: 'FORBIDDEN', message: 'Public templates cannot be modified.' },
+        error: {
+          code: 'FORBIDDEN',
+          message: 'Public templates cannot be modified.',
+        },
       });
       return;
     }
 
-    const canManage = await canManageWorkspaceResource(req.user!, template.createdBy);
+    const canManage = await canManageWorkspaceResource(
+      req.user!,
+      template.createdBy
+    );
     if (!canManage) {
       res.status(403).json({
         success: false,
-        error: { code: 'FORBIDDEN', message: 'You cannot modify this team template.' },
+        error: {
+          code: 'FORBIDDEN',
+          message: 'You cannot modify this team template.',
+        },
       });
       return;
     }
@@ -358,16 +438,24 @@ export const updateTemplate = async (
     const payload = req.body as TemplatePayload;
     const nextName = sanitizeString(payload.name) || template.name;
     const nextDescription =
-      payload.description !== undefined ? String(payload.description).trim() : template.description;
+      payload.description !== undefined
+        ? String(payload.description).trim()
+        : template.description;
     const nextCategory = sanitizeString(payload.category) || template.category;
     const nextMode = sanitizeTemplateMode(payload.mode ?? template.mode);
     const nextPrimaryColor = sanitizeHexColor(payload.primaryColor, '#3B82F6');
-    const nextSecondaryColor = sanitizeHexColor(payload.secondaryColor, '#64748B');
+    const nextSecondaryColor = sanitizeHexColor(
+      payload.secondaryColor,
+      '#64748B'
+    );
 
     if (!VALID_CATEGORIES.includes(nextCategory)) {
       res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: `Invalid category. Use: ${VALID_CATEGORIES.join(', ')}` },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: `Invalid category. Use: ${VALID_CATEGORIES.join(', ')}`,
+        },
       });
       return;
     }
@@ -380,7 +468,8 @@ export const updateTemplate = async (
 
     if (nextMode === TEMPLATE_MODE_BACKGROUND) {
       nextBackgroundImageUrl =
-        sanitizeString(payload.backgroundImageUrl) || template.backgroundImageUrl;
+        sanitizeString(payload.backgroundImageUrl) ||
+        template.backgroundImageUrl;
 
       if (!nextBackgroundImageUrl) {
         res.status(400).json({
@@ -401,7 +490,10 @@ export const updateTemplate = async (
             success: false,
             error: {
               code: 'VALIDATION_ERROR',
-              message: error instanceof Error ? error.message : 'Invalid template fields.',
+              message:
+                error instanceof Error
+                  ? error.message
+                  : 'Invalid template fields.',
             },
           });
           return;
@@ -413,7 +505,8 @@ export const updateTemplate = async (
           success: false,
           error: {
             code: 'VALIDATION_ERROR',
-            message: 'At least one visible field is required for a background template.',
+            message:
+              'At least one visible field is required for a background template.',
           },
         });
         return;
@@ -423,7 +516,8 @@ export const updateTemplate = async (
       nextThumbnail = nextBackgroundImageUrl;
       nextStyles = '';
     } else {
-      const nextPresetTemplate = sanitizeString(payload.htmlContent) || template.htmlContent;
+      const nextPresetTemplate =
+        sanitizeString(payload.htmlContent) || template.htmlContent;
       if (!VALID_PRESET_TEMPLATES.includes(nextPresetTemplate)) {
         res.status(400).json({
           success: false,
@@ -436,7 +530,11 @@ export const updateTemplate = async (
       }
 
       nextHtmlContent = nextPresetTemplate;
-      nextThumbnail = buildTemplateThumbnail(nextName, nextPrimaryColor, nextSecondaryColor);
+      nextThumbnail = buildTemplateThumbnail(
+        nextName,
+        nextPrimaryColor,
+        nextSecondaryColor
+      );
       nextStyles = buildPresetStyles(nextPrimaryColor, nextSecondaryColor);
       nextBackgroundImageUrl = undefined;
       nextFields = [];
@@ -470,7 +568,10 @@ export const deleteTemplate = async (
     if (!template) {
       res.status(404).json({
         success: false,
-        error: { code: 'NOT_FOUND', message: 'Template not found or cannot be deleted.' },
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Template not found or cannot be deleted.',
+        },
       });
       return;
     }
@@ -478,23 +579,35 @@ export const deleteTemplate = async (
     if (template.isPublic) {
       res.status(400).json({
         success: false,
-        error: { code: 'FORBIDDEN', message: 'Public templates cannot be deleted.' },
+        error: {
+          code: 'FORBIDDEN',
+          message: 'Public templates cannot be deleted.',
+        },
       });
       return;
     }
 
-    const canManage = await canManageWorkspaceResource(req.user!, template.createdBy);
+    const canManage = await canManageWorkspaceResource(
+      req.user!,
+      template.createdBy
+    );
     if (!canManage) {
       res.status(403).json({
         success: false,
-        error: { code: 'FORBIDDEN', message: 'You cannot delete this team template.' },
+        error: {
+          code: 'FORBIDDEN',
+          message: 'You cannot delete this team template.',
+        },
       });
       return;
     }
 
     await template.deleteOne();
 
-    res.json({ success: true, data: { message: 'Template deleted successfully.' } });
+    res.json({
+      success: true,
+      data: { message: 'Template deleted successfully.' },
+    });
   } catch (error) {
     next(error);
   }

@@ -131,7 +131,8 @@ export const runNativeIntegrationChecks = async (
     {
       label: 'Webhook-only flow',
       status: 'configured',
-      detail: 'This provider uses the webhook contract only and does not require native connector credentials.',
+      detail:
+        'This provider uses the webhook contract only and does not require native connector credentials.',
     },
   ];
 };
@@ -145,14 +146,19 @@ export const syncQueuedGoogleSheetsBatch = async (
     ...integration.settings.googleSheets,
     spreadsheetId: context.spreadsheetId,
     sheetName: context.sheetName,
-    statusColumn: context.statusColumn || integration.settings.googleSheets?.statusColumn,
+    statusColumn:
+      context.statusColumn || integration.settings.googleSheets?.statusColumn,
     certificateIdColumn:
-      context.certificateIdColumn || integration.settings.googleSheets?.certificateIdColumn,
-    pdfUrlColumn: context.pdfUrlColumn || integration.settings.googleSheets?.pdfUrlColumn,
+      context.certificateIdColumn ||
+      integration.settings.googleSheets?.certificateIdColumn,
+    pdfUrlColumn:
+      context.pdfUrlColumn || integration.settings.googleSheets?.pdfUrlColumn,
     batchJobIdColumn:
-      context.batchJobIdColumn || integration.settings.googleSheets?.batchJobIdColumn,
+      context.batchJobIdColumn ||
+      integration.settings.googleSheets?.batchJobIdColumn,
     processedAtColumn:
-      context.processedAtColumn || integration.settings.googleSheets?.processedAtColumn,
+      context.processedAtColumn ||
+      integration.settings.googleSheets?.processedAtColumn,
     enabled: true,
   });
 
@@ -186,7 +192,7 @@ const buildGoogleSheetsResultRows = (
 
     return {
       rowNumber: row.rowNumber,
-      status: result.status === 'success' ? 'Issued' : 'Failed',
+      status: result.status === 'success' ? 'Created' : 'Failed',
       certificateId: result.publicCertificateId,
       pdfUrl: result.pdfUrl,
       processedAt: buildProcessedAt(),
@@ -196,7 +202,10 @@ const buildGoogleSheetsResultRows = (
 export const syncBatchJobNativeResults = async (
   job: IBatchJobDocument
 ): Promise<void> => {
-  if (job.integrationContext?.provider !== 'google_sheets' || !job.integrationContext.googleSheets) {
+  if (
+    job.integrationContext?.provider !== 'google_sheets' ||
+    !job.integrationContext.googleSheets
+  ) {
     return;
   }
 
@@ -205,7 +214,8 @@ export const syncBatchJobNativeResults = async (
     spreadsheetId: job.integrationContext.googleSheets.spreadsheetId,
     sheetName: job.integrationContext.googleSheets.sheetName,
     statusColumn: job.integrationContext.googleSheets.statusColumn,
-    certificateIdColumn: job.integrationContext.googleSheets.certificateIdColumn,
+    certificateIdColumn:
+      job.integrationContext.googleSheets.certificateIdColumn,
     pdfUrlColumn: job.integrationContext.googleSheets.pdfUrlColumn,
     batchJobIdColumn: job.integrationContext.googleSheets.batchJobIdColumn,
     processedAtColumn: job.integrationContext.googleSheets.processedAtColumn,
@@ -217,7 +227,10 @@ export const syncBatchJobNativeResults = async (
 
   await syncGoogleSheetsRows(
     buildGoogleSheetsContext(baseConfig),
-    buildGoogleSheetsResultRows(job.integrationContext.googleSheets, job.results)
+    buildGoogleSheetsResultRows(
+      job.integrationContext.googleSheets,
+      job.results
+    )
   );
 };
 
@@ -242,8 +255,10 @@ export const syncSingleIntegrationNativeResult = async ({
     const baseConfig = resolveGoogleSheetsConfig({
       ...integration.settings.googleSheets,
       spreadsheetId:
-        googleSheets.spreadsheetId || integration.settings.googleSheets?.spreadsheetId,
-      sheetName: googleSheets.sheetName || integration.settings.googleSheets?.sheetName,
+        googleSheets.spreadsheetId ||
+        integration.settings.googleSheets?.spreadsheetId,
+      sheetName:
+        googleSheets.sheetName || integration.settings.googleSheets?.sheetName,
       enabled: true,
     });
 
@@ -251,7 +266,7 @@ export const syncSingleIntegrationNativeResult = async ({
       await syncGoogleSheetsRows(baseConfig, [
         {
           rowNumber: googleSheets.rowNumber,
-          status: 'Issued',
+          status: 'Created',
           certificateId: publicCertificateId,
           pdfUrl,
           processedAt: buildProcessedAt(),
@@ -264,7 +279,8 @@ export const syncSingleIntegrationNativeResult = async ({
     const baseConfig = resolveCanvasConfig({
       ...integration.settings.canvas,
       courseId: canvas?.courseId || integration.settings.canvas?.courseId,
-      assignmentId: canvas?.assignmentId || integration.settings.canvas?.assignmentId,
+      assignmentId:
+        canvas?.assignmentId || integration.settings.canvas?.assignmentId,
       enabled: true,
     });
 

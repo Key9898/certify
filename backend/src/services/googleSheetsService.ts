@@ -61,7 +61,9 @@ export const normalizeGooglePrivateKey = (value: string): string =>
 
 const getGoogleServiceAccountCredentials = () => {
   const clientEmail = getEnvValue(process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL);
-  const privateKey = getEnvValue(process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY);
+  const privateKey = getEnvValue(
+    process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
+  );
 
   if (!clientEmail || !privateKey) {
     return null;
@@ -101,7 +103,10 @@ export const createGoogleServiceAccountAssertion = (
   const encodedHeader = base64UrlEncode(JSON.stringify(header));
   const encodedPayload = base64UrlEncode(JSON.stringify(payload));
   const signingInput = `${encodedHeader}.${encodedPayload}`;
-  const signature = crypto.createSign('RSA-SHA256').update(signingInput).sign(privateKey);
+  const signature = crypto
+    .createSign('RSA-SHA256')
+    .update(signingInput)
+    .sign(privateKey);
 
   return `${signingInput}.${base64UrlEncode(signature)}`;
 };
@@ -111,9 +116,9 @@ export const isGoogleSheetsNativeSyncReady = (
 ): settings is GoogleSheetsResolvedConfig =>
   Boolean(
     settings?.enabled &&
-      getEnvValue(settings.spreadsheetId) &&
-      getEnvValue(settings.sheetName) &&
-      getGoogleServiceAccountCredentials()
+    getEnvValue(settings.spreadsheetId) &&
+    getEnvValue(settings.sheetName) &&
+    getGoogleServiceAccountCredentials()
   );
 
 export const resolveGoogleSheetsConfig = (
@@ -211,7 +216,9 @@ export const getGoogleAccessToken = async (
 
   if (!response.ok || !result.access_token) {
     throw new Error(
-      result.error_description || result.error || 'Failed to obtain a Google access token.'
+      result.error_description ||
+        result.error ||
+        'Failed to obtain a Google access token.'
     );
   }
 
@@ -257,7 +264,9 @@ const resolveColumnLetter = (
   const resolved = headerMap[normalized];
 
   if (!resolved) {
-    throw new Error(`Google Sheets column "${columnName}" for ${label} was not found.`);
+    throw new Error(
+      `Google Sheets column "${columnName}" for ${label} was not found.`
+    );
   }
 
   return resolved;
@@ -269,13 +278,21 @@ export const buildGoogleBatchUpdateData = (
   rowUpdates: GoogleSheetsRowUpdate[]
 ): Array<{ range: string; values: string[][] }> => {
   const headerMap = mapHeaderColumns(headers);
-  const statusColumn = resolveColumnLetter(headerMap, config.statusColumn, 'status');
+  const statusColumn = resolveColumnLetter(
+    headerMap,
+    config.statusColumn,
+    'status'
+  );
   const certificateIdColumn = resolveColumnLetter(
     headerMap,
     config.certificateIdColumn,
     'certificate ID'
   );
-  const pdfUrlColumn = resolveColumnLetter(headerMap, config.pdfUrlColumn, 'PDF URL');
+  const pdfUrlColumn = resolveColumnLetter(
+    headerMap,
+    config.pdfUrlColumn,
+    'PDF URL'
+  );
   const batchJobIdColumn = resolveColumnLetter(
     headerMap,
     config.batchJobIdColumn,
@@ -292,7 +309,11 @@ export const buildGoogleBatchUpdateData = (
   rowUpdates.forEach((rowUpdate) => {
     if (statusColumn && rowUpdate.status !== undefined) {
       updates.push({
-        range: buildGoogleSheetRange(config.sheetName, statusColumn, rowUpdate.rowNumber),
+        range: buildGoogleSheetRange(
+          config.sheetName,
+          statusColumn,
+          rowUpdate.rowNumber
+        ),
         values: [[rowUpdate.status]],
       });
     }
@@ -310,14 +331,22 @@ export const buildGoogleBatchUpdateData = (
 
     if (pdfUrlColumn && rowUpdate.pdfUrl !== undefined) {
       updates.push({
-        range: buildGoogleSheetRange(config.sheetName, pdfUrlColumn, rowUpdate.rowNumber),
+        range: buildGoogleSheetRange(
+          config.sheetName,
+          pdfUrlColumn,
+          rowUpdate.rowNumber
+        ),
         values: [[rowUpdate.pdfUrl]],
       });
     }
 
     if (batchJobIdColumn && rowUpdate.batchJobId !== undefined) {
       updates.push({
-        range: buildGoogleSheetRange(config.sheetName, batchJobIdColumn, rowUpdate.rowNumber),
+        range: buildGoogleSheetRange(
+          config.sheetName,
+          batchJobIdColumn,
+          rowUpdate.rowNumber
+        ),
         values: [[rowUpdate.batchJobId]],
       });
     }
@@ -342,13 +371,19 @@ export const syncGoogleSheetsRows = async (
   rowUpdates: GoogleSheetsRowUpdate[],
   fetchImpl: typeof fetch = fetch
 ): Promise<{ updatedCells: number }> => {
-  const filteredUpdates = rowUpdates.filter((rowUpdate) => rowUpdate.rowNumber > 0);
+  const filteredUpdates = rowUpdates.filter(
+    (rowUpdate) => rowUpdate.rowNumber > 0
+  );
   if (filteredUpdates.length === 0) {
     return { updatedCells: 0 };
   }
 
   const sheetHeaders = await fetchGoogleSheetHeaders(config, fetchImpl);
-  const data = buildGoogleBatchUpdateData(config, sheetHeaders, filteredUpdates);
+  const data = buildGoogleBatchUpdateData(
+    config,
+    sheetHeaders,
+    filteredUpdates
+  );
 
   if (data.length === 0) {
     return { updatedCells: 0 };
@@ -383,7 +418,11 @@ export const syncGoogleSheetsRows = async (
 export const testGoogleSheetsConnection = async (
   config: GoogleSheetsResolvedConfig,
   fetchImpl: typeof fetch = fetch
-): Promise<{ sheetName: string; headerCount: number; sampleHeaders: string[] }> => {
+): Promise<{
+  sheetName: string;
+  headerCount: number;
+  sampleHeaders: string[];
+}> => {
   const headers = await fetchGoogleSheetHeaders(config, fetchImpl);
 
   return {

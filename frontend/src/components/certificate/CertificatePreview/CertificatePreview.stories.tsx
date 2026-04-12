@@ -28,7 +28,8 @@ export const WithDescription: Story = {
   args: {
     data: {
       ...baseData,
-      description: 'For successfully completing the React Development Bootcamp with distinction.',
+      description:
+        'For successfully completing the React Development Bootcamp with distinction.',
     },
   },
 };
@@ -68,4 +69,3 @@ export const GreenTheme: Story = {
     },
   },
 };
-

@@ -36,9 +36,15 @@ export const createSecureUpload = (options: {
       file: Express.Multer.File,
       cb: multer.FileFilterCallback
     ): void => {
-      const ext = file.originalname.toLowerCase().slice(file.originalname.lastIndexOf('.'));
+      const ext = file.originalname
+        .toLowerCase()
+        .slice(file.originalname.lastIndexOf('.'));
       if (!options.allowedExtensions.includes(ext)) {
-        cb(new Error(`Invalid file type. Allowed: ${options.allowedExtensions.join(', ')}`));
+        cb(
+          new Error(
+            `Invalid file type. Allowed: ${options.allowedExtensions.join(', ')}`
+          )
+        );
         return;
       }
       file.originalname = sanitizeFilename(file.originalname);

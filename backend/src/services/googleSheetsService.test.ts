@@ -13,16 +13,19 @@ const { privateKey } = crypto.generateKeyPairSync('rsa', {
   modulusLength: 2048,
 });
 
-const GOOGLE_PRIVATE_KEY = privateKey.export({
-  type: 'pkcs8',
-  format: 'pem',
-}).toString();
+const GOOGLE_PRIVATE_KEY = privateKey
+  .export({
+    type: 'pkcs8',
+    format: 'pem',
+  })
+  .toString();
 
 const withGoogleEnv = async (callback: () => Promise<void>) => {
   const previousEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const previousKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY;
 
-  process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL = 'certify-tests@project.iam.gserviceaccount.com';
+  process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL =
+    'certify-tests@project.iam.gserviceaccount.com';
   process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY = GOOGLE_PRIVATE_KEY;
 
   try {
@@ -44,7 +47,7 @@ describe('googleSheetsService', () => {
   it('builds batch cell updates from sheet headers and row updates', () => {
     const config: GoogleSheetsResolvedConfig = {
       spreadsheetId: 'sheet-id',
-      sheetName: 'Ready to Issue',
+      sheetName: 'Ready to Create',
       statusColumn: 'Certify Status',
       certificateIdColumn: 'Certify ID',
       pdfUrlColumn: 'Certificate PDF URL',
@@ -66,7 +69,7 @@ describe('googleSheetsService', () => {
       [
         {
           rowNumber: 4,
-          status: 'Issued',
+          status: 'Created',
           certificateId: 'CERT-001',
           pdfUrl: 'https://example.com/certificate.pdf',
           batchJobId: 'batch-123',
@@ -76,14 +79,14 @@ describe('googleSheetsService', () => {
     );
 
     assert.deepEqual(updates, [
-      { range: 'Ready to Issue!C4', values: [['Issued']] },
-      { range: 'Ready to Issue!D4', values: [['CERT-001']] },
+      { range: 'Ready to Create!C4', values: [['Created']] },
+      { range: 'Ready to Create!D4', values: [['CERT-001']] },
       {
-        range: 'Ready to Issue!E4',
+        range: 'Ready to Create!E4',
         values: [['https://example.com/certificate.pdf']],
       },
-      { range: 'Ready to Issue!F4', values: [['batch-123']] },
-      { range: 'Ready to Issue!G4', values: [['2026-04-05T10:00:00.000Z']] },
+      { range: 'Ready to Create!F4', values: [['batch-123']] },
+      { range: 'Ready to Create!G4', values: [['2026-04-05T10:00:00.000Z']] },
     ]);
   });
 
@@ -97,7 +100,7 @@ describe('googleSheetsService', () => {
     assert.equal(assertion.split('.').length, 3);
   });
 
-  it('syncs queued and issued values through the Google Sheets batch update endpoint', async () => {
+  it('syncs queued and created values through the Google Sheets batch update endpoint', async () => {
     await withGoogleEnv(async () => {
       const requests: Array<{ url: string; init?: RequestInit }> = [];
       const mockFetch: typeof fetch = async (input, init) => {
@@ -111,39 +114,43 @@ describe('googleSheetsService', () => {
           );
         }
 
-        if (url.includes('/values/Ready%20to%20Issue!1%3A1')) {
+        if (url.includes('/values/Ready%20to%20Create!1%3A1')) {
           return new Response(
             JSON.stringify({
-              values: [[
-                'Recipient Name',
-                'Certify Status',
-                'Certify ID',
-                'Certificate PDF URL',
-                'Certify Batch ID',
-                'Processed At',
-              ]],
+              values: [
+                [
+                  'Recipient Name',
+                  'Certify Status',
+                  'Certify ID',
+                  'Certificate PDF URL',
+                  'Certify Job ID',
+                  'Processed At',
+                ],
+              ],
             }),
             { status: 200 }
           );
         }
 
-        return new Response(JSON.stringify({ totalUpdatedCells: 5 }), { status: 200 });
+        return new Response(JSON.stringify({ totalUpdatedCells: 5 }), {
+          status: 200,
+        });
       };
 
       const result = await syncGoogleSheetsRows(
         {
           spreadsheetId: 'spreadsheet-id',
-          sheetName: 'Ready to Issue',
+          sheetName: 'Ready to Create',
           statusColumn: 'Certify Status',
           certificateIdColumn: 'Certify ID',
           pdfUrlColumn: 'Certificate PDF URL',
-          batchJobIdColumn: 'Certify Batch ID',
+          batchJobIdColumn: 'Certify Job ID',
           processedAtColumn: 'Processed At',
         },
         [
           {
             rowNumber: 5,
-            status: 'Issued',
+            status: 'Created',
             certificateId: 'CERT-5',
             pdfUrl: 'https://example.com/5.pdf',
             batchJobId: 'batch-5',

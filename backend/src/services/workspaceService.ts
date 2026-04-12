@@ -1,7 +1,14 @@
 import mongoose from 'mongoose';
-import { Organization, type IOrganizationDocument } from '../models/Organization';
+import {
+  Organization,
+  type IOrganizationDocument,
+} from '../models/Organization';
 import { TeamInvitation } from '../models/TeamInvitation';
-import { User, type IUserDocument, type OrganizationRole } from '../models/User';
+import {
+  User,
+  type IUserDocument,
+  type OrganizationRole,
+} from '../models/User';
 
 const DEFAULT_PRIMARY_COLOR = '#3B82F6';
 const DEFAULT_SECONDARY_COLOR = '#64748B';
@@ -32,22 +39,41 @@ export const createWorkspaceForUser = async (
   user: IUserDocument,
   name?: string
 ): Promise<IUserDocument> => {
-  const organization = await Organization.create({
-    name: name?.trim() || `${user.name}'s Workspace`,
-    slug: await createUniqueSlug(name?.trim() || `${user.name}'s Workspace`),
-    owner: user._id,
-    whiteLabel: {
-      brandName: name?.trim() || user.name,
-      primaryColor: user.settings.defaultColors.primary || DEFAULT_PRIMARY_COLOR,
-      secondaryColor: user.settings.defaultColors.secondary || DEFAULT_SECONDARY_COLOR,
-      hidePoweredBy: false,
-    },
-  });
+  const workspaceName = name?.trim() || `${user.name}'s Workspace`;
+  let retries = 0;
+  const maxRetries = 5;
 
-  user.organizationId = organization._id as mongoose.Types.ObjectId;
-  user.organizationRole = 'owner';
-  await user.save();
-  return user;
+  while (retries < maxRetries) {
+    try {
+      const organization = await Organization.create({
+        name: workspaceName,
+        slug: await createUniqueSlug(workspaceName),
+        owner: user._id,
+        whiteLabel: {
+          brandName: name?.trim() || user.name,
+          primaryColor:
+            user.settings.defaultColors.primary || DEFAULT_PRIMARY_COLOR,
+          secondaryColor:
+            user.settings.defaultColors.secondary || DEFAULT_SECONDARY_COLOR,
+          hidePoweredBy: false,
+        },
+      });
+
+      user.organizationId = organization._id as mongoose.Types.ObjectId;
+      user.organizationRole = 'owner';
+      await user.save();
+      return user;
+    } catch (error: unknown) {
+      const mongoError = error as { code?: number };
+      if (mongoError.code === 11000) {
+        retries++;
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw new Error('Failed to create workspace after maximum retries');
 };
 
 const assignInvitationToUser = async (
@@ -82,7 +108,9 @@ const assignInvitationToUser = async (
   return user;
 };
 
-export const ensureUserWorkspace = async (user: IUserDocument): Promise<IUserDocument> => {
+export const ensureUserWorkspace = async (
+  user: IUserDocument
+): Promise<IUserDocument> => {
   if (user.organizationId) {
     return user;
   }
@@ -105,8 +133,12 @@ export const getWorkspaceMemberIds = async (
     return [new mongoose.Types.ObjectId(user._id.toString())];
   }
 
-  const members = await User.find({ organizationId: user.organizationId }).select('_id').lean();
-  return members.map((member) => new mongoose.Types.ObjectId(member._id.toString()));
+  const members = await User.find({ organizationId: user.organizationId })
+    .select('_id')
+    .lean();
+  return members.map(
+    (member) => new mongoose.Types.ObjectId(member._id.toString())
+  );
 };
 
 export const getWorkspaceMemberIdsForUserId = async (
@@ -153,8 +185,10 @@ const serializeOrganization = (organization: IOrganizationDocument | null) => {
     whiteLabel: {
       brandName: organization.whiteLabel.brandName,
       logoUrl: organization.whiteLabel.logoUrl,
-      primaryColor: organization.whiteLabel.primaryColor || DEFAULT_PRIMARY_COLOR,
-      secondaryColor: organization.whiteLabel.secondaryColor || DEFAULT_SECONDARY_COLOR,
+      primaryColor:
+        organization.whiteLabel.primaryColor || DEFAULT_PRIMARY_COLOR,
+      secondaryColor:
+        organization.whiteLabel.secondaryColor || DEFAULT_SECONDARY_COLOR,
       supportEmail: organization.whiteLabel.supportEmail,
       customDomain: organization.whiteLabel.customDomain,
       hidePoweredBy: organization.whiteLabel.hidePoweredBy ?? false,
@@ -165,7 +199,8 @@ const serializeOrganization = (organization: IOrganizationDocument | null) => {
 };
 
 export const buildAppUser = async (userOrId: IUserDocument | string) => {
-  const userId = typeof userOrId === 'string' ? userOrId : userOrId._id.toString();
+  const userId =
+    typeof userOrId === 'string' ? userOrId : userOrId._id.toString();
 
   const user = await User.findById(userId).populate('organizationId');
   if (!user) {
@@ -173,7 +208,9 @@ export const buildAppUser = async (userOrId: IUserDocument | string) => {
   }
 
   const organization =
-    user.organizationId && typeof user.organizationId === 'object' && 'name' in user.organizationId
+    user.organizationId &&
+    typeof user.organizationId === 'object' &&
+    'name' in user.organizationId
       ? (user.organizationId as unknown as IOrganizationDocument)
       : null;
 
@@ -181,8 +218,11 @@ export const buildAppUser = async (userOrId: IUserDocument | string) => {
 
   return {
     ...plainUser,
-    organizationId: organization?._id?.toString() || plainUser.organizationId?.toString(),
-    organizationRole: plainUser.organizationRole as OrganizationRole | undefined,
+    organizationId:
+      organization?._id?.toString() || plainUser.organizationId?.toString(),
+    organizationRole: plainUser.organizationRole as
+      | OrganizationRole
+      | undefined,
     organization: serializeOrganization(organization),
   };
 };
@@ -192,7 +232,9 @@ export const getWorkspaceMembers = async (user: IUserDocument) => {
     return [user];
   }
 
-  return User.find({ organizationId: user.organizationId }).sort({ createdAt: 1 });
+  return User.find({ organizationId: user.organizationId }).sort({
+    createdAt: 1,
+  });
 };
 
 export const normalizeWorkspaceEmail = normalizeEmail;

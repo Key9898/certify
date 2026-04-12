@@ -42,20 +42,27 @@ const SetupRequired: React.FC<{ onTryDemo: () => void }> = ({ onTryDemo }) => (
       className="card max-w-lg w-full rounded border border-base-200 bg-base-100 p-8 text-center shadow-xl"
     >
       <div className="mb-4 text-5xl">Key</div>
-      <h1 className="mb-2 text-2xl font-bold text-base-content">Auth0 Setup Required</h1>
+      <h1 className="mb-2 text-2xl font-bold text-base-content">
+        Auth0 Setup Required
+      </h1>
       <p className="mb-6 text-sm leading-relaxed text-base-content/60">
         To run Certify, you need to configure your Auth0 credentials in{' '}
-        <code className="rounded bg-base-200 px-1.5 py-0.5 text-xs">frontend/.env.local</code>
+        <code className="rounded bg-base-200 px-1.5 py-0.5 text-xs">
+          frontend/.env.local
+        </code>
       </p>
       <div className="mb-6 space-y-1 rounded bg-base-200 p-4 text-left font-mono text-xs">
         <p className="text-success">
-          VITE_AUTH0_DOMAIN=<span className="text-warning">your-tenant.auth0.com</span>
+          VITE_AUTH0_DOMAIN=
+          <span className="text-warning">your-tenant.auth0.com</span>
         </p>
         <p className="text-success">
-          VITE_AUTH0_CLIENT_ID=<span className="text-warning">your-client-id</span>
+          VITE_AUTH0_CLIENT_ID=
+          <span className="text-warning">your-client-id</span>
         </p>
         <p className="text-success">
-          VITE_AUTH0_AUDIENCE=<span className="text-warning">https://certify-api</span>
+          VITE_AUTH0_AUDIENCE=
+          <span className="text-warning">https://certify-api</span>
         </p>
       </div>
       <div className="mb-8 space-y-1 text-xs text-base-content/40">
@@ -64,15 +71,18 @@ const SetupRequired: React.FC<{ onTryDemo: () => void }> = ({ onTryDemo }) => (
         </p>
         <p>
           2. Set Callback/Logout URL to{' '}
-          <code className="rounded bg-base-200 px-1">http://localhost:5174</code>
+          <code className="rounded bg-base-200 px-1">
+            http://localhost:5174
+          </code>
         </p>
         <p>
           3. Create an API with identifier{' '}
           <code className="rounded bg-base-200 px-1">https://certify-api</code>
         </p>
         <p>
-          4. Fill in <code className="rounded bg-base-200 px-1">.env.local</code> and restart
-          the dev server
+          4. Fill in{' '}
+          <code className="rounded bg-base-200 px-1">.env.local</code> and
+          restart the dev server
         </p>
       </div>
       <div className="divider text-xs text-base-content/30">OR</div>
@@ -84,7 +94,9 @@ const SetupRequired: React.FC<{ onTryDemo: () => void }> = ({ onTryDemo }) => (
       >
         Try Demo - No Setup Required
       </motion.button>
-      <p className="mt-2 text-xs text-base-content/40">Explore the full UI with sample data</p>
+      <p className="mt-2 text-xs text-base-content/40">
+        Explore the full UI with sample data
+      </p>
     </motion.div>
   </div>
 );
@@ -120,7 +132,9 @@ const Root: React.FC = () => {
         : window.location.pathname && window.location.pathname !== '/'
           ? window.location.pathname
           : ROUTES.DASHBOARD;
-    const resolvedTarget = target.startsWith('http') ? target : `${window.location.origin}${target}`;
+    const resolvedTarget = target.startsWith('http')
+      ? target
+      : `${window.location.origin}${target}`;
 
     window.location.replace(resolvedTarget);
   };
@@ -148,6 +162,7 @@ const Root: React.FC = () => {
       cacheLocation="localstorage"
       authorizationParams={{
         redirect_uri: window.location.origin,
+        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
       }}
     >
       <App />
@@ -158,9 +173,12 @@ const Root: React.FC = () => {
 const AppCrashFallback = (
   <div className="flex min-h-screen items-center justify-center bg-base-100 p-6 text-center">
     <div className="max-w-[440px]">
-      <p className="mb-2 text-lg font-bold text-base-content">Something went wrong</p>
+      <p className="mb-2 text-lg font-bold text-base-content">
+        Something went wrong
+      </p>
       <p className="mb-5 text-sm text-base-content/60">
-        The application failed to load. Open the browser console for details, then reload.
+        The application failed to load. Open the browser console for details,
+        then reload.
       </p>
       <button
         className="btn btn-primary"

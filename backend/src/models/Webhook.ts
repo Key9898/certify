@@ -25,7 +25,12 @@ const WebhookSchema = new Schema<IWebhookDocument>(
     secret: { type: String, default: () => nanoid(32) },
     events: {
       type: [String],
-      enum: ['certificate.created', 'certificate.pdf_generated', 'batch.completed', 'batch.failed'],
+      enum: [
+        'certificate.created',
+        'certificate.pdf_generated',
+        'batch.completed',
+        'batch.failed',
+      ],
       default: ['certificate.created'],
     },
     isActive: { type: Boolean, default: true },
@@ -36,4 +41,7 @@ const WebhookSchema = new Schema<IWebhookDocument>(
 
 WebhookSchema.index({ createdBy: 1 });
 
-export const Webhook = mongoose.model<IWebhookDocument>('Webhook', WebhookSchema);
+export const Webhook = mongoose.model<IWebhookDocument>(
+  'Webhook',
+  WebhookSchema
+);

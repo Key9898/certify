@@ -1,26 +1,26 @@
 import React from 'react';
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "@/components/ui/Chart"
+} from '@/components/ui/Chart';
 
 export interface OverviewChartPoint {
-  month: string
-  count: number
+  month: string;
+  count: number;
 }
 
 const chartConfig = {
   count: {
-    label: "Certificates",
-    color: "var(--color-primary)",
+    label: 'Certificates',
+    color: 'var(--color-primary)',
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 interface OverviewChartProps {
-  data: OverviewChartPoint[]
+  data: OverviewChartPoint[];
 }
 
 export const OverviewChart: React.FC<OverviewChartProps> = ({ data }) => {
@@ -29,7 +29,7 @@ export const OverviewChart: React.FC<OverviewChartProps> = ({ data }) => {
       <div className="flex h-[300px] items-center justify-center rounded border border-dashed border-base-200 text-sm font-medium text-base-content/50">
         No issuance trend data yet.
       </div>
-    )
+    );
   }
 
   return (
@@ -40,7 +40,7 @@ export const OverviewChart: React.FC<OverviewChartProps> = ({ data }) => {
           left: 12,
           right: 12,
           top: 20,
-          bottom: 0
+          bottom: 0,
         }}
       >
         <defs>
@@ -57,10 +57,10 @@ export const OverviewChart: React.FC<OverviewChartProps> = ({ data }) => {
             />
           </linearGradient>
         </defs>
-        <CartesianGrid 
-          vertical={false} 
-          strokeDasharray="3 3" 
-          className="stroke-base-300/50" 
+        <CartesianGrid
+          vertical={false}
+          strokeDasharray="3 3"
+          className="stroke-base-300/50"
         />
         <XAxis
           dataKey="month"
@@ -70,7 +70,7 @@ export const OverviewChart: React.FC<OverviewChartProps> = ({ data }) => {
           tickFormatter={(value) => value.slice(0, 3)}
           className="text-[10px] font-black uppercase tracking-widest fill-base-content/30"
         />
-        <YAxis 
+        <YAxis
           tickLine={false}
           axisLine={false}
           tickMargin={12}
@@ -91,5 +91,5 @@ export const OverviewChart: React.FC<OverviewChartProps> = ({ data }) => {
         />
       </AreaChart>
     </ChartContainer>
-  )
-}
+  );
+};

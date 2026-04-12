@@ -19,9 +19,12 @@ const AuthContext = createContext<AuthContextValue>({
   setAppUser: () => undefined,
 });
 
-const buildFallbackAppUser = (authUser: ReturnType<typeof useAuth0>['user']): User => {
+const buildFallbackAppUser = (
+  authUser: ReturnType<typeof useAuth0>['user']
+): User => {
   const displayName = getAuthProfileDisplayName(authUser);
-  const fallbackEmail = authUser?.email?.trim() || `${displayName.replace(/\s+/g, '.')}@auth.local`;
+  const fallbackEmail =
+    authUser?.email?.trim() || `${displayName.replace(/\s+/g, '.')}@auth.local`;
   const timestamp = new Date().toISOString();
 
   return {
@@ -46,8 +49,11 @@ const buildFallbackAppUser = (authUser: ReturnType<typeof useAuth0>['user']): Us
   };
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, user, getAccessTokenSilently, isLoading } = useAuth0();
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const { isAuthenticated, user, getAccessTokenSilently, isLoading } =
+    useAuth0();
   const auth0Audience = import.meta.env.VITE_AUTH0_AUDIENCE || '';
   const { isDemoMode, mockUser } = useDemo();
   const [appUser, setAppUser] = useState<User | null>(null);
@@ -58,6 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (isDemoMode) {
       setAppUser(mockUser);
       setIsLoadingUser(false);
+      setTokenGetter(async () => 'mock-demo-token');
     }
   }, [isDemoMode, mockUser]);
 
@@ -74,7 +81,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else if (!isLoading && !isAuthenticated) {
       setTokenGetter(null);
     }
-  }, [isDemoMode, isAuthenticated, isLoading, getAccessTokenSilently, auth0Audience]);
+  }, [
+    isDemoMode,
+    isAuthenticated,
+    isLoading,
+    getAccessTokenSilently,
+    auth0Audience,
+  ]);
 
   useEffect(() => {
     if (isDemoMode) return;

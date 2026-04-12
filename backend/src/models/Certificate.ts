@@ -25,7 +25,11 @@ export interface ICertificateDocument extends ICertificate, Document {}
 
 const CertificateSchema = new Schema<ICertificateDocument>(
   {
-    templateId: { type: Schema.Types.ObjectId, ref: 'Template', required: true },
+    templateId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Template',
+      required: true,
+    },
     recipientName: { type: String, required: true, trim: true },
     recipientEmail: { type: String, lowercase: true, trim: true },
     certificateTitle: { type: String, required: true, trim: true },
@@ -55,4 +59,7 @@ const CertificateSchema = new Schema<ICertificateDocument>(
 CertificateSchema.index({ createdBy: 1, createdAt: -1 });
 CertificateSchema.index({ recipientName: 'text', certificateTitle: 'text' });
 
-export const Certificate = mongoose.model<ICertificateDocument>('Certificate', CertificateSchema);
+export const Certificate = mongoose.model<ICertificateDocument>(
+  'Certificate',
+  CertificateSchema
+);

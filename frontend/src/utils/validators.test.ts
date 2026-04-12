@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { isValidEmail, isValidUrl, isValidImageFile, isValidSignatureFile } from './validators';
+import {
+  isValidEmail,
+  isValidUrl,
+  isValidImageFile,
+  isValidSignatureFile,
+} from './validators';
 
 describe('isValidEmail', () => {
   it('accepts valid emails', () => {
@@ -43,7 +48,9 @@ describe('isValidImageFile', () => {
   });
 
   it('rejects files over 2MB', () => {
-    expect(isValidImageFile(makeFile('image/png', 2 * 1024 * 1024 + 1))).toBe(false);
+    expect(isValidImageFile(makeFile('image/png', 2 * 1024 * 1024 + 1))).toBe(
+      false
+    );
   });
 
   it('rejects disallowed file types', () => {
@@ -62,7 +69,9 @@ describe('isValidSignatureFile', () => {
   });
 
   it('rejects files over 1MB', () => {
-    expect(isValidSignatureFile(makeFile('image/png', 1024 * 1024 + 1))).toBe(false);
+    expect(isValidSignatureFile(makeFile('image/png', 1024 * 1024 + 1))).toBe(
+      false
+    );
   });
 
   it('rejects non-PNG types', () => {

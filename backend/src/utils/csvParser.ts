@@ -40,7 +40,10 @@ const isXlsxUpload = (buffer: Buffer, options?: ParseCsvOptions): boolean => {
     return true;
   }
 
-  if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+  if (
+    mimeType ===
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  ) {
     return true;
   }
 
@@ -96,15 +99,17 @@ const parseCellValue = (value: ExcelJS.CellValue): string => {
   }
 
   if (typeof value === 'object' && 'richText' in value) {
-    return (value as ExcelJS.CellRichTextValue)
-      .richText.map((rt) => rt.text)
+    return (value as ExcelJS.CellRichTextValue).richText
+      .map((rt) => rt.text)
       .join('');
   }
 
   return String(value).trim();
 };
 
-const parseXlsxBuffer = async (buffer: Buffer): Promise<Record<string, string>[]> => {
+const parseXlsxBuffer = async (
+  buffer: Buffer
+): Promise<Record<string, string>[]> => {
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(buffer as unknown as ArrayBuffer);
 
@@ -127,7 +132,9 @@ const parseXlsxBuffer = async (buffer: Buffer): Promise<Record<string, string>[]
       return;
     }
 
-    const hasContent = values.slice(1).some((value) => parseCellValue(value).length > 0);
+    const hasContent = values
+      .slice(1)
+      .some((value) => parseCellValue(value).length > 0);
     if (!hasContent) {
       return;
     }
@@ -153,7 +160,10 @@ export const parseCsv = async (
     return parseXlsxBuffer(buffer);
   }
 
-  const text = buffer.toString('utf-8').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const text = buffer
+    .toString('utf-8')
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
   const lines = text.split('\n').filter((l) => l.trim().length > 0);
 
   if (lines.length < 2) return [];
@@ -171,7 +181,12 @@ export const parseCsv = async (
   });
 };
 
-const REQUIRED_FIELDS = ['recipientName', 'certificateTitle', 'issuerName', 'issueDate'];
+const REQUIRED_FIELDS = [
+  'recipientName',
+  'certificateTitle',
+  'issuerName',
+  'issueDate',
+];
 
 export const validateBatchData = (
   rows: Record<string, string>[]

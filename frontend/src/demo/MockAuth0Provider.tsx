@@ -24,7 +24,9 @@ const mockContextValue = {
   handleRedirectCallback: async () => ({ appState: undefined }),
 } as unknown as Auth0ContextInterface;
 
-export const MockAuth0Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const MockAuth0Provider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   return (
     <Auth0Context.Provider value={mockContextValue}>
       {children}

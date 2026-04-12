@@ -7,11 +7,18 @@ import { QUICK_SPRING, SOFT_SPRING } from '@/utils/motion';
 
 const MAX_SIZE = 5 * 1024 * 1024;
 
-export const BatchUpload: React.FC<BatchUploadProps> = ({ onParsed, isLoading, error }) => {
+export const BatchUpload: React.FC<BatchUploadProps> = ({
+  onParsed,
+  isLoading,
+  error,
+}) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
-  const [parsedFile, setParsedFile] = useState<{ name: string; rowCount: number } | null>(null);
+  const [parsedFile, setParsedFile] = useState<{
+    name: string;
+    rowCount: number;
+  } | null>(null);
 
   const handleFile = useCallback(
     async (file: File) => {
@@ -20,7 +27,9 @@ export const BatchUpload: React.FC<BatchUploadProps> = ({ onParsed, isLoading, e
 
       const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'));
       if (!['.csv', '.xlsx'].includes(ext)) {
-        setLocalError('Invalid file type. Only CSV and XLSX files are allowed.');
+        setLocalError(
+          'Invalid file type. Only CSV and XLSX files are allowed.'
+        );
         return;
       }
       if (file.size > MAX_SIZE) {
@@ -60,7 +69,9 @@ export const BatchUpload: React.FC<BatchUploadProps> = ({ onParsed, isLoading, e
       <motion.div
         className={[
           'cursor-pointer rounded border border-dashed p-10 text-center outline-none selection:bg-primary/10',
-          dragOver ? 'border-primary bg-primary/5' : 'border-base-300 hover:border-primary/50 hover:bg-base-200/20',
+          dragOver
+            ? 'border-primary bg-primary/5'
+            : 'border-base-300 hover:border-primary/50 hover:bg-base-200/20',
           isLoading ? 'opacity-50 pointer-events-none' : '',
           displayError ? 'border-error bg-error/5' : '',
           parsedFile ? 'border-success bg-success/5' : '',
@@ -68,7 +79,10 @@ export const BatchUpload: React.FC<BatchUploadProps> = ({ onParsed, isLoading, e
           .filter(Boolean)
           .join(' ')}
         onDrop={handleDrop}
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
         onDragLeave={() => setDragOver(false)}
         onClick={() => !isLoading && inputRef.current?.click()}
         animate={{ scale: dragOver ? 1.01 : 1 }}
@@ -77,7 +91,9 @@ export const BatchUpload: React.FC<BatchUploadProps> = ({ onParsed, isLoading, e
         {isLoading ? (
           <div className="flex flex-col items-center gap-4 py-4">
             <span className="loading loading-spinner loading-md text-primary" />
-            <p className="text-base-content/60 text-xs font-bold uppercase tracking-widest">Parsing Data...</p>
+            <p className="text-base-content/60 text-xs font-bold uppercase tracking-widest">
+              Parsing Data...
+            </p>
           </div>
         ) : parsedFile ? (
           <motion.div
@@ -94,10 +110,16 @@ export const BatchUpload: React.FC<BatchUploadProps> = ({ onParsed, isLoading, e
               <CheckCircle size={32} />
             </motion.div>
             <div>
-              <p className="font-black text-base-content tracking-tight">{parsedFile.name}</p>
-              <p className="text-success text-xs font-bold uppercase tracking-widest mt-2">{parsedFile.rowCount} recipients found</p>
+              <p className="font-black text-base-content tracking-tight">
+                {parsedFile.name}
+              </p>
+              <p className="text-success text-xs font-bold uppercase tracking-widest mt-2">
+                {parsedFile.rowCount} recipients found
+              </p>
             </div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/30 hover:text-primary transition-colors">Click to reset file</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/30 hover:text-primary transition-colors">
+              Click to reset file
+            </p>
           </motion.div>
         ) : (
           <motion.div
@@ -109,13 +131,21 @@ export const BatchUpload: React.FC<BatchUploadProps> = ({ onParsed, isLoading, e
               animate={{ scale: dragOver ? 1.1 : 1, rotate: dragOver ? -3 : 0 }}
               transition={QUICK_SPRING}
             >
-              <FileSpreadsheet size={48} className={dragOver ? 'text-primary' : 'text-base-content/20'} />
+              <FileSpreadsheet
+                size={48}
+                className={dragOver ? 'text-primary' : 'text-base-content/20'}
+              />
             </motion.div>
             <div>
               <p className="text-base-content font-black tracking-tight text-lg mb-1">
-                <span className="text-primary hover:underline">Click to upload</span> or drag and drop
+                <span className="text-primary hover:underline">
+                  Click to upload
+                </span>{' '}
+                or drag and drop
               </p>
-              <p className="text-base-content/40 text-sm font-medium">Accepts CSV or XLSX (Max 5MB)</p>
+              <p className="text-base-content/40 text-sm font-medium">
+                Accepts CSV or XLSX (Max 5MB)
+              </p>
             </div>
             <div className="text-[10px] font-black uppercase tracking-widest text-base-content/30 border border-base-200 px-3 py-1.5 rounded bg-base-100">
               Required: name, title, issuer, date
@@ -146,7 +176,9 @@ export const BatchUpload: React.FC<BatchUploadProps> = ({ onParsed, isLoading, e
       )}
 
       <div className="mt-8 pt-6 border-t border-base-200">
-        <p className="text-xs font-black uppercase tracking-widest text-base-content/40 mb-4">Supported Columns</p>
+        <p className="text-xs font-black uppercase tracking-widest text-base-content/40 mb-4">
+          Supported Columns
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
           {[
             { label: 'Recipient Name', cols: 'name, recipientName' },
@@ -154,13 +186,22 @@ export const BatchUpload: React.FC<BatchUploadProps> = ({ onParsed, isLoading, e
             { label: 'Issuer Information', cols: 'issuer, issuerName' },
             { label: 'Issue Date', cols: 'date, issueDate' },
           ].map((item) => (
-            <div key={item.label} className="bg-base-200/50 p-3 rounded flex flex-col gap-1 border border-base-200/50">
-              <span className="text-[10px] font-black text-base-content/40 uppercase tracking-widest">{item.label}</span>
-              <span className="text-xs font-mono text-primary font-bold">{item.cols}</span>
+            <div
+              key={item.label}
+              className="bg-base-200/50 p-3 rounded flex flex-col gap-1 border border-base-200/50"
+            >
+              <span className="text-[10px] font-black text-base-content/40 uppercase tracking-widest">
+                {item.label}
+              </span>
+              <span className="text-xs font-mono text-primary font-bold">
+                {item.cols}
+              </span>
             </div>
           ))}
         </div>
-        <p className="text-[10px] text-base-content/30 mt-4 italic">Optional: email, description</p>
+        <p className="text-[10px] text-base-content/30 mt-4 italic">
+          Optional: email, description
+        </p>
       </div>
     </div>
   );

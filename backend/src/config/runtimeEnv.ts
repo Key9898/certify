@@ -31,8 +31,12 @@ export const logRuntimeEnvReadiness = (): void => {
     'CANVAS_API_TOKEN',
   ];
 
-  const missingRequired = requiredKeys.filter((key) => !hasRealValue(process.env[key]));
-  const missingConnectors = optionalConnectorKeys.filter((key) => !hasRealValue(process.env[key]));
+  const missingRequired = requiredKeys.filter(
+    (key) => !hasRealValue(process.env[key])
+  );
+  const missingConnectors = optionalConnectorKeys.filter(
+    (key) => !hasRealValue(process.env[key])
+  );
 
   if (missingRequired.length > 0) {
     console.warn(
@@ -47,6 +51,8 @@ export const logRuntimeEnvReadiness = (): void => {
   }
 
   if (missingRequired.length === 0 && missingConnectors.length === 0) {
-    console.log('[env] Runtime configuration looks ready for full production feature coverage.');
+    console.log(
+      '[env] Runtime configuration looks ready for full production feature coverage.'
+    );
   }
 };

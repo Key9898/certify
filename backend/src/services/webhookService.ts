@@ -20,7 +20,11 @@ export const triggerWebhooks = async (
 
   if (webhooks.length === 0) return;
 
-  const payload = JSON.stringify({ event, data, timestamp: new Date().toISOString() });
+  const payload = JSON.stringify({
+    event,
+    data,
+    timestamp: new Date().toISOString(),
+  });
 
   await Promise.allSettled(
     webhooks.map(async (webhook) => {

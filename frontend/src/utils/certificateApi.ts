@@ -1,5 +1,10 @@
 import { del, fetchWithAuth, get, post } from './api';
-import type { ApiResponse, PaginatedResponse, Certificate, CreateCertificateDto } from '@/types';
+import type {
+  ApiResponse,
+  PaginatedResponse,
+  Certificate,
+  CreateCertificateDto,
+} from '@/types';
 
 export const fetchCertificates = async (params?: {
   search?: string;
@@ -11,10 +16,14 @@ export const fetchCertificates = async (params?: {
   if (params?.page) query.set('page', params.page.toString());
   if (params?.limit) query.set('limit', params.limit.toString());
   const qs = query.toString() ? `?${query.toString()}` : '';
-  return (await get<Certificate[]>(`/certificates${qs}`)) as unknown as PaginatedResponse<Certificate>;
+  return (await get<Certificate[]>(
+    `/certificates${qs}`
+  )) as unknown as PaginatedResponse<Certificate>;
 };
 
-export const fetchCertificate = async (id: string): Promise<ApiResponse<Certificate>> => {
+export const fetchCertificate = async (
+  id: string
+): Promise<ApiResponse<Certificate>> => {
   return get<Certificate>(`/certificates/${id}`);
 };
 
@@ -24,11 +33,16 @@ export const createCertificate = async (
   return post<Certificate>('/certificates', data);
 };
 
-export const generatePdf = async (id: string): Promise<ApiResponse<{ pdfUrl: string }>> => {
+export const generatePdf = async (
+  id: string
+): Promise<ApiResponse<{ pdfUrl: string }>> => {
   return post<{ pdfUrl: string }>(`/certificates/generate-pdf/${id}`, {});
 };
 
-export const downloadPng = async (id: string, certificateId: string): Promise<void> => {
+export const downloadPng = async (
+  id: string,
+  certificateId: string
+): Promise<void> => {
   const response = await fetchWithAuth(`/certificates/generate-png/${id}`, {
     method: 'POST',
   });
@@ -42,6 +56,8 @@ export const downloadPng = async (id: string, certificateId: string): Promise<vo
   URL.revokeObjectURL(url);
 };
 
-export const deleteCertificate = async (id: string): Promise<ApiResponse<unknown>> => {
+export const deleteCertificate = async (
+  id: string
+): Promise<ApiResponse<unknown>> => {
   return del(`/certificates/${id}`);
 };

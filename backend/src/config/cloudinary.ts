@@ -5,12 +5,7 @@ export const configureCloudinary = (): void => {
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
-  if (
-    !cloudName ||
-    cloudName === 'your-cloud-name' ||
-    !apiKey ||
-    !apiSecret
-  ) {
+  if (!cloudName || cloudName === 'your-cloud-name' || !apiKey || !apiSecret) {
     console.warn(
       '⚠️  Cloudinary not configured. File uploads will not work. Set CLOUDINARY_* vars in .env'
     );

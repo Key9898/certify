@@ -13,16 +13,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
       <div className="relative min-w-0 min-h-screen lg:ml-64 transition-all duration-300">
         <div className="relative flex min-h-screen flex-col">
-          <DashboardHeader onMenuToggle={() => setIsSidebarOpen((prev) => !prev)} />
+          <DashboardHeader
+            onMenuToggle={() => setIsSidebarOpen((prev) => !prev)}
+          />
 
-          <motion.main 
+          <motion.main
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="flex-1 p-6 md:p-8"
           >
-            <div className="mx-auto w-full max-w-7xl">
-              {children}
-            </div>
+            <div className="mx-auto w-full max-w-7xl">{children}</div>
           </motion.main>
         </div>
       </div>

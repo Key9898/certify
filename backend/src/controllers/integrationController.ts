@@ -10,8 +10,14 @@ import {
 } from '../models/Integration';
 import { AuthenticatedRequest } from '../types';
 import { createBatchJob, processBatchJob } from '../services/batchService';
-import { createCertificate, generateAndUploadPdf } from '../services/certificateService';
-import { getWorkspaceMemberIds, isWorkspaceAdmin } from '../services/workspaceService';
+import {
+  createCertificate,
+  generateAndUploadPdf,
+} from '../services/certificateService';
+import {
+  getWorkspaceMemberIds,
+  isWorkspaceAdmin,
+} from '../services/workspaceService';
 import {
   INTEGRATION_CATALOG,
   buildBatchIntegrationRows,
@@ -34,6 +40,8 @@ const PROVIDERS = new Set<IntegrationProvider>(
 );
 const STATUSES = new Set<IntegrationStatus>(['active', 'paused']);
 const MODES = new Set<IntegrationMode>(['single', 'batch']);
+const MAX_BATCH_ROWS = 500;
+const MAX_PAYLOAD_SIZE = 1024 * 1024;
 
 type OptionalDefaults = Partial<IIntegrationDocument['defaults']>;
 type OptionalSettings = Partial<IIntegrationDocument['settings']>;
@@ -52,12 +60,15 @@ const getTemplateIdValue = (integration: IIntegrationDocument): string => {
 };
 
 const getBaseUrl = (req: Request): string =>
-  (process.env.API_URL || `${req.protocol}://${req.get('host') || 'localhost:3000'}`).replace(
-    /\/$/,
-    ''
-  );
+  (
+    process.env.API_URL ||
+    `${req.protocol}://${req.get('host') || 'localhost:3000'}`
+  ).replace(/\/$/, '');
 
-const requireWorkspaceAdmin = (req: AuthenticatedRequest, res: Response): boolean => {
+const requireWorkspaceAdmin = (
+  req: AuthenticatedRequest,
+  res: Response
+): boolean => {
   if (!isWorkspaceAdmin(req.user!)) {
     res.status(403).json({
       success: false,
@@ -97,26 +108,33 @@ const sanitizeOptionalBoolean = (value: unknown): boolean | undefined =>
 
 const sanitizeGoogleSheetsSettings = (settings?: OptionalSettings) => ({
   enabled: sanitizeOptionalBoolean(settings?.googleSheets?.enabled) ?? false,
-  spreadsheetId: sanitizeOptionalString(settings?.googleSheets?.spreadsheetId) || undefined,
-  sheetName: sanitizeOptionalString(settings?.googleSheets?.sheetName) || undefined,
-  statusColumn: sanitizeOptionalString(settings?.googleSheets?.statusColumn) || undefined,
+  spreadsheetId:
+    sanitizeOptionalString(settings?.googleSheets?.spreadsheetId) || undefined,
+  sheetName:
+    sanitizeOptionalString(settings?.googleSheets?.sheetName) || undefined,
+  statusColumn:
+    sanitizeOptionalString(settings?.googleSheets?.statusColumn) || undefined,
   certificateIdColumn:
-    sanitizeOptionalString(settings?.googleSheets?.certificateIdColumn) || undefined,
-  pdfUrlColumn: sanitizeOptionalString(settings?.googleSheets?.pdfUrlColumn) || undefined,
+    sanitizeOptionalString(settings?.googleSheets?.certificateIdColumn) ||
+    undefined,
+  pdfUrlColumn:
+    sanitizeOptionalString(settings?.googleSheets?.pdfUrlColumn) || undefined,
   batchJobIdColumn:
-    sanitizeOptionalString(settings?.googleSheets?.batchJobIdColumn) || undefined,
+    sanitizeOptionalString(settings?.googleSheets?.batchJobIdColumn) ||
+    undefined,
   processedAtColumn:
-    sanitizeOptionalString(settings?.googleSheets?.processedAtColumn) || undefined,
+    sanitizeOptionalString(settings?.googleSheets?.processedAtColumn) ||
+    undefined,
 });
 
 const sanitizeCanvasSettings = (settings?: OptionalSettings) => ({
   enabled: sanitizeOptionalBoolean(settings?.canvas?.enabled) ?? false,
   baseUrl: sanitizeOptionalString(settings?.canvas?.baseUrl) || undefined,
   courseId: sanitizeOptionalString(settings?.canvas?.courseId) || undefined,
-  assignmentId: sanitizeOptionalString(settings?.canvas?.assignmentId) || undefined,
+  assignmentId:
+    sanitizeOptionalString(settings?.canvas?.assignmentId) || undefined,
   moduleId: sanitizeOptionalString(settings?.canvas?.moduleId) || undefined,
-  completionPreset:
-    settings?.canvas?.completionPreset || 'course_completion',
+  completionPreset: settings?.canvas?.completionPreset || 'course_completion',
   returnMode: settings?.canvas?.returnMode || 'response_only',
 });
 
@@ -128,7 +146,10 @@ const assertAccessibleTemplate = async (
   if (!/^[a-f\d]{24}$/i.test(templateId)) {
     res.status(400).json({
       success: false,
-      error: { code: 'INVALID_TEMPLATE', message: 'Invalid templateId format.' },
+      error: {
+        code: 'INVALID_TEMPLATE',
+        message: 'Invalid templateId format.',
+      },
     });
     return null;
   }
@@ -142,7 +163,10 @@ const assertAccessibleTemplate = async (
   if (!template) {
     res.status(404).json({
       success: false,
-      error: { code: 'TEMPLATE_NOT_FOUND', message: 'Template not found for this workspace.' },
+      error: {
+        code: 'TEMPLATE_NOT_FOUND',
+        message: 'Template not found for this workspace.',
+      },
     });
     return null;
   }
@@ -161,8 +185,7 @@ const serializeIntegration = (
   description: integration.description,
   status: integration.status,
   mode: integration.mode,
-  templateId:
-    getTemplateIdValue(integration),
+  templateId: getTemplateIdValue(integration),
   templateName,
   webhookUrl: buildIntegrationWebhookUrl(baseUrl, integration.webhookKey),
   defaults: integration.defaults,
@@ -191,7 +214,9 @@ const markIntegrationFailure = async (
   await integration.save();
 };
 
-const markIntegrationSuccess = async (integration: IIntegrationDocument): Promise<void> => {
+const markIntegrationSuccess = async (
+  integration: IIntegrationDocument
+): Promise<void> => {
   const now = new Date();
   integration.stats.totalRuns += 1;
   integration.stats.successRuns += 1;
@@ -228,7 +253,8 @@ export const listIntegrations = async (
         serializeIntegration(
           integration,
           baseUrl,
-          typeof integration.templateId === 'object' && 'name' in integration.templateId
+          typeof integration.templateId === 'object' &&
+            'name' in integration.templateId
             ? (integration.templateId as { name: string }).name
             : undefined
         )
@@ -270,7 +296,10 @@ export const createIntegration = async (
     if (!name?.trim()) {
       res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'Integration name is required.' },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Integration name is required.',
+        },
       });
       return;
     }
@@ -278,7 +307,10 @@ export const createIntegration = async (
     if (!provider || !PROVIDERS.has(provider)) {
       res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'A valid provider is required.' },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'A valid provider is required.',
+        },
       });
       return;
     }
@@ -286,7 +318,10 @@ export const createIntegration = async (
     if (!mode || !MODES.has(mode)) {
       res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'Mode must be single or batch.' },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Mode must be single or batch.',
+        },
       });
       return;
     }
@@ -312,13 +347,18 @@ export const createIntegration = async (
       mode,
       templateId: template._id,
       defaults: {
-        certificateTitle: sanitizeOptionalString(defaults?.certificateTitle) || undefined,
+        certificateTitle:
+          sanitizeOptionalString(defaults?.certificateTitle) || undefined,
         description: sanitizeOptionalString(defaults?.description) || undefined,
         issuerName: sanitizeOptionalString(defaults?.issuerName) || undefined,
-        issuerSignature: sanitizeOptionalString(defaults?.issuerSignature) || undefined,
-        organizationLogo: sanitizeOptionalString(defaults?.organizationLogo) || undefined,
-        primaryColor: sanitizeOptionalString(defaults?.primaryColor) || undefined,
-        secondaryColor: sanitizeOptionalString(defaults?.secondaryColor) || undefined,
+        issuerSignature:
+          sanitizeOptionalString(defaults?.issuerSignature) || undefined,
+        organizationLogo:
+          sanitizeOptionalString(defaults?.organizationLogo) || undefined,
+        primaryColor:
+          sanitizeOptionalString(defaults?.primaryColor) || undefined,
+        secondaryColor:
+          sanitizeOptionalString(defaults?.secondaryColor) || undefined,
       },
       settings: {
         autoGeneratePdf: settings?.autoGeneratePdf ?? true,
@@ -331,7 +371,10 @@ export const createIntegration = async (
       success: true,
       data: {
         ...serializeIntegration(integration, getBaseUrl(req), template.name),
-        samplePayload: buildIntegrationSamplePayload(integration, template.name),
+        samplePayload: buildIntegrationSamplePayload(
+          integration,
+          template.name
+        ),
       },
     });
   } catch (error) {
@@ -383,7 +426,8 @@ export const updateIntegration = async (
     };
 
     let templateName =
-      typeof integration.templateId === 'object' && 'name' in integration.templateId
+      typeof integration.templateId === 'object' &&
+      'name' in integration.templateId
         ? (integration.templateId as { name: string }).name
         : undefined;
 
@@ -392,7 +436,10 @@ export const updateIntegration = async (
       if (!trimmed) {
         res.status(400).json({
           success: false,
-          error: { code: 'VALIDATION_ERROR', message: 'Integration name cannot be empty.' },
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Integration name cannot be empty.',
+          },
         });
         return;
       }
@@ -418,7 +465,10 @@ export const updateIntegration = async (
       if (!STATUSES.has(status)) {
         res.status(400).json({
           success: false,
-          error: { code: 'VALIDATION_ERROR', message: 'Status must be active or paused.' },
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Status must be active or paused.',
+          },
         });
         return;
       }
@@ -429,7 +479,10 @@ export const updateIntegration = async (
       if (!MODES.has(mode)) {
         res.status(400).json({
           success: false,
-          error: { code: 'VALIDATION_ERROR', message: 'Mode must be single or batch.' },
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Mode must be single or batch.',
+          },
         });
         return;
       }
@@ -479,7 +532,8 @@ export const updateIntegration = async (
     }
 
     if (settings?.googleSheets) {
-      integration.settings.googleSheets = sanitizeGoogleSheetsSettings(settings);
+      integration.settings.googleSheets =
+        sanitizeGoogleSheetsSettings(settings);
     }
 
     if (settings?.canvas) {
@@ -553,11 +607,18 @@ export const testIntegration = async (
     }
 
     const templateName =
-      typeof integration.templateId === 'object' && 'name' in integration.templateId
+      typeof integration.templateId === 'object' &&
+      'name' in integration.templateId
         ? (integration.templateId as { name: string }).name
         : undefined;
-    const webhookUrl = buildIntegrationWebhookUrl(getBaseUrl(req), integration.webhookKey);
-    const samplePayload = buildIntegrationSamplePayload(integration, templateName);
+    const webhookUrl = buildIntegrationWebhookUrl(
+      getBaseUrl(req),
+      integration.webhookKey
+    );
+    const samplePayload = buildIntegrationSamplePayload(
+      integration,
+      templateName
+    );
     const nativeChecks = await runNativeIntegrationChecks(integration);
 
     integration.stats.lastTestedAt = new Date();
@@ -607,13 +668,17 @@ export const getIntegrationHookInfo = async (
     if (integration.status !== 'active') {
       res.status(409).json({
         success: false,
-        error: { code: 'INTEGRATION_PAUSED', message: 'This integration is currently paused.' },
+        error: {
+          code: 'INTEGRATION_PAUSED',
+          message: 'This integration is currently paused.',
+        },
       });
       return;
     }
 
     const templateName =
-      typeof integration.templateId === 'object' && 'name' in integration.templateId
+      typeof integration.templateId === 'object' &&
+      'name' in integration.templateId
         ? (integration.templateId as { name: string }).name
         : undefined;
 
@@ -623,7 +688,10 @@ export const getIntegrationHookInfo = async (
         name: integration.name,
         provider: integration.provider,
         mode: integration.mode,
-        webhookUrl: buildIntegrationWebhookUrl(getBaseUrl(req), integration.webhookKey),
+        webhookUrl: buildIntegrationWebhookUrl(
+          getBaseUrl(req),
+          integration.webhookKey
+        ),
         samplePayload: buildIntegrationSamplePayload(integration, templateName),
       },
     });
@@ -653,7 +721,22 @@ export const receiveIntegrationWebhook = async (
     if (integration.status !== 'active') {
       res.status(409).json({
         success: false,
-        error: { code: 'INTEGRATION_PAUSED', message: 'This integration is currently paused.' },
+        error: {
+          code: 'INTEGRATION_PAUSED',
+          message: 'This integration is currently paused.',
+        },
+      });
+      return;
+    }
+
+    const payloadSize = JSON.stringify(req.body).length;
+    if (payloadSize > MAX_PAYLOAD_SIZE) {
+      res.status(413).json({
+        success: false,
+        error: {
+          code: 'PAYLOAD_TOO_LARGE',
+          message: `Request body exceeds maximum size of 1MB.`,
+        },
       });
       return;
     }
@@ -661,8 +744,34 @@ export const receiveIntegrationWebhook = async (
     try {
       if (integration.mode === 'batch') {
         const rows = buildBatchIntegrationRows(integration, req.body);
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+          res.status(400).json({
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Batch mode requires a non-empty data array.',
+            },
+          });
+          return;
+        }
+
+        if (rows.length > MAX_BATCH_ROWS) {
+          res.status(413).json({
+            success: false,
+            error: {
+              code: 'PAYLOAD_TOO_LARGE',
+              message: `Batch exceeds maximum of ${MAX_BATCH_ROWS} rows. Found ${rows.length} rows.`,
+            },
+          });
+          return;
+        }
+
         const templateId = resolveIntegrationTemplateId(integration, req.body);
-        const googleSheetsContext = buildGoogleSheetsBatchSyncContext(integration, req.body);
+        const googleSheetsContext = buildGoogleSheetsBatchSyncContext(
+          integration,
+          req.body
+        );
         const job = await createBatchJob(
           templateId,
           rows,
@@ -692,24 +801,27 @@ export const receiveIntegrationWebhook = async (
           console.error('Integration batch processing error:', error);
         });
 
-        let nativeSyncStatus: 'queued' | 'skipped' | 'failed' = googleSheetsContext
-          ? 'queued'
-          : 'skipped';
+        let nativeSyncStatus: 'queued' | 'skipped' | 'failed' =
+          googleSheetsContext ? 'queued' : 'skipped';
         let nativeSyncMessage: string | undefined;
 
         if (googleSheetsContext) {
           try {
-            await syncQueuedGoogleSheetsBatch(integration, {
-              ...googleSheetsContext,
-              statusColumn: integration.settings.googleSheets?.statusColumn,
-              certificateIdColumn:
-                integration.settings.googleSheets?.certificateIdColumn,
-              pdfUrlColumn: integration.settings.googleSheets?.pdfUrlColumn,
-              batchJobIdColumn:
-                integration.settings.googleSheets?.batchJobIdColumn,
-              processedAtColumn:
-                integration.settings.googleSheets?.processedAtColumn,
-            }, job._id.toString());
+            await syncQueuedGoogleSheetsBatch(
+              integration,
+              {
+                ...googleSheetsContext,
+                statusColumn: integration.settings.googleSheets?.statusColumn,
+                certificateIdColumn:
+                  integration.settings.googleSheets?.certificateIdColumn,
+                pdfUrlColumn: integration.settings.googleSheets?.pdfUrlColumn,
+                batchJobIdColumn:
+                  integration.settings.googleSheets?.batchJobIdColumn,
+                processedAtColumn:
+                  integration.settings.googleSheets?.processedAtColumn,
+              },
+              job._id.toString()
+            );
           } catch (syncError) {
             nativeSyncStatus = 'failed';
             nativeSyncMessage =
@@ -736,9 +848,18 @@ export const receiveIntegrationWebhook = async (
         return;
       }
 
-      const certificateInput = buildSingleIntegrationRequest(integration, req.body);
-      const googleSheetsContext = buildGoogleSheetsSingleSyncContext(integration, req.body);
-      const canvasReturnContext = buildCanvasReturnContext(integration, req.body);
+      const certificateInput = buildSingleIntegrationRequest(
+        integration,
+        req.body
+      );
+      const googleSheetsContext = buildGoogleSheetsSingleSyncContext(
+        integration,
+        req.body
+      );
+      const canvasReturnContext = buildCanvasReturnContext(
+        integration,
+        req.body
+      );
       const certificate = await createCertificate(
         certificateInput,
         integration.createdBy.toString()
@@ -791,7 +912,10 @@ export const receiveIntegrationWebhook = async (
         },
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Integration processing failed.';
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Integration processing failed.';
       await markIntegrationFailure(integration, message);
 
       const statusCode =
@@ -799,7 +923,7 @@ export const receiveIntegrationWebhook = async (
         error !== null &&
         'statusCode' in error &&
         typeof (error as { statusCode: unknown }).statusCode === 'number'
-          ? ((error as { statusCode: number }).statusCode)
+          ? (error as { statusCode: number }).statusCode
           : 400;
 
       res.status(statusCode).json({

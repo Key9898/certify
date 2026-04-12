@@ -23,16 +23,22 @@ const ModalDemo = () => {
         title="Confirm Delete"
         footer={
           <>
-            <Button variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
-            <Button variant="error" onClick={() => setIsOpen(false)}>Delete</Button>
+            <Button variant="ghost" onClick={() => setIsOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="error" onClick={() => setIsOpen(false)}>
+              Delete
+            </Button>
           </>
         }
       >
-        <p>Are you sure you want to delete this certificate? This action cannot be undone.</p>
+        <p>
+          Are you sure you want to delete this certificate? This action cannot
+          be undone.
+        </p>
       </Modal>
     </div>
   );
 };
 
 export const Default: Story = { render: () => <ModalDemo /> };
-

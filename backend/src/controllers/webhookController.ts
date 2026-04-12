@@ -57,7 +57,9 @@ export const createWebhook = async (
 
     const resolvedEvents: WebhookEvent[] =
       Array.isArray(events) && events.length > 0
-        ? (events.filter((e) => VALID_EVENTS.includes(e as WebhookEvent)) as WebhookEvent[])
+        ? (events.filter((e) =>
+            VALID_EVENTS.includes(e as WebhookEvent)
+          ) as WebhookEvent[])
         : ['certificate.created'];
 
     const webhook = new Webhook({

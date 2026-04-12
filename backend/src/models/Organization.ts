@@ -37,7 +37,14 @@ const WhiteLabelSchema = new Schema<IWhiteLabelSettings>(
 const OrganizationSchema = new Schema<IOrganizationDocument>(
   {
     name: { type: String, required: true, trim: true },
-    slug: { type: String, required: true, unique: true, index: true, trim: true, lowercase: true },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+      trim: true,
+      lowercase: true,
+    },
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     whiteLabel: { type: WhiteLabelSchema, default: () => ({}) },
   },

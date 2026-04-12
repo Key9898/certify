@@ -5,7 +5,9 @@ import { Integrations } from './Integrations';
 import type { Integration, Template, User } from '@/types';
 
 vi.mock('@/components/layout/MainLayout', () => ({
-  MainLayout: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  MainLayout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 const mockUser: User = {
@@ -81,7 +83,8 @@ const mockIntegrations: Integration[] = [
     mode: 'batch',
     templateId: 'template-academic',
     templateName: 'Academic Trust',
-    webhookUrl: 'https://demo.certify.app/api/integrations/hooks/ig_demo_sheets',
+    webhookUrl:
+      'https://demo.certify.app/api/integrations/hooks/ig_demo_sheets',
     defaults: {
       certificateTitle: 'Leadership Cohort Graduation',
       issuerName: 'Summit Academy',
@@ -91,11 +94,11 @@ const mockIntegrations: Integration[] = [
       googleSheets: {
         enabled: true,
         spreadsheetId: 'demo-spreadsheet',
-        sheetName: 'Ready to Issue',
+        sheetName: 'Ready to Create',
         statusColumn: 'Certify Status',
         certificateIdColumn: 'Certify ID',
         pdfUrlColumn: 'Certificate PDF URL',
-        batchJobIdColumn: 'Certify Batch ID',
+        batchJobIdColumn: 'Certify Job ID',
         processedAtColumn: 'Processed At',
       },
     },

@@ -28,6 +28,8 @@ describe('truncateText', () => {
 
   it('truncates and appends ellipsis when over limit', () => {
     expect(truncateText('Hello World', 5)).toBe('Hello...');
-    expect(truncateText('Certificate of Excellence', 11)).toBe('Certificate...');
+    expect(truncateText('Certificate of Excellence', 11)).toBe(
+      'Certificate...'
+    );
   });
 });

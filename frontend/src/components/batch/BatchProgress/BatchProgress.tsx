@@ -1,10 +1,24 @@
 import React, { useState } from 'react';
-import { CheckCircle, Clock, Download, Loader, XCircle, Search, Layers } from 'lucide-react';
+import {
+  CheckCircle,
+  Clock,
+  Download,
+  Loader,
+  XCircle,
+  Search,
+  Layers,
+} from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { BatchProgressProps } from './BatchProgress.types';
 import type { BatchResult } from '@/types/batch';
 import { downloadBatchZip } from '@/utils/batchApi';
-import { QUICK_SPRING, TAP_PRESS, STAGGER_CONTAINER, REVEAL_ITEM, SOFT_SPRING } from '@/utils/motion';
+import {
+  QUICK_SPRING,
+  TAP_PRESS,
+  STAGGER_CONTAINER,
+  REVEAL_ITEM,
+  SOFT_SPRING,
+} from '@/utils/motion';
 
 const statusIcon = {
   pending: <Clock size={16} className="text-warning" />,
@@ -27,20 +41,25 @@ const statusLabel = {
   failed: 'Failed',
 };
 
-const ResultRow: React.FC<{ result: BatchResult; index: number }> = ({ result, index }) => (
+const ResultRow: React.FC<{ result: BatchResult; index: number }> = ({
+  result,
+  index,
+}) => (
   <motion.tr
     variants={REVEAL_ITEM}
     whileHover={{ backgroundColor: 'rgba(226,232,240,0.4)' }}
     className="group"
   >
-    <td className="pl-6 meta-label">
-      {String(index + 1).padStart(2, '0')}
+    <td className="pl-6 meta-label">{String(index + 1).padStart(2, '0')}</td>
+    <td className="font-bold tracking-tight text-base-content">
+      {result.recipientName}
     </td>
-    <td className="font-bold tracking-tight text-base-content">{result.recipientName}</td>
     <td>
       <span
         className={`badge badge-sm rounded-none border-none px-3 font-black uppercase tracking-widest ${
-          result.status === 'success' ? 'bg-success/10 text-success' : 'bg-error/10 text-error'
+          result.status === 'success'
+            ? 'bg-success/10 text-success'
+            : 'bg-error/10 text-error'
         }`}
       >
         {result.status}
@@ -75,7 +94,9 @@ export const BatchProgress: React.FC<BatchProgressProps> = ({ job }) => {
   const [zipLoading, setZipLoading] = useState(false);
   const [zipError, setZipError] = useState<string | null>(null);
 
-  const hasPdfs = job.results.some((result) => result.status === 'success' && result.pdfUrl);
+  const hasPdfs = job.results.some(
+    (result) => result.status === 'success' && result.pdfUrl
+  );
 
   const handleDownloadZip = async () => {
     setZipLoading(true);
@@ -95,12 +116,16 @@ export const BatchProgress: React.FC<BatchProgressProps> = ({ job }) => {
       ? Math.round((job.processedCertificates / job.totalCertificates) * 100)
       : 0;
 
-  const successCount = job.results.filter((result) => result.status === 'success').length;
-  const failedCount = job.results.filter((result) => result.status === 'failed').length;
+  const successCount = job.results.filter(
+    (result) => result.status === 'success'
+  ).length;
+  const failedCount = job.results.filter(
+    (result) => result.status === 'failed'
+  ).length;
 
   return (
     <div className="space-y-8">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={SOFT_SPRING}
@@ -122,18 +147,25 @@ export const BatchProgress: React.FC<BatchProgressProps> = ({ job }) => {
             <div>
               <p className="meta-label mb-1 text-right">Throughput</p>
               <p className="text-xl font-black tracking-tight text-base-content">
-                {job.processedCertificates} <span className="text-base-content/20">/</span> {job.totalCertificates}
+                {job.processedCertificates}{' '}
+                <span className="text-base-content/20">/</span>{' '}
+                {job.totalCertificates}
               </p>
             </div>
             <div>
               <p className="meta-label mb-1 text-right">Success Rate</p>
               <p className="text-xl font-black tracking-tight text-success">
-                {job.totalCertificates > 0 ? Math.round((successCount / job.totalCertificates) * 100) : 0}%
+                {job.totalCertificates > 0
+                  ? Math.round((successCount / job.totalCertificates) * 100)
+                  : 0}
+                %
               </p>
             </div>
             {failedCount > 0 && (
               <div>
-                <p className="meta-label mb-1 text-right text-error/60">Anomalies</p>
+                <p className="meta-label mb-1 text-right text-error/60">
+                  Anomalies
+                </p>
                 <p className="text-xl font-black tracking-tight text-error">
                   {failedCount}
                 </p>
@@ -179,7 +211,7 @@ export const BatchProgress: React.FC<BatchProgressProps> = ({ job }) => {
                   ) : (
                     <Download size={14} className="mr-2" />
                   )}
-                  Export Batch (.ZIP)
+                  Export Job (.ZIP)
                 </motion.button>
               )}
             </AnimatePresence>
@@ -188,7 +220,7 @@ export const BatchProgress: React.FC<BatchProgressProps> = ({ job }) => {
       </motion.div>
 
       {job.results.length > 0 && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
@@ -216,10 +248,10 @@ export const BatchProgress: React.FC<BatchProgressProps> = ({ job }) => {
                   <th className="pl-6 meta-label py-4">Idx</th>
                   <th className="meta-label py-4">Recipient Identity</th>
                   <th className="meta-label py-4">Verification Status</th>
-                  <th className="pr-6 text-right meta-label py-4">Ledger Action</th>
+                  <th className="pr-6 text-right meta-label py-4">Action</th>
                 </tr>
               </thead>
-              <motion.tbody 
+              <motion.tbody
                 variants={STAGGER_CONTAINER}
                 initial="hidden"
                 animate="visible"

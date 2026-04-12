@@ -40,4 +40,3 @@ export const GeneratingPdf: Story = {
     generatingPdfId: MOCK_CERTIFICATES[0]._id,
   },
 };
-

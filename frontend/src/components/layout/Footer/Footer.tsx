@@ -3,7 +3,12 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/utils/constants';
 import type { FooterProps } from './Footer.types';
-import { QUICK_SPRING, REVEAL_ITEM, STAGGER_CONTAINER, VIEWPORT_ONCE } from '@/utils/motion';
+import {
+  QUICK_SPRING,
+  REVEAL_ITEM,
+  STAGGER_CONTAINER,
+  VIEWPORT_ONCE,
+} from '@/utils/motion';
 
 export const Footer: React.FC<FooterProps> = ({ minimal = false }) => {
   const currentYear = new Date().getFullYear();
@@ -35,19 +40,28 @@ export const Footer: React.FC<FooterProps> = ({ minimal = false }) => {
     >
       <div className="mx-auto w-full max-w-7xl px-4 md:px-6">
         <div className="mb-20 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
-          <motion.div variants={REVEAL_ITEM} className="col-span-1 lg:col-span-1">
+          <motion.div
+            variants={REVEAL_ITEM}
+            className="col-span-1 lg:col-span-1"
+          >
             <div className="mb-8 flex items-center gap-3">
               <motion.div
                 whileHover={{ rotate: -6, y: -2, transition: QUICK_SPRING }}
                 className="rounded bg-primary p-2 shadow-lg shadow-primary/20"
               >
-                <img src="/Logo/logo.svg" alt="Certify" className="h-5 w-5 brightness-0 invert" />
+                <img
+                  src="/Logo/logo.svg"
+                  alt="Certify"
+                  className="h-5 w-5 brightness-0 invert"
+                />
               </motion.div>
-              <span className="text-2xl font-black tracking-tighter text-base-content">Certify</span>
+              <span className="text-2xl font-black tracking-tighter text-base-content">
+                Certify
+              </span>
             </div>
             <p className="mb-8 font-medium leading-relaxed text-base-content/50 pr-4">
-              Empowering organizations to recognize achievements with beautiful, secure, and
-              professional digital certificates.
+              Empowering organizations to recognize achievements with beautiful,
+              secure, and professional digital certificates.
             </p>
           </motion.div>
 
@@ -58,8 +72,8 @@ export const Footer: React.FC<FooterProps> = ({ minimal = false }) => {
             </h4>
             <ul className="space-y-4">
               <li>
-                <a 
-                  className="font-bold text-base-content/60 transition-colors hover:text-primary text-sm uppercase tracking-wide" 
+                <a
+                  className="font-bold text-base-content/60 transition-colors hover:text-primary text-sm uppercase tracking-wide"
                   href="/#features"
                 >
                   Features
@@ -160,7 +174,7 @@ export const Footer: React.FC<FooterProps> = ({ minimal = false }) => {
               © {currentYear} Certify Platforms. Developed by Wunna Aung.
             </p>
           </div>
-          
+
           <div className="flex items-center gap-6">
             <div className="h-1 w-1 rounded-full bg-base-200" />
             <p className="text-xs font-black uppercase tracking-widest text-base-content/20">

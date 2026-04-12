@@ -4,7 +4,10 @@ import { CertificateForm } from '../CertificateForm';
 import { CertificatePreview } from '../CertificatePreview';
 import { TemplatePreview } from '@/components/template/TemplatePreview';
 import { useAppUser } from '@/context/AuthContext';
-import { DEFAULT_PRIMARY_COLOR, DEFAULT_SECONDARY_COLOR } from '@/utils/constants';
+import {
+  DEFAULT_PRIMARY_COLOR,
+  DEFAULT_SECONDARY_COLOR,
+} from '@/utils/constants';
 import type { CertificateEditorProps } from './CertificateEditor.types';
 import type { CreateCertificateDto } from '@/types';
 import type { CertificateFormData } from '../CertificateForm/CertificateForm.types';
@@ -37,7 +40,9 @@ export const CertificateEditor: React.FC<CertificateEditorProps> = ({
     appUser?.settings.defaultColors.secondary ||
     DEFAULT_SECONDARY_COLOR;
   const initialOrganizationLogo =
-    appUser?.settings.defaultLogo || appUser?.organization?.whiteLabel.logoUrl || '';
+    appUser?.settings.defaultLogo ||
+    appUser?.organization?.whiteLabel.logoUrl ||
+    '';
   const [previewData, setPreviewData] = useState<PreviewData>({
     ...defaultPreview,
     organizationLogo: initialOrganizationLogo,
@@ -45,21 +50,24 @@ export const CertificateEditor: React.FC<CertificateEditorProps> = ({
     secondaryColor: initialSecondaryColor,
   });
 
-  const handleFormChange = useCallback((formData: Partial<CertificateFormData>) => {
-    setPreviewData((prev) => ({
-      ...prev,
-      recipientName: formData.recipientName ?? prev.recipientName,
-      certificateTitle: formData.certificateTitle ?? prev.certificateTitle,
-      description: formData.description ?? prev.description,
-      issueDate: formData.issueDate ?? prev.issueDate,
-      expiryDate: formData.expiryDate ?? prev.expiryDate,
-      issuerName: formData.issuerName ?? prev.issuerName,
-      issuerSignature: formData.issuerSignature ?? prev.issuerSignature,
-      organizationLogo: formData.organizationLogo ?? prev.organizationLogo,
-      primaryColor: formData.primaryColor ?? prev.primaryColor,
-      secondaryColor: formData.secondaryColor ?? prev.secondaryColor,
-    }));
-  }, []);
+  const handleFormChange = useCallback(
+    (formData: Partial<CertificateFormData>) => {
+      setPreviewData((prev) => ({
+        ...prev,
+        recipientName: formData.recipientName ?? prev.recipientName,
+        certificateTitle: formData.certificateTitle ?? prev.certificateTitle,
+        description: formData.description ?? prev.description,
+        issueDate: formData.issueDate ?? prev.issueDate,
+        expiryDate: formData.expiryDate ?? prev.expiryDate,
+        issuerName: formData.issuerName ?? prev.issuerName,
+        issuerSignature: formData.issuerSignature ?? prev.issuerSignature,
+        organizationLogo: formData.organizationLogo ?? prev.organizationLogo,
+        primaryColor: formData.primaryColor ?? prev.primaryColor,
+        secondaryColor: formData.secondaryColor ?? prev.secondaryColor,
+      }));
+    },
+    []
+  );
 
   const handleSubmit = async (data: CreateCertificateDto) => {
     const formData: CertificateFormData = {
@@ -74,7 +82,8 @@ export const CertificateEditor: React.FC<CertificateEditorProps> = ({
       issuerSignature: data.issuerSignature || '',
       organizationLogo: data.organizationLogo || '',
       primaryColor: data.customFields?.primaryColor || DEFAULT_PRIMARY_COLOR,
-      secondaryColor: data.customFields?.secondaryColor || DEFAULT_SECONDARY_COLOR,
+      secondaryColor:
+        data.customFields?.secondaryColor || DEFAULT_SECONDARY_COLOR,
     };
     await onComplete(formData);
   };
@@ -89,10 +98,15 @@ export const CertificateEditor: React.FC<CertificateEditorProps> = ({
         className="space-y-4"
       >
         <div className="flex items-center gap-3 pb-2 border-b border-base-200">
-          <TemplatePreview template={template} className="w-16 h-12 object-cover" />
+          <TemplatePreview
+            template={template}
+            className="w-16 h-12 object-cover"
+          />
           <div>
             <h3 className="font-bold text-base-content">{template.name}</h3>
-            <p className="text-xs text-base-content/60 capitalize">{template.category}</p>
+            <p className="text-xs text-base-content/60 capitalize">
+              {template.category}
+            </p>
           </div>
         </div>
         <CertificateForm
@@ -119,7 +133,11 @@ export const CertificateEditor: React.FC<CertificateEditorProps> = ({
         <p className="text-sm font-semibold text-base-content/60 uppercase tracking-wide mb-3">
           Live Preview
         </p>
-        <CertificatePreview data={previewData} template={template} templateName={template.htmlContent} />
+        <CertificatePreview
+          data={previewData}
+          template={template}
+          templateName={template.htmlContent}
+        />
         <p className="text-xs text-base-content/40 text-center mt-2">
           Preview updates as you type
         </p>

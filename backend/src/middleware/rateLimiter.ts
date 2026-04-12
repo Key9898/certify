@@ -7,7 +7,10 @@ export const generalLimiter = rateLimit({
   legacyHeaders: false,
   message: {
     success: false,
-    error: { code: 'RATE_LIMIT', message: 'Too many requests, please try again later.' },
+    error: {
+      code: 'RATE_LIMIT',
+      message: 'Too many requests, please try again later.',
+    },
   },
 });
 
@@ -29,7 +32,11 @@ export const batchLimiter = rateLimit({
   legacyHeaders: false,
   message: {
     success: false,
-    error: { code: 'RATE_LIMIT', message: 'Too many batch upload requests. Please wait before uploading again.' },
+    error: {
+      code: 'RATE_LIMIT',
+      message:
+        'Too many batch upload requests. Please wait before uploading again.',
+    },
   },
 });
 
@@ -40,7 +47,10 @@ export const teamLimiter = rateLimit({
   legacyHeaders: false,
   message: {
     success: false,
-    error: { code: 'RATE_LIMIT', message: 'Too many team operations. Please slow down.' },
+    error: {
+      code: 'RATE_LIMIT',
+      message: 'Too many team operations. Please slow down.',
+    },
   },
 });
 
@@ -51,7 +61,10 @@ export const webhookLimiter = rateLimit({
   legacyHeaders: false,
   message: {
     success: false,
-    error: { code: 'RATE_LIMIT', message: 'Too many webhook operations. Please slow down.' },
+    error: {
+      code: 'RATE_LIMIT',
+      message: 'Too many webhook operations. Please slow down.',
+    },
   },
 });
 
@@ -62,6 +75,38 @@ export const verifyLimiter = rateLimit({
   legacyHeaders: false,
   message: {
     success: false,
-    error: { code: 'RATE_LIMIT', message: 'Too many verification requests. Please wait before trying again.' },
+    error: {
+      code: 'RATE_LIMIT',
+      message:
+        'Too many verification requests. Please wait before trying again.',
+    },
+  },
+});
+
+export const integrationWebhookLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: {
+      code: 'RATE_LIMIT',
+      message: 'Too many webhook requests. Please wait before trying again.',
+    },
+  },
+});
+
+export const integrationApiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: {
+      code: 'RATE_LIMIT',
+      message: 'Too many integration API requests. Please slow down.',
+    },
   },
 });

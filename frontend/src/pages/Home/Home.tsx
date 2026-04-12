@@ -15,8 +15,10 @@ import {
   TAP_PRESS,
   VIEWPORT_ONCE,
 } from '@/utils/motion';
-import { VerifySearchWidget } from '@/components/common/VerifySearchWidget/VerifySearchWidget';
 import { ScrollToTop } from '@/components/common/ScrollToTop/ScrollToTop';
+import { VerifyModal } from '@/components/common/VerifyModal/VerifyModal';
+import { VerifyFAB } from '@/components/common/VerifyFAB/VerifyFAB';
+import { get } from '@/utils/api';
 
 const CERTIFICATE_PREVIEWS = [
   {
@@ -80,7 +82,7 @@ const WORKFLOW_STEPS = [
 const TEAM_FEATURES = [
   {
     title: 'Dynamic Variables',
-    desc: 'Batch generate certificates with unique details.',
+    desc: 'Bulk generate certificates with unique details.',
   },
   {
     title: 'Custom Branding',
@@ -103,23 +105,13 @@ const SOCIAL_PROOF_AVATARS = [
   '1534528741775-53994a69daeb',
 ] as const;
 
-const HERO_METRICS = [
-  {
-    label: 'Template Library',
-    value: '12+',
-    detail: 'curated certificate looks',
-  },
-  {
-    label: 'Automation Ready',
-    value: 'Sheets + Canvas',
-    detail: 'native-first launch paths',
-  },
-  {
-    label: 'Verification Layer',
-    value: 'PDF + Public Link',
-    detail: 'shareable proof by default',
-  },
-] as const;
+const formatPreviewDate = () => {
+  return new Date().toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
 
 const CertificatePreview: React.FC<{
   title: string;
@@ -166,7 +158,10 @@ const CertificatePreview: React.FC<{
     >
       <motion.div
         className={`pointer-events-none absolute inset-2 rounded border-2 border-current opacity-[0.15] md:inset-4 ${getPrimaryColor()}`}
-        animate={{ scale: isFeatured ? 1 : 0.985, opacity: isFeatured ? 0.15 : 0.11 }}
+        animate={{
+          scale: isFeatured ? 1 : 0.985,
+          opacity: isFeatured ? 0.15 : 0.11,
+        }}
         transition={SOFT_SPRING}
       />
 
@@ -184,7 +179,11 @@ const CertificatePreview: React.FC<{
           animate={{ rotate: isFeatured ? 0 : -4 }}
           transition={SOFT_SPRING}
         >
-          <img src="/Logo/logo.svg" alt="Award" className="h-5 w-5 brightness-0 invert md:h-9 md:w-9" />
+          <img
+            src="/Logo/logo.svg"
+            alt="Award"
+            className="h-5 w-5 brightness-0 invert md:h-9 md:w-9"
+          />
         </motion.div>
         <p
           className={`text-[6px] font-black uppercase tracking-[0.4em] opacity-90 md:text-[10px] ${getPrimaryColor()}`}
@@ -211,7 +210,10 @@ const CertificatePreview: React.FC<{
 
       <motion.div
         className={`relative z-10 mx-auto mb-3 h-0.5 w-12 rounded bg-current/20 md:mb-5 md:h-1 md:w-20 ${getPrimaryColor()}`}
-        animate={{ opacity: isFeatured ? 1 : 0.35, scaleX: isFeatured ? 1 : 0.8 }}
+        animate={{
+          opacity: isFeatured ? 1 : 0.35,
+          scaleX: isFeatured ? 1 : 0.8,
+        }}
         transition={SOFT_SPRING}
       />
 
@@ -245,8 +247,8 @@ const CertificatePreview: React.FC<{
             transition={SOFT_SPRING}
             className="relative z-10 mb-auto max-w-[200px] overflow-hidden pb-2 text-[7px] leading-tight text-slate-500 md:max-w-md md:text-[11px]"
           >
-            In recognition of outstanding dedication and exceptional professional integrity
-            within the industry.
+            In recognition of outstanding dedication and exceptional
+            professional integrity within the industry.
           </motion.p>
         )}
       </AnimatePresence>
@@ -257,13 +259,17 @@ const CertificatePreview: React.FC<{
         className="relative z-10 flex w-full items-end justify-between border-t border-slate-100 pt-4 md:pt-6"
       >
         <div className="w-1/3 text-left">
-          <p className="text-[6px] font-bold text-slate-800 md:text-[11px]">Mar 28, 2026</p>
+          <p className="text-[6px] font-bold text-slate-800 md:text-[11px]">
+            {formatPreviewDate()}
+          </p>
           <p className="mt-1 text-[5px] font-black uppercase tracking-widest text-slate-400 md:text-[8px]">
             Date
           </p>
         </div>
         <div className="flex w-1/3 flex-col items-center">
-          <div className={`mb-0.5 text-[8px] font-serif italic opacity-60 md:text-lg ${getPrimaryColor()}`}>
+          <div
+            className={`mb-0.5 text-[8px] font-serif italic opacity-60 md:text-lg ${getPrimaryColor()}`}
+          >
             Certify.ink
           </div>
           <div className="h-px w-8 bg-slate-200 md:w-16" />
@@ -272,7 +278,9 @@ const CertificatePreview: React.FC<{
           </p>
         </div>
         <div className="w-1/3 text-right">
-          <p className="text-[6px] font-bold text-slate-800 md:text-[11px]">Global Academy</p>
+          <p className="text-[6px] font-bold text-slate-800 md:text-[11px]">
+            Global Academy
+          </p>
           <p className="mt-1 text-[5px] font-black uppercase tracking-widest text-slate-400 md:text-[8px]">
             Issuer
           </p>
@@ -283,17 +291,42 @@ const CertificatePreview: React.FC<{
 };
 
 export const Home: React.FC = () => {
-  const { isAuthenticated, loginWithRedirect, isLoading, error: auth0Error } = useAuth0();
+  const {
+    isAuthenticated,
+    loginWithRedirect,
+    isLoading,
+    error: auth0Error,
+  } = useAuth0();
   const location = useLocation();
   const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
-  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>(
+    'signin'
+  );
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [activeAuthAction, setActiveAuthAction] = useState<'signin' | 'signup' | 'google' | null>(
-    null
-  );
+  const [activeAuthAction, setActiveAuthAction] = useState<
+    'signin' | 'signup' | 'google' | null
+  >(null);
+  const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
+  const [templateCount, setTemplateCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchTemplateCount = async () => {
+      try {
+        const response = await get<{ count: number }>(
+          '/templates/public/count'
+        );
+        if (response.success && response.data) {
+          setTemplateCount(response.data.count);
+        }
+      } catch {
+        setTemplateCount(null);
+      }
+    };
+    fetchTemplateCount();
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -381,7 +414,8 @@ export const Home: React.FC = () => {
       closeAuthModal();
       await loginWithRedirect(authOptions);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Authentication failed.';
+      const message =
+        error instanceof Error ? error.message : 'Authentication failed.';
 
       setAuthError(
         `${message} If you are testing locally, make sure ${window.location.origin} is added to Allowed Callback URLs, Allowed Logout URLs, and Allowed Web Origins in Auth0.`
@@ -400,13 +434,8 @@ export const Home: React.FC = () => {
     openAuthModal('signup');
   };
 
-  const handleExploreTemplates = () => {
-    if (isAuthenticated) {
-      navigate(ROUTES.DASHBOARD);
-      return;
-    }
-
-    openAuthModal('signin');
+  const handleVerifyCertificate = () => {
+    setIsVerifyModalOpen(true);
   };
 
   const cardVariants: Variants = {
@@ -450,7 +479,10 @@ export const Home: React.FC = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-base-100">
-      <Header onOpenAuthModal={openAuthModal} />
+      <Header
+        onOpenAuthModal={openAuthModal}
+        onOpenVerifyModal={() => setIsVerifyModalOpen(true)}
+      />
 
       <section className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-4 pb-16 pt-32 text-center">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-base-100 to-base-100" />
@@ -466,27 +498,6 @@ export const Home: React.FC = () => {
           transition={SOFT_SPRING}
           className="z-10 mx-auto max-w-4xl"
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ ...SOFT_SPRING, delay: 0.15 }}
-            className="mb-10 inline-flex items-center gap-2 rounded border border-primary/20 bg-primary/10 px-5 py-2 text-sm font-semibold text-primary backdrop-blur-sm"
-          >
-            <span className="relative flex h-2 w-2">
-              <motion.span
-                className="absolute inline-flex h-full w-full rounded bg-primary opacity-55"
-                animate={{ scale: [1, 1.9], opacity: [0.55, 0] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
-              />
-              <motion.span
-                className="relative inline-flex h-2 w-2 rounded-full bg-primary"
-                animate={{ scale: [1, 0.92, 1] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            </span>
-            New: Pro Templates v2.0
-          </motion.div>
-
           <motion.h1
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
@@ -505,8 +516,8 @@ export const Home: React.FC = () => {
             transition={{ ...SOFT_SPRING, delay: 0.28 }}
             className="mx-auto mb-12 max-w-2xl text-xl font-medium leading-relaxed text-base-content/60 md:text-2xl"
           >
-            A polished workspace for designing certificates, automating issuance, and
-            connecting your training stack without friction.
+            A polished workspace for designing certificates, automating
+            issuance, and connecting your training stack without friction.
           </motion.p>
 
           <motion.div
@@ -517,7 +528,11 @@ export const Home: React.FC = () => {
           >
             <motion.div variants={REVEAL_ITEM}>
               {isAuthenticated ? (
-                <motion.div whileHover={{ y: -4 }} whileTap={TAP_PRESS} transition={QUICK_SPRING}>
+                <motion.div
+                  whileHover={{ y: -4 }}
+                  whileTap={TAP_PRESS}
+                  transition={QUICK_SPRING}
+                >
                   <Link
                     to={ROUTES.DASHBOARD}
                     className="btn btn-primary btn-lg rounded px-12 text-lg font-bold shadow-xl shadow-primary/25"
@@ -539,7 +554,11 @@ export const Home: React.FC = () => {
                     <motion.span
                       className="loading loading-spinner"
                       animate={{ rotate: 360 }}
-                      transition={{ duration: 1.2, ease: 'linear', repeat: Infinity }}
+                      transition={{
+                        duration: 1.2,
+                        ease: 'linear',
+                        repeat: Infinity,
+                      }}
                     />
                   ) : (
                     'Start Free'
@@ -556,10 +575,10 @@ export const Home: React.FC = () => {
             >
               <button
                 type="button"
-                onClick={handleExploreTemplates}
+                onClick={handleVerifyCertificate}
                 className="btn btn-ghost btn-lg rounded px-8 text-lg font-bold"
               >
-                Explore Templates
+                Verify a Certificate
               </button>
             </motion.div>
           </motion.div>
@@ -570,42 +589,54 @@ export const Home: React.FC = () => {
             animate="visible"
             className="mx-auto mt-10 grid max-w-4xl gap-3 text-left sm:grid-cols-3"
           >
-            {HERO_METRICS.map((item) => (
-              <motion.div
-                key={item.label}
-                variants={REVEAL_ITEM}
-                whileHover={{ y: -4 }}
-                transition={QUICK_SPRING}
-                className="rounded border border-base-200 bg-base-100/85 px-5 py-4 shadow-sm backdrop-blur"
-              >
-                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-base-content/35">
-                  {item.label}
-                </p>
-                <p className="mt-2 text-lg font-black tracking-tight text-base-content">
-                  {item.value}
-                </p>
-                <p className="mt-1 text-sm font-medium text-base-content/55">
-                  {item.detail}
-                </p>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 32 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ ...SOFT_SPRING, delay: 0.5 }}
-            className="mt-20 flex w-full max-w-4xl flex-col items-center gap-6 rounded bg-base-200/50 p-8 border border-base-200 backdrop-blur-md md:p-12"
-          >
-            <div className="text-center">
-              <h2 className="mb-2 text-2xl font-black tracking-tighter text-base-content md:text-3xl">
-                Verify a Digital Achievement
-              </h2>
-              <p className="mb-8 font-medium text-base-content/50">
-                Enter a Certificate ID to validate its authenticity instantly.
+            <motion.div
+              variants={REVEAL_ITEM}
+              whileHover={{ y: -4 }}
+              transition={QUICK_SPRING}
+              className="rounded border border-base-200 bg-base-100/85 px-5 py-4 shadow-sm backdrop-blur"
+            >
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-base-content/35">
+                Template Gallery
               </p>
-            </div>
-            <VerifySearchWidget variant="large" />
+              <p className="mt-2 text-lg font-black tracking-tight text-base-content">
+                {templateCount !== null ? `${templateCount}+` : '—'}
+              </p>
+              <p className="mt-1 text-sm font-medium text-base-content/55">
+                curated certificate looks
+              </p>
+            </motion.div>
+            <motion.div
+              variants={REVEAL_ITEM}
+              whileHover={{ y: -4 }}
+              transition={QUICK_SPRING}
+              className="rounded border border-base-200 bg-base-100/85 px-5 py-4 shadow-sm backdrop-blur"
+            >
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-base-content/35">
+                Integration Ready
+              </p>
+              <p className="mt-2 text-lg font-black tracking-tight text-base-content">
+                Sheets + Canvas
+              </p>
+              <p className="mt-1 text-sm font-medium text-base-content/55">
+                native-first launch paths
+              </p>
+            </motion.div>
+            <motion.div
+              variants={REVEAL_ITEM}
+              whileHover={{ y: -4 }}
+              transition={QUICK_SPRING}
+              className="rounded border border-base-200 bg-base-100/85 px-5 py-4 shadow-sm backdrop-blur"
+            >
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-base-content/35">
+                Verification Layer
+              </p>
+              <p className="mt-2 text-lg font-black tracking-tight text-base-content">
+                PDF + Public Link
+              </p>
+              <p className="mt-1 text-sm font-medium text-base-content/55">
+                shareable proof by default
+              </p>
+            </motion.div>
           </motion.div>
         </motion.div>
 
@@ -636,7 +667,9 @@ export const Home: React.FC = () => {
                           ? 'shadow-[0_50px_100px_-25px_rgba(0,0,0,0.25)]'
                           : 'shadow-xl'
                       }`}
-                      whileHover={{ boxShadow: '0 35px 70px -28px rgba(15,23,42,0.22)' }}
+                      whileHover={{
+                        boxShadow: '0 35px 70px -28px rgba(15,23,42,0.22)',
+                      }}
                       transition={QUICK_SPRING}
                     >
                       <CertificatePreview
@@ -667,7 +700,9 @@ export const Home: React.FC = () => {
                 >
                   <motion.span
                     className={`block rounded ${
-                      activeIndex === index ? 'bg-primary shadow-lg shadow-primary/30' : 'bg-base-300'
+                      activeIndex === index
+                        ? 'bg-primary shadow-lg shadow-primary/30'
+                        : 'bg-base-300'
                     }`}
                     animate={{
                       width: activeIndex === index ? 40 : 10,
@@ -707,10 +742,13 @@ export const Home: React.FC = () => {
             </div>
             <div className="text-left">
               <p className="mb-1 text-lg font-black leading-none tracking-tight text-primary">
-                2,500+ <span className="font-medium text-base-content/60">Joined Professionals</span>
+                Join{' '}
+                <span className="font-medium text-base-content/60">
+                  Early Adopters
+                </span>
               </p>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-base-content/20 italic">
-                Global Industry Standard
+                Shape the Future of Credentials
               </p>
             </div>
           </motion.div>
@@ -860,15 +898,18 @@ export const Home: React.FC = () => {
           >
             <motion.div
               className="absolute right-0 top-0 h-[800px] w-[800px] rounded-full bg-white/10 blur-[150px]"
-              animate={{ x: ['50%', '46%', '50%'], y: ['-50%', '-46%', '-50%'] }}
+              animate={{
+                x: ['50%', '46%', '50%'],
+                y: ['-50%', '-46%', '-50%'],
+              }}
               transition={{ duration: 10, ease: 'easeInOut', repeat: Infinity }}
             />
             <h2 className="mb-10 text-6xl font-black leading-[0.9] tracking-tighter text-white md:text-8xl">
               Start Creating <br /> Today
             </h2>
             <p className="mx-auto mb-14 max-w-2xl text-2xl font-medium text-primary-content/80">
-              Join thousands of professionals issuing verified digital certificates instantly
-              and for free.
+              Join thousands of professionals creating verified digital
+              certificates instantly and for free.
             </p>
             <div className="flex justify-center">
               <motion.button
@@ -884,14 +925,22 @@ export const Home: React.FC = () => {
                   <motion.span
                     className="loading loading-spinner"
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1.2, ease: 'linear', repeat: Infinity }}
+                    transition={{
+                      duration: 1.2,
+                      ease: 'linear',
+                      repeat: Infinity,
+                    }}
                   />
                 ) : (
                   <>
                     {isAuthenticated ? 'Open Dashboard' : 'Start Free'}
                     <motion.span
                       animate={{ x: [0, 4, 0] }}
-                      transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                      transition={{
+                        duration: 1.8,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                      }}
                     >
                       <ArrowRight size={32} />
                     </motion.span>
@@ -911,12 +960,19 @@ export const Home: React.FC = () => {
         onClose={closeAuthModal}
         onSignIn={() => authenticate('signin')}
         onSignUp={() => authenticate('signup', { screenHint: 'signup' })}
-        onGoogleSignIn={() => authenticate('google', { connection: 'google-oauth2' })}
+        onGoogleSignIn={() =>
+          authenticate('google', { connection: 'google-oauth2' })
+        }
         isLoading={activeAuthAction !== null}
         activeAction={activeAuthAction}
         error={authError}
       />
       <ScrollToTop />
+      <VerifyFAB onClick={() => setIsVerifyModalOpen(true)} />
+      <VerifyModal
+        isOpen={isVerifyModalOpen}
+        onClose={() => setIsVerifyModalOpen(false)}
+      />
     </div>
   );
 };

@@ -1,17 +1,31 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { AuthProvider } from '@/context/AuthContext';
 import { Loading } from '@/components/common/Loading';
 import { ROUTES } from '@/utils/constants';
 import { PAGE_VARIANTS } from '@/utils/motion';
 
-const Home = lazy(() => import('@/pages/Home').then((m) => ({ default: m.Home })));
-const Dashboard = lazy(() => import('@/pages/Dashboard').then((m) => ({ default: m.Dashboard })));
-const Templates = lazy(() => import('@/pages/Templates').then((m) => ({ default: m.Templates })));
+const Home = lazy(() =>
+  import('@/pages/Home').then((m) => ({ default: m.Home }))
+);
+const Dashboard = lazy(() =>
+  import('@/pages/Dashboard').then((m) => ({ default: m.Dashboard }))
+);
+const Templates = lazy(() =>
+  import('@/pages/Templates').then((m) => ({ default: m.Templates }))
+);
 const CreateCertificate = lazy(() =>
-  import('@/pages/CreateCertificate').then((m) => ({ default: m.CreateCertificate }))
+  import('@/pages/CreateCertificate').then((m) => ({
+    default: m.CreateCertificate,
+  }))
 );
 const Certificates = lazy(() =>
   import('@/pages/Certificates').then((m) => ({ default: m.Certificates }))
@@ -22,20 +36,38 @@ const BatchGenerate = lazy(() =>
 const Integrations = lazy(() =>
   import('@/pages/Integrations').then((m) => ({ default: m.Integrations }))
 );
-const Settings = lazy(() => import('@/pages/Settings').then((m) => ({ default: m.Settings })));
-const Verify = lazy(() => import('@/pages/Verify').then((m) => ({ default: m.VerifyPortal })));
-const VerifyPortal = lazy(() => import('@/pages/Verify').then((m) => ({ default: m.VerifyPortal })));
+const Settings = lazy(() =>
+  import('@/pages/Settings').then((m) => ({ default: m.Settings }))
+);
+const Verify = lazy(() =>
+  import('@/pages/Verify').then((m) => ({ default: m.VerifyPortal }))
+);
+const VerifyPortal = lazy(() =>
+  import('@/pages/Verify').then((m) => ({ default: m.VerifyPortal }))
+);
 const TemplateBuilder = lazy(() =>
-  import('@/pages/TemplateBuilder').then((m) => ({ default: m.TemplateBuilder }))
+  import('@/pages/TemplateBuilder').then((m) => ({
+    default: m.TemplateBuilder,
+  }))
 );
 
 // Support & Legal
-const About = lazy(() => import('@/pages/Support').then((m) => ({ default: m.About })));
-const FAQ = lazy(() => import('@/pages/Support').then((m) => ({ default: m.FAQ })));
-const Privacy = lazy(() => import('@/pages/Legal').then((m) => ({ default: m.Privacy })));
-const Terms = lazy(() => import('@/pages/Legal').then((m) => ({ default: m.Terms })));
+const About = lazy(() =>
+  import('@/pages/Support').then((m) => ({ default: m.About }))
+);
+const FAQ = lazy(() =>
+  import('@/pages/Support').then((m) => ({ default: m.FAQ }))
+);
+const Privacy = lazy(() =>
+  import('@/pages/Legal').then((m) => ({ default: m.Privacy }))
+);
+const Terms = lazy(() =>
+  import('@/pages/Legal').then((m) => ({ default: m.Terms }))
+);
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
   const location = useLocation();
 
@@ -91,7 +123,9 @@ const RouteScene: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 const AppRoutes: React.FC = () => {
   const location = useLocation();
-  const scene = (children: React.ReactNode) => <RouteScene>{children}</RouteScene>;
+  const scene = (children: React.ReactNode) => (
+    <RouteScene>{children}</RouteScene>
+  );
   const protectedScene = (children: React.ReactNode) =>
     scene(<ProtectedRoute>{children}</ProtectedRoute>);
 
@@ -99,17 +133,35 @@ const AppRoutes: React.FC = () => {
     <AnimatePresence initial={false} mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path={ROUTES.HOME} element={scene(<Home />)} />
-        <Route path={ROUTES.DASHBOARD} element={protectedScene(<Dashboard />)} />
-        <Route path={ROUTES.TEMPLATES} element={protectedScene(<Templates />)} />
+        <Route
+          path={ROUTES.DASHBOARD}
+          element={protectedScene(<Dashboard />)}
+        />
+        <Route
+          path={ROUTES.TEMPLATES}
+          element={protectedScene(<Templates />)}
+        />
         <Route
           path={ROUTES.CREATE_CERTIFICATE}
           element={protectedScene(<CreateCertificate />)}
         />
-        <Route path={ROUTES.CERTIFICATES} element={protectedScene(<Certificates />)} />
-        <Route path={ROUTES.BATCH_GENERATE} element={protectedScene(<BatchGenerate />)} />
-        <Route path={ROUTES.INTEGRATIONS} element={protectedScene(<Integrations />)} />
+        <Route
+          path={ROUTES.CERTIFICATES}
+          element={protectedScene(<Certificates />)}
+        />
+        <Route
+          path={ROUTES.BATCH_GENERATE}
+          element={protectedScene(<BatchGenerate />)}
+        />
+        <Route
+          path={ROUTES.INTEGRATIONS}
+          element={protectedScene(<Integrations />)}
+        />
         <Route path={ROUTES.SETTINGS} element={protectedScene(<Settings />)} />
-        <Route path={ROUTES.TEMPLATE_BUILDER} element={protectedScene(<TemplateBuilder />)} />
+        <Route
+          path={ROUTES.TEMPLATE_BUILDER}
+          element={protectedScene(<TemplateBuilder />)}
+        />
         <Route path={ROUTES.VERIFY} element={scene(<Verify />)} />
         <Route path={ROUTES.VERIFY_PORTAL} element={scene(<VerifyPortal />)} />
         <Route path={ROUTES.ABOUT} element={scene(<About />)} />

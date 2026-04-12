@@ -9,10 +9,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Bundle Size Optimization**: Implemented lazy loading for heavy libraries to eliminate Vite 500kB chunk warnings. ExcelJS dynamically imported in csvParser.ts for XLSX parsing. Recharts components (OverviewChart, UsageChart) lazy loaded via React.Suspense in Dashboard.tsx. Results: BatchGenerate chunk reduced from 955.96 kB to 26.36 kB (97% reduction), Dashboard chunk reduced from 417.81 kB to 16.03 kB (96% reduction). New lazy chunks: exceljs.min (929.91 kB), Chart (362.12 kB).
+- **UI Label Updates**: Changed "Program & Branding" to "Program" and "Program Logo" to "Organization Logo" in CertificateForm and TemplateBuilder for consistency with organization-level branding terminology.
+
+### Fixed
+
+- **Landing Page Dynamic Dates**: Fixed hardcoded dates in Home.tsx certificate preview carousel. Added `formatPreviewDate()` function to dynamically render dates using `new Date().toLocaleDateString()`. Previously showed static "Mar 28, 2026" - now displays current date in "Mon DD, YYYY" format.
+- **About Page "Since Year"**: Fixed hardcoded "Since 2026" in About.tsx to use `new Date().getFullYear()` for dynamic year display.
+- **Privacy/Terms Last Updated Dates**: Fixed hardcoded dates in PrivacyPolicy.tsx and TermsOfService.tsx to dynamically render current date.
+- **Social Proof Text**: Changed "Join 500+ organizations" to "Join Early Adopters" in Home.tsx for accurate pre-launch messaging.
+- **Template Count Display**: Fixed hardcoded template count to use actual count from templates API in Home.tsx.
+
+### Fixed
+
+- **Google Sheets Default Sheet Name**: Reverted default sheet name from "Ready to Issue" back to "Ready to Create" in `integrationService.ts`. Tests define expected behavior - code should match tests, not the other way around.
+- **Usage Stats API 500 Error**: Fixed three bugs in `usageController.ts` causing Internal Server Error:
+  1. Wrong user ID type - used `req.user` (MongoDB ObjectId) instead of `req.auth?.payload.sub` (Auth0 ID string) for `getWorkspaceMemberIds`
+  2. Response format mismatch - wrapped response in `ApiResponse` format (`{ success: true, data: {...} }`) to match frontend expectations
+  3. Error response format - standardized error responses with `{ success: false, error: { code, message } }`
+
 ### Added
-- **Design System Standardization**: Enforced a strict 0.25rem (rounded) corner radius across the entire application (Pages, Components, and Portals) to align with the core corporate design system.
+
+- **Usage Stats Dashboard**: Real-time usage statistics in sidebar showing certificates created this month, batch jobs completed, and storage used with animated progress bars (Phase 1 simple stats - no billing/limits yet)
+  - Backend: `GET /api/usage` endpoint with organization-scoped statistics
+  - Frontend: `useUsageStats` hook with demo mode support
+  - UI: `UsageStats` component with Framer Motion animated progress bars
 
 ### Changed
+
+- **Settings Security Tab Labels**: Simplified 10 technical labels to user-friendly terminology - "Security Protocol" → "Security Settings", "Credential Standard" → "Login Method", "Session Protocol" → "Session", "Multi-Factor Authentication" → "Two-Factor Auth", "Password Management" → "Password", "Technical Support Email" → "Support Email", "Custom Verification URL" → "Custom Verify Link", "API Credential Management" → "API Keys", "Webhook Configuration" → "Webhooks", "Account Deletion Protocol" → "Account Deletion"
+- **Settings Branding Tab**: Changed "Corporate Brand Mark" to "Organization Logo" for clearer terminology
+- **Danger Zone UI**: Added spacing between "Danger Zone" and "Account Deletion" labels; removed italic styling from "Account Deletion" for cleaner appearance
+- **VerifyPortal Stats**: Simplified "Security Protocol" to "Security" for cleaner UI
+
+### Fixed
+
+- **SecurityTab Linter Warnings**: Removed unused `Mail` import from lucide-react; renamed unused props (`pwResetStatus`, `pwResetLoading`, `handlePasswordReset`) with underscore prefix to satisfy TypeScript noUnusedLocals rule
+
+### Fixed
+
+- **500 Internal Server Error for Unauthenticated API Requests**: Fixed error handler in `backend/src/middleware/errorHandler.ts` to properly handle JWT middleware errors from `express-oauth2-jwt-bearer`. The library throws errors with `status` property (e.g., 401) instead of `statusCode`, causing the error handler to default to 500. Added `status` property check and `getErrorCode`/`getErrorMessage` functions to map JWT errors to proper HTTP status codes and error codes.
+
+- **TemplateGallery Duplicate UI**: Removed duplicate category filter tabs from `TemplateGallery.tsx` component. Filtering logic now lives exclusively in parent `Templates.tsx` page, preventing double-filtering and duplicate UI elements.
+- **Templates Category Tabs Animation**: Fixed jarring color transitions on category filter tabs. Improved spring physics (`stiffness: 400, damping: 30`), added smooth text color transitions, and implemented prominent primary-color hover states for better UX.
+- **UI Naming Consistency**: Systematically replaced all legacy naming references across pages and components - "ledger" → "registry", "library" → "templates", "automation" → "integration", "Design Library" → "Template Gallery", "Automation Center" → "Integration Center", "Automations" → "Sync Runs".
+
+### Changed
+
+- **Sidebar Navigation Naming**: Renamed sidebar items for better user clarity - "Ledger" → "Certificates", "Library" → "Templates", "Instant Issue" → "Quick Create", "Batch Flow" → "Bulk Create", "Automation" → "Integrations", "Admin Tools" → "Settings"
+- **Dashboard UI Labels**: Updated "Issuance Ledger" → "Recent Certificates", "Ledger is empty" → "No certificates yet" for user-friendly terminology
+- **Certificates Page**: Changed "Immutable Ledger" badge to "Certificate Records" for clearer context
+- **Batch Progress Table**: Simplified "Ledger Action" column header to "Action" for cleaner UI
 - **Mass Refactoring**: Systematically refactored all non-compliant "bubble-mode" rounding tokens (rounded-lg, rounded-xl, rounded-2xl, rounded-full) to standard `rounded` utility while preserving decorative blurs and status indicators.
 - **Corporate UI Polish**: Standardized buttons, cards, avatars, and navigation elements in Header, Sidebar, and Dashboard for a premium, professional SaaS aesthetic.
 
@@ -100,6 +149,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Sidebar Accessibility**: Added `title="Close menu"` attribute to mobile close button for screen reader compatibility — resolves "Buttons must have discernible text" lint error
+- **MongoDB Duplicate Key Error Handling**: Added retry logic with exponential backoff in `workspaceService.ts` to handle race conditions during organization creation — resolves `E11000 duplicate key error` when multiple requests attempt to create the same workspace simultaneously
 - **CI backend build failure**: Removed deprecated `zapier`, `make`, and `moodle` provider entries from `INTEGRATION_CATALOG` in `integrationService.ts` — these providers were already removed from the `IntegrationProvider` type union, causing TS2322 type mismatch errors on every push
 - **CI frontend test failure**: Rewrote `Integrations.test.tsx` to assert against current UI text (`Integrations Hub`, `Google Sheets, Canvas LMS, and Webhooks`) instead of stale strings that no longer exist in the page after the Hub layout optimization
 - **Decorative blur blobs**: Restored `rounded-full` on background decorative blurs in `Dashboard.tsx`, `Home.tsx`, and `main.tsx` that were incorrectly flattened to `rounded` during the mass design-system refactor

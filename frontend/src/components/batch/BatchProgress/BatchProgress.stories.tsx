@@ -51,7 +51,7 @@ export const Failed: Story = {
           error: 'PDF generation timeout',
         },
       ],
-      errorMessage: 'Unexpected error during batch processing.',
+      errorMessage: 'Unexpected error during bulk processing.',
     } satisfies BatchJob,
   },
 };
@@ -62,10 +62,14 @@ export const AllSucceeded: Story = {
       ...MOCK_BATCH_JOB_COMPLETED,
       results: MOCK_BATCH_JOB_COMPLETED.results.map((r) =>
         r.status === 'failed'
-          ? { recipientName: r.recipientName, status: 'success' as const, certificateId: 'cert-003', pdfUrl: 'https://example.com/cert-carol.pdf' }
+          ? {
+              recipientName: r.recipientName,
+              status: 'success' as const,
+              certificateId: 'cert-003',
+              pdfUrl: 'https://example.com/cert-carol.pdf',
+            }
           : r
       ),
     } satisfies BatchJob,
   },
 };
-

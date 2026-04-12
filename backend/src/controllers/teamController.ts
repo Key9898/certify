@@ -13,7 +13,10 @@ import {
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const requireWorkspaceAdmin = (req: AuthenticatedRequest, res: Response): boolean => {
+const requireWorkspaceAdmin = (
+  req: AuthenticatedRequest,
+  res: Response
+): boolean => {
   if (!isWorkspaceAdmin(req.user!)) {
     res.status(403).json({
       success: false,
@@ -107,13 +110,19 @@ export const inviteTeamMember = async (
   try {
     if (!requireWorkspaceAdmin(req, res)) return;
 
-    const { email, role } = req.body as { email?: string; role?: 'admin' | 'member' };
+    const { email, role } = req.body as {
+      email?: string;
+      role?: 'admin' | 'member';
+    };
     const normalizedEmail = email ? normalizeWorkspaceEmail(email) : '';
 
     if (!EMAIL_REGEX.test(normalizedEmail)) {
       res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'A valid email address is required.' },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'A valid email address is required.',
+        },
       });
       return;
     }
@@ -121,7 +130,10 @@ export const inviteTeamMember = async (
     if (!role || !['admin', 'member'].includes(role)) {
       res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'Role must be admin or member.' },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Role must be admin or member.',
+        },
       });
       return;
     }
@@ -154,7 +166,8 @@ export const inviteTeamMember = async (
         success: false,
         error: {
           code: 'INVITE_EXISTS',
-          message: 'A pending invitation already exists for that email address.',
+          message:
+            'A pending invitation already exists for that email address.',
         },
       });
       return;
@@ -195,7 +208,10 @@ export const updateTeamMemberRole = async (
     if (!role || !['admin', 'member'].includes(role)) {
       res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'Role must be admin or member.' },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Role must be admin or member.',
+        },
       });
       return;
     }
@@ -276,7 +292,10 @@ export const removeTeamMember = async (
     await member.save();
     await createWorkspaceForUser(member);
 
-    res.json({ success: true, data: { message: 'Member removed from workspace.' } });
+    res.json({
+      success: true,
+      data: { message: 'Member removed from workspace.' },
+    });
   } catch (error) {
     next(error);
   }

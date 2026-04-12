@@ -30,7 +30,10 @@ export const getAnalytics = async (
 
       BatchJob.countDocuments({ createdBy: { $in: workspaceUserIds } }),
 
-      BatchJob.countDocuments({ createdBy: { $in: workspaceUserIds }, status: 'completed' }),
+      BatchJob.countDocuments({
+        createdBy: { $in: workspaceUserIds },
+        status: 'completed',
+      }),
 
       Certificate.aggregate([
         { $match: { createdBy: { $in: workspaceUserIds } } },
@@ -96,7 +99,10 @@ export const getAnalytics = async (
         batch: {
           total: batchJobsTotal,
           completed: batchJobsCompleted,
-          successRate: batchJobsTotal > 0 ? Math.round((batchJobsCompleted / batchJobsTotal) * 100) : 0,
+          successRate:
+            batchJobsTotal > 0
+              ? Math.round((batchJobsCompleted / batchJobsTotal) * 100)
+              : 0,
         },
         templates: {
           customCount: customTemplates,

@@ -55,10 +55,14 @@ const isIpInRange = (ip: string, start: string, end: string): boolean => {
 };
 
 const isBlockedIp = (ip: string): boolean => {
-  return BLOCKED_IP_RANGES.some((range) => isIpInRange(ip, range.start, range.end));
+  return BLOCKED_IP_RANGES.some((range) =>
+    isIpInRange(ip, range.start, range.end)
+  );
 };
 
-export const isSafeUrl = async (urlString: string): Promise<{ safe: boolean; reason?: string }> => {
+export const isSafeUrl = async (
+  urlString: string
+): Promise<{ safe: boolean; reason?: string }> => {
   try {
     const url = new URL(urlString);
 

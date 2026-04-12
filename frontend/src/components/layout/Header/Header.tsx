@@ -1,14 +1,21 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { LayoutDashboard, Menu } from 'lucide-react';
+import { LayoutDashboard, Menu, Search } from 'lucide-react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { ROUTES } from '@/utils/constants';
-import { getAuthProfileDisplayName, getAuthProfileInitial } from '@/utils/formatters';
+import {
+  getAuthProfileDisplayName,
+  getAuthProfileInitial,
+} from '@/utils/formatters';
 import type { HeaderProps } from './Header.types';
 import { QUICK_SPRING, SOFT_SPRING, TAP_PRESS } from '@/utils/motion';
 
-export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onOpenAuthModal }) => {
+export const Header: React.FC<HeaderProps> = ({
+  onMenuToggle,
+  onOpenAuthModal,
+  onOpenVerifyModal,
+}) => {
   const { user, isAuthenticated, loginWithRedirect } = useAuth0();
   const displayName = getAuthProfileDisplayName(user);
 
@@ -50,12 +57,22 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onOpenAuthModal })
           <motion.div whileHover={{ y: -2, transition: SOFT_SPRING }}>
             <Link to={ROUTES.HOME} className="group flex items-center gap-3">
               <motion.div
-                whileHover={{ rotate: -6, scale: 1.06, transition: QUICK_SPRING }}
+                whileHover={{
+                  rotate: -6,
+                  scale: 1.06,
+                  transition: QUICK_SPRING,
+                }}
                 className="rounded bg-primary p-2 shadow-lg shadow-primary/20"
               >
-                <img src="/Logo/logo.svg" alt="Certify" className="h-5 w-5 brightness-0 invert" />
+                <img
+                  src="/Logo/logo.svg"
+                  alt="Certify"
+                  className="h-5 w-5 brightness-0 invert"
+                />
               </motion.div>
-              <span className="text-2xl font-black tracking-tighter text-base-content">Certify</span>
+              <span className="text-2xl font-black tracking-tighter text-base-content">
+                Certify
+              </span>
             </Link>
           </motion.div>
         </div>
@@ -86,6 +103,19 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onOpenAuthModal })
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          {onOpenVerifyModal && (
+            <motion.button
+              type="button"
+              onClick={onOpenVerifyModal}
+              className="btn btn-ghost btn-sm rounded border border-base-200 bg-base-100/70 px-3 shadow-sm sm:btn-md"
+              whileHover={{ y: -2, scale: 1.01, transition: SOFT_SPRING }}
+              whileTap={TAP_PRESS}
+              aria-label="Verify a certificate"
+            >
+              <Search size={18} />
+              <span className="hidden sm:inline">Verify</span>
+            </motion.button>
+          )}
           {isAuthenticated ? (
             <>
               <motion.div
@@ -106,7 +136,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onOpenAuthModal })
                 <motion.div
                   tabIndex={0}
                   role="button"
-                    className="btn btn-ghost rounded avatar p-0.5 ring-1 ring-primary/20 ring-offset-1 hover:ring-primary"
+                  className="btn btn-ghost rounded avatar p-0.5 ring-1 ring-primary/20 ring-offset-1 hover:ring-primary"
                   whileHover={{ y: -2, scale: 1.03 }}
                   transition={SOFT_SPRING}
                 >

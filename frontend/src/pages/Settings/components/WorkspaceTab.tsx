@@ -1,7 +1,15 @@
-import { Users, Plus, Trash2, Building2, ShieldCheck, Mail } from 'lucide-react';
+import {
+  Users,
+  Plus,
+  Trash2,
+  Building2,
+  ShieldCheck,
+  Mail,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
+import { RolePermissionMatrix } from './RolePermissionMatrix';
 import type { WorkspaceTabProps } from './types';
 
 export const WorkspaceTab: React.FC<WorkspaceTabProps> = ({
@@ -32,33 +40,54 @@ export const WorkspaceTab: React.FC<WorkspaceTabProps> = ({
             <Users size={20} aria-hidden="true" />
           </div>
           <div>
-            <h2 className="text-xl font-black tracking-tight text-base-content">Personnel & Access</h2>
-            <p className="text-sm text-base-content/55 font-medium">Coordinate issuance and design tasks across your workspace.</p>
+            <h2 className="text-xl font-black tracking-tight text-base-content">
+              Personnel & Access
+            </h2>
+            <p className="text-sm text-base-content/55 font-medium">
+              Coordinate issuance and design tasks across your workspace.
+            </p>
           </div>
         </div>
 
         {teamLoading ? (
           <div className="flex flex-col items-center justify-center py-16">
             <span className="loading loading-spinner loading-lg text-primary" />
-            <p className="mt-4 text-xs font-black uppercase tracking-widest text-base-content/30 italic">Synchronizing team state...</p>
+            <p className="mt-4 text-xs font-black uppercase tracking-widest text-base-content/30 italic">
+              Synchronizing team state...
+            </p>
           </div>
         ) : (
           <>
             {teamData?.organization && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                 <div className="rounded border border-base-200 bg-base-200/30 p-5 group hover:bg-base-200/50 transition-colors">
-                  <p className="meta-label mb-2 flex items-center gap-1.5"><Building2 size={10} /> Workspace</p>
-                  <p className="text-lg font-black text-base-content tracking-tight">{teamData.organization.name}</p>
+                  <p className="meta-label mb-2 flex items-center gap-1.5">
+                    <Building2 size={10} /> Workspace
+                  </p>
+                  <p className="text-lg font-black text-base-content tracking-tight">
+                    {teamData.organization.name}
+                  </p>
                 </div>
                 <div className="rounded border border-base-200 bg-base-200/30 p-5 group hover:bg-base-200/50 transition-colors">
-                  <p className="meta-label mb-2 flex items-center gap-1.5"><ShieldCheck size={10} /> Role Access</p>
-                  <p className="text-lg font-black text-base-content tracking-tight capitalize">{teamData.members.find(m => m.isCurrentUser)?.role || 'Member'}</p>
+                  <p className="meta-label mb-2 flex items-center gap-1.5">
+                    <ShieldCheck size={10} /> Role Access
+                  </p>
+                  <p className="text-lg font-black text-base-content tracking-tight capitalize">
+                    {teamData.members.find((m) => m.isCurrentUser)?.role ||
+                      'Member'}
+                  </p>
                 </div>
                 <div className="rounded border border-base-200 bg-base-200/30 p-5 group hover:bg-base-200/50 transition-colors">
-                  <p className="meta-label mb-2 flex items-center gap-1.5"><Plus size={10} /> Seats Used</p>
+                  <p className="meta-label mb-2 flex items-center gap-1.5">
+                    <Plus size={10} /> Seats Used
+                  </p>
                   <div className="flex items-center gap-2">
-                    <p className="text-lg font-black text-base-content tracking-tight">{teamData.members.length}</p>
-                    <span className="text-[10px] font-bold text-base-content/40 uppercase tracking-widest">Active Accounts</span>
+                    <p className="text-lg font-black text-base-content tracking-tight">
+                      {teamData.members.length}
+                    </p>
+                    <span className="text-[10px] font-bold text-base-content/40 uppercase tracking-widest">
+                      Active Accounts
+                    </span>
                   </div>
                 </div>
               </div>
@@ -68,14 +97,17 @@ export const WorkspaceTab: React.FC<WorkspaceTabProps> = ({
               <div className="alert border-info/20 bg-info/5 rounded mb-6 flex items-start gap-3 p-4">
                 <ShieldCheck className="text-info shrink-0 h-5 w-5" />
                 <span className="text-sm font-medium text-base-content/75">
-                  Restricted Access: Only workspace Owners and Administrators can orchestrate invitations and modify teammate roles.
+                  Restricted Access: Only workspace Owners and Administrators
+                  can orchestrate invitations and modify teammate roles.
                 </span>
               </div>
             )}
 
             {teamError && (
               <div className="alert alert-error rounded mb-6 p-4">
-                <span className="text-sm font-black tracking-tight">{teamError}</span>
+                <span className="text-sm font-black tracking-tight">
+                  {teamError}
+                </span>
               </div>
             )}
 
@@ -97,43 +129,51 @@ export const WorkspaceTab: React.FC<WorkspaceTabProps> = ({
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="font-black text-base-content tracking-tight">{member.name}</p>
+                        <p className="font-black text-base-content tracking-tight">
+                          {member.name}
+                        </p>
                         {member.isCurrentUser && (
                           <span className="brand-tag !px-2 !py-0.5">You</span>
                         )}
                       </div>
-                      <p className="text-xs font-medium text-base-content/40 flex items-center gap-1.5"><Mail size={10} /> {member.email}</p>
+                      <p className="text-xs font-medium text-base-content/40 flex items-center gap-1.5">
+                        <Mail size={10} /> {member.email}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 border-t border-base-200 pt-3 md:border-none md:pt-0">
-                    <span className="badge badge-outline border-base-300 px-3 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-base-content/50 capitalize">{member.role}</span>
-                    {canManageWorkspace && member.role !== 'owner' && !member.isCurrentUser && (
-                      <div className="flex items-center gap-2">
-                        <select
-                          className="select select-bordered select-sm rounded font-bold text-[11px] h-9 min-h-[36px]"
-                          value={member.role}
-                          onChange={(e) =>
-                            handleUpdateMemberRole(
-                              member._id,
-                              e.target.value as 'admin' | 'member'
-                            )
-                          }
-                          disabled={!!teamActionId}
-                          aria-label={`Change role for ${member.name}`}
-                        >
-                          <option value="member">Member Access</option>
-                          <option value="admin">Admin Root</option>
-                        </select>
-                        <button
-                          className="btn btn-ghost btn-sm text-error h-9 min-h-[36px]"
-                          onClick={() => handleRemoveMember(member._id)}
-                          disabled={!!teamActionId}
-                          aria-label={`Revoke access for ${member.name}`}
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                    )}
+                    <span className="badge badge-outline border-base-300 px-3 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-base-content/50 capitalize">
+                      {member.role}
+                    </span>
+                    {canManageWorkspace &&
+                      member.role !== 'owner' &&
+                      !member.isCurrentUser && (
+                        <div className="flex items-center gap-2">
+                          <select
+                            className="select select-bordered select-sm rounded font-bold text-[11px] h-9 min-h-[36px]"
+                            value={member.role}
+                            onChange={(e) =>
+                              handleUpdateMemberRole(
+                                member._id,
+                                e.target.value as 'admin' | 'member'
+                              )
+                            }
+                            disabled={!!teamActionId}
+                            aria-label={`Change role for ${member.name}`}
+                          >
+                            <option value="member">Member Access</option>
+                            <option value="admin">Admin Root</option>
+                          </select>
+                          <button
+                            className="btn btn-ghost btn-sm text-error h-9 min-h-[36px]"
+                            onClick={() => handleRemoveMember(member._id)}
+                            disabled={!!teamActionId}
+                            aria-label={`Revoke access for ${member.name}`}
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      )}
                   </div>
                 </motion.div>
               ))}
@@ -141,7 +181,9 @@ export const WorkspaceTab: React.FC<WorkspaceTabProps> = ({
 
             {canManageWorkspace && (
               <div className="rounded border border-primary/10 bg-primary/5 p-6 mt-8">
-                <p className="meta-label !text-primary mb-4 flex items-center gap-2"><Plus size={14} /> Onboard New Teammate</p>
+                <p className="meta-label !text-primary mb-4 flex items-center gap-2">
+                  <Plus size={14} /> Onboard New Teammate
+                </p>
                 <div className="grid grid-cols-1 md:grid-cols-[1fr_160px_auto] items-end gap-5">
                   <Input
                     label="Invitation Email"
@@ -153,12 +195,17 @@ export const WorkspaceTab: React.FC<WorkspaceTabProps> = ({
                   />
                   <div className="form-control">
                     <label className="label h-8 p-0 mb-2">
-                      <span className="text-[11px] font-black uppercase tracking-widest text-base-content/40">Default Role</span>
+                      <span className="text-[11px] font-black uppercase tracking-widest text-base-content/40">
+                        Default Role
+                      </span>
                     </label>
                     <select
                       className="select select-bordered rounded h-11 min-h-[44px] font-bold text-xs"
                       value={inviteRole}
-                      onChange={(e) => setInviteRole(e.target.value as 'admin' | 'member')}
+                      onChange={(e) =>
+                        setInviteRole(e.target.value as 'admin' | 'member')
+                      }
+                      aria-label="Select default role for new team member"
                     >
                       <option value="member">Member</option>
                       <option value="admin">Admin</option>
@@ -190,9 +237,15 @@ export const WorkspaceTab: React.FC<WorkspaceTabProps> = ({
                       className="flex flex-col md:flex-row md:items-center justify-between gap-4 rounded border border-dashed border-base-300 bg-base-200/10 px-5 py-4"
                     >
                       <div>
-                        <p className="font-black text-base-content tracking-tight">{invitation.email}</p>
+                        <p className="font-black text-base-content tracking-tight">
+                          {invitation.email}
+                        </p>
                         <p className="text-xs font-bold text-base-content/40 uppercase tracking-widest mt-1">
-                          {invitation.role} invite — set for {new Date(invitation.expiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          {invitation.role} invite — set for{' '}
+                          {new Date(invitation.expiresAt).toLocaleDateString(
+                            'en-US',
+                            { month: 'short', day: 'numeric', year: 'numeric' }
+                          )}
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
@@ -202,7 +255,9 @@ export const WorkspaceTab: React.FC<WorkspaceTabProps> = ({
                         {canManageWorkspace && (
                           <button
                             className="btn btn-ghost btn-sm text-error h-8 min-h-[32px] px-3 font-bold text-xs"
-                            onClick={() => handleCancelInvitation(invitation._id)}
+                            onClick={() =>
+                              handleCancelInvitation(invitation._id)
+                            }
                             disabled={teamActionId === invitation._id}
                           >
                             Cancel
@@ -214,6 +269,10 @@ export const WorkspaceTab: React.FC<WorkspaceTabProps> = ({
                 </div>
               </div>
             )}
+
+            <div className="mt-10">
+              <RolePermissionMatrix />
+            </div>
           </>
         )}
       </motion.div>

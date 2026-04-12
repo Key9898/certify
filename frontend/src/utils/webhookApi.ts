@@ -26,7 +26,8 @@ export interface CreatedWebhook extends Webhook {
   secret: string;
 }
 
-export const listWebhooks = (): Promise<ApiResponse<Webhook[]>> => get<Webhook[]>('/webhooks');
+export const listWebhooks = (): Promise<ApiResponse<Webhook[]>> =>
+  get<Webhook[]>('/webhooks');
 
 export const createWebhook = (
   url: string,

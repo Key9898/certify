@@ -21,9 +21,25 @@ export interface ITeamInvitationDocument extends ITeamInvitation, Document {}
 
 const TeamInvitationSchema = new Schema<ITeamInvitationDocument>(
   {
-    organizationId: { type: Schema.Types.ObjectId, ref: 'Organization', required: true, index: true },
-    email: { type: String, required: true, lowercase: true, trim: true, index: true },
-    role: { type: String, enum: ['admin', 'member'], default: 'member', required: true },
+    organizationId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Organization',
+      required: true,
+      index: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      lowercase: true,
+      trim: true,
+      index: true,
+    },
+    role: {
+      type: String,
+      enum: ['admin', 'member'],
+      default: 'member',
+      required: true,
+    },
     token: {
       type: String,
       required: true,

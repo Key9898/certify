@@ -47,7 +47,11 @@ export const apiKeyAuth = async (
   if (!key) {
     res.status(401).json({
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'API key required. Use Authorization: Bearer <key> or X-Api-Key header.' },
+      error: {
+        code: 'UNAUTHORIZED',
+        message:
+          'API key required. Use Authorization: Bearer <key> or X-Api-Key header.',
+      },
     });
     return;
   }
@@ -57,7 +61,10 @@ export const apiKeyAuth = async (
   if (!apiKey) {
     res.status(401).json({
       success: false,
-      error: { code: 'INVALID_API_KEY', message: 'Invalid or revoked API key.' },
+      error: {
+        code: 'INVALID_API_KEY',
+        message: 'Invalid or revoked API key.',
+      },
     });
     return;
   }
@@ -93,7 +100,9 @@ export const apiKeyAuth = async (
     return;
   }
 
-  ApiKey.findByIdAndUpdate(apiKey._id, { lastUsedAt: new Date() }).catch(() => {});
+  ApiKey.findByIdAndUpdate(apiKey._id, { lastUsedAt: new Date() }).catch(
+    () => {}
+  );
 
   (req as AuthenticatedRequest).user = user;
   next();

@@ -1,53 +1,127 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-<meta charset="UTF-8" />
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Arial', sans-serif; -webkit-print-color-adjust: exact; }
-.certificate {
-  width: 297mm; height: 210mm;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 15mm 20mm;
-  background: linear-gradient(135deg, {{primaryColor}} 0%, {{secondaryColor}} 100%);
-  color: white;
-  position: relative;
-}
-.logo-img { max-height: 55px; max-width: 160px; object-fit: contain; filter: brightness(0) invert(1); margin-bottom: 4mm; }
-.cert-label { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; opacity: 0.8; margin-bottom: 4mm; }
-.cert-title { font-size: 34px; font-weight: 700; margin-bottom: 6mm; text-align: center; }
-.presented-to { font-size: 13px; opacity: 0.85; margin-bottom: 2mm; }
-.recipient-name { font-size: 36px; font-style: italic; margin-bottom: 4mm; font-family: 'Georgia', serif; }
-.description { font-size: 13px; opacity: 0.85; text-align: center; max-width: 180mm; line-height: 1.6; margin-bottom: 6mm; }
-.footer { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: auto; }
-.footer-section { text-align: center; }
-.footer-value { font-size: 12px; font-weight: 600; }
-.footer-label { font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; margin-top: 1mm; }
-.signature-img { max-height: 40px; object-fit: contain; filter: brightness(0) invert(1); }
-.cert-id { font-size: 9px; opacity: 0.5; font-family: monospace; }
-</style>
-</head>
-<body>
-<div class="certificate">
-  {{organizationLogo}}
-  <div class="cert-label">Certificate of Achievement</div>
-  <div class="cert-title">{{certificateTitle}}</div>
-  <div class="presented-to">Proudly presented to</div>
-  <div class="recipient-name">{{recipientName}}</div>
-  <div class="description">{{description}}</div>
-  <div class="footer">
-    <div class="footer-section">
-      <div class="footer-value">{{issueDate}}</div>
-      <div class="footer-label">Issue Date</div>
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: 'Arial', sans-serif;
+        -webkit-print-color-adjust: exact;
+      }
+      .certificate {
+        width: 297mm;
+        height: 210mm;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 15mm 20mm;
+        background: linear-gradient(
+          135deg,
+          {{primaryColor}} 0%,
+          {{secondaryColor}} 100%
+        );
+        color: white;
+        position: relative;
+      }
+      .logo-img {
+        max-height: 55px;
+        max-width: 160px;
+        object-fit: contain;
+        filter: brightness(0) invert(1);
+        margin-bottom: 4mm;
+      }
+      .cert-label {
+        font-size: 11px;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        opacity: 0.8;
+        margin-bottom: 4mm;
+      }
+      .cert-title {
+        font-size: 34px;
+        font-weight: 700;
+        margin-bottom: 6mm;
+        text-align: center;
+      }
+      .presented-to {
+        font-size: 13px;
+        opacity: 0.85;
+        margin-bottom: 2mm;
+      }
+      .recipient-name {
+        font-size: 36px;
+        font-style: italic;
+        margin-bottom: 4mm;
+        font-family: 'Georgia', serif;
+      }
+      .description {
+        font-size: 13px;
+        opacity: 0.85;
+        text-align: center;
+        max-width: 180mm;
+        line-height: 1.6;
+        margin-bottom: 6mm;
+      }
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        width: 100%;
+        margin-top: auto;
+      }
+      .footer-section {
+        text-align: center;
+      }
+      .footer-value {
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .footer-label {
+        font-size: 10px;
+        opacity: 0.7;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 1mm;
+      }
+      .signature-img {
+        max-height: 40px;
+        object-fit: contain;
+        filter: brightness(0) invert(1);
+      }
+      .cert-id {
+        font-size: 9px;
+        opacity: 0.5;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="certificate">
+      {{organizationLogo}}
+      <div class="cert-label">Certificate of Achievement</div>
+      <div class="cert-title">{{certificateTitle}}</div>
+      <div class="presented-to">Proudly presented to</div>
+      <div class="recipient-name">{{recipientName}}</div>
+      <div class="description">{{description}}</div>
+      <div class="footer">
+        <div class="footer-section">
+          <div class="footer-value">{{issueDate}}</div>
+          <div class="footer-label">Issue Date</div>
+        </div>
+        <div class="footer-section">
+          <div class="cert-id">ID: {{certificateId}}</div>
+        </div>
+        <div class="footer-section">
+          {{issuerSignature}}
+          <div class="footer-value">{{issuerName}}</div>
+          <div class="footer-label">Issuer</div>
+        </div>
+      </div>
     </div>
-    <div class="footer-section"><div class="cert-id">ID: {{certificateId}}</div></div>
-    <div class="footer-section">
-      {{issuerSignature}}
-      <div class="footer-value">{{issuerName}}</div>
-      <div class="footer-label">Issuer</div>
-    </div>
-  </div>
-</div>
-</body>
+  </body>
 </html>

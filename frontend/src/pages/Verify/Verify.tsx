@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, Download, ArrowLeft, ShieldAlert } from 'lucide-react';
+import {
+  CheckCircle,
+  XCircle,
+  Download,
+  ArrowLeft,
+  ShieldAlert,
+} from 'lucide-react';
 import { get } from '@/utils/api';
 import { QUICK_SPRING } from '@/utils/motion';
 
@@ -38,7 +44,10 @@ export const Verify: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [isRevoked, setIsRevoked] = useState(false);
-  const brandName = data?.organization?.whiteLabel.brandName || data?.organization?.name || 'Certify';
+  const brandName =
+    data?.organization?.whiteLabel.brandName ||
+    data?.organization?.name ||
+    'Certify';
   const showPoweredBy = !data?.organization?.whiteLabel.hidePoweredBy;
 
   useEffect(() => {
@@ -77,10 +86,16 @@ export const Verify: React.FC = () => {
               whileHover={{ rotate: -6, scale: 1.06, transition: QUICK_SPRING }}
               className="rounded bg-primary p-2 shadow-lg shadow-primary/20"
             >
-              <img src="/Logo/logo.svg" alt="Certify" className="h-5 w-5 brightness-0 invert" />
+              <img
+                src="/Logo/logo.svg"
+                alt="Certify"
+                className="h-5 w-5 brightness-0 invert"
+              />
             </motion.div>
           )}
-          <span className="font-bold text-lg text-base-content">{brandName}</span>
+          <span className="font-bold text-lg text-base-content">
+            {brandName}
+          </span>
         </Link>
       </header>
 
@@ -89,7 +104,9 @@ export const Verify: React.FC = () => {
           {isLoading ? (
             <div className="card bg-base-100 p-10 text-center">
               <span className="loading loading-spinner loading-lg text-primary mx-auto" />
-              <p className="text-base-content/60 mt-4">Verifying certificate...</p>
+              <p className="text-base-content/60 mt-4">
+                Verifying certificate...
+              </p>
             </div>
           ) : isRevoked ? (
             <motion.div
@@ -98,9 +115,12 @@ export const Verify: React.FC = () => {
               className="card bg-base-100 p-10 text-center"
             >
               <ShieldAlert size={56} className="text-warning mx-auto mb-4" />
-              <h1 className="text-xl font-bold text-base-content mb-2">Certificate Revoked</h1>
+              <h1 className="text-xl font-bold text-base-content mb-2">
+                Certificate Revoked
+              </h1>
               <p className="text-base-content/60 mb-6">
-                The certificate ID <code className="text-primary">{certificateId}</code> has been
+                The certificate ID{' '}
+                <code className="text-primary">{certificateId}</code> has been
                 revoked by the issuer and is no longer valid.
               </p>
               <Link to="/" className="btn btn-outline btn-sm">
@@ -115,9 +135,12 @@ export const Verify: React.FC = () => {
               className="card bg-base-100 p-10 text-center"
             >
               <XCircle size={56} className="text-error mx-auto mb-4" />
-              <h1 className="text-xl font-bold text-base-content mb-2">Certificate Not Found</h1>
+              <h1 className="text-xl font-bold text-base-content mb-2">
+                Certificate Not Found
+              </h1>
               <p className="text-base-content/60 mb-6">
-                The certificate ID <code className="text-primary">{certificateId}</code> does not
+                The certificate ID{' '}
+                <code className="text-primary">{certificateId}</code> does not
                 exist or has been removed.
               </p>
               <Link to="/" className="btn btn-outline btn-sm">
@@ -135,13 +158,23 @@ export const Verify: React.FC = () => {
               <motion.div
                 initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', stiffness: 260, damping: 18, delay: 0.15 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 260,
+                  damping: 18,
+                  delay: 0.15,
+                }}
                 className="card border-2 border-success bg-success/10 p-5 flex flex-row items-center gap-4"
               >
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 14, delay: 0.3 }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 300,
+                    damping: 14,
+                    delay: 0.3,
+                  }}
                 >
                   <CheckCircle size={40} className="text-success shrink-0" />
                 </motion.div>
@@ -160,7 +193,8 @@ export const Verify: React.FC = () => {
                     transition={{ delay: 0.5 }}
                     className="text-sm text-base-content/60"
                   >
-                    This certificate is genuine and was officially issued by {brandName}.
+                    This certificate is genuine and was officially issued by{' '}
+                    {brandName}.
                   </motion.p>
                 </div>
               </motion.div>
@@ -172,9 +206,13 @@ export const Verify: React.FC = () => {
                     <p className="text-xs text-base-content/50 uppercase tracking-wide mb-1">
                       Certificate of
                     </p>
-                    <h2 className="text-2xl font-bold text-base-content">{data.certificateTitle}</h2>
+                    <h2 className="text-2xl font-bold text-base-content">
+                      {data.certificateTitle}
+                    </h2>
                     {data.description && (
-                      <p className="text-base-content/60 text-sm mt-1">{data.description}</p>
+                      <p className="text-base-content/60 text-sm mt-1">
+                        {data.description}
+                      </p>
                     )}
                   </div>
 
@@ -183,13 +221,17 @@ export const Verify: React.FC = () => {
                       <p className="text-xs text-base-content/50 uppercase tracking-wide">
                         Awarded to
                       </p>
-                      <p className="font-semibold text-base-content mt-0.5">{data.recipientName}</p>
+                      <p className="font-semibold text-base-content mt-0.5">
+                        {data.recipientName}
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-base-content/50 uppercase tracking-wide">
                         Issued by
                       </p>
-                      <p className="font-semibold text-base-content mt-0.5">{data.issuerName}</p>
+                      <p className="font-semibold text-base-content mt-0.5">
+                        {data.issuerName}
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-base-content/50 uppercase tracking-wide">
@@ -209,11 +251,14 @@ export const Verify: React.FC = () => {
                           Expiry Date
                         </p>
                         <p className="font-medium text-base-content mt-0.5">
-                          {new Date(data.expiryDate).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
+                          {new Date(data.expiryDate).toLocaleDateString(
+                            'en-US',
+                            {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            }
+                          )}
                         </p>
                       </div>
                     )}
@@ -222,7 +267,9 @@ export const Verify: React.FC = () => {
                   <div className="border-t border-base-200 pt-3">
                     <p className="text-xs text-base-content/40">
                       Certificate ID:{' '}
-                      <code className="text-base-content/60">{data.certificateId}</code>
+                      <code className="text-base-content/60">
+                        {data.certificateId}
+                      </code>
                     </p>
                   </div>
                 </div>
@@ -240,7 +287,8 @@ export const Verify: React.FC = () => {
                 </a>
               )}
 
-              {(showPoweredBy || data?.organization?.whiteLabel.supportEmail) && (
+              {(showPoweredBy ||
+                data?.organization?.whiteLabel.supportEmail) && (
                 <div className="text-center text-xs text-base-content/40 pt-2">
                   {data?.organization?.whiteLabel.supportEmail && (
                     <p>Support: {data.organization.whiteLabel.supportEmail}</p>
