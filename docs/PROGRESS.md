@@ -1,6 +1,6 @@
 # Certify - Project Progress
 
-**Last Updated:** 2026-04-21
+**Last Updated:** 2026-04-22
 
 ---
 
@@ -16,6 +16,7 @@
 
 | Date       | Task                                                                             | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ---------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-04-22 | Fix Railway healthcheck startup failure                                          | Railway build succeeded but `/health` never became reachable because backend startup waited on database initialization and seed data before opening the HTTP listener. The server now listens first, reports database status in `/health`, initializes external dependencies asynchronously, and skips default template seeding when MongoDB is unavailable.                                                                                                                                                                                                                                                                              |
 | 2026-04-21 | Deep scan security and release hygiene pass                                      | Verified repository readiness, lint, Prettier, tests, build, and production dependency audits; updated Vite to a patched release, refreshed backend vulnerable transitive locks, removed a Fast Refresh lint warning, fixed formatting drift, and aligned backend local CORS fallback with the supported Vite port range. Production frontend returned HTTP 200, and backend hosting verification moved into the Railway migration checklist.                                                                                                                                                                                             |
 | 2026-04-21 | Fix production API 404 routing                                                   | Confirmed live Vercel SPA routes return 200, identified production API calls were using the backend origin without `/api`, normalized `VITE_API_URL` in the frontend API client, and switched integration webhook links to the backend-provided webhook URL.                                                                                                                                                                                                                                                                                                                                                                              |
 | 2026-04-21 | Prepare Railway backend deployment migration                                     | Added Railway config-as-code for both the repo root and backend folder, removed the Render blueprint, updated readiness checks to look for Railway deployment config, and made the Express server explicitly listen on `0.0.0.0:$PORT` for Railway public networking. The root config lets Railway deploy from the monorepo root even when the dashboard does not expose Root Directory editing.                                                                                                                                                                                                                                          |
@@ -190,7 +191,7 @@
 ## Next Steps
 
 1. Commit and push the latest repository changes, then redeploy the Railway backend service from the GitHub repository
-2. In Railway, keep the service on the repo root and let root `railway.json` run `npm --prefix backend ...`; add production environment variables, generate a public domain, and verify `${API_URL}/health` returns HTTP 200
+2. In Railway, keep the service on the repo root and let root `railway.json` run `npm --prefix backend ...`; add production environment variables, generate a public domain, and verify `${API_URL}/health` returns HTTP 200 with `database: "connected"`
 3. Run a full local authenticated smoke test with a real Auth0 user: sign in -> confirm header avatar/name -> confirm `/api/auth/sync` succeeds -> verify dashboard/templates/certificates data loads from the backend
 4. Confirm Auth0 Dashboard settings: Allowed Callback URLs, Logout URLs, and Web Origins include `http://localhost:5174` (and the port currently in use) plus the production Vercel domain
 5. Test the full verify flow end-to-end: issue a certificate -> open public verify URL -> confirm "Authentic & Verified" stamp -> revoke via `PATCH /api/certificates/:id/revoke` -> re-open public verify URL -> confirm 410 "Certificate Revoked" state
@@ -202,7 +203,7 @@
 
 ## Blockers
 
-Repository-side deployment readiness is Railway-ready and no code-side blockers are currently open. The remaining release verification item is external: redeploy the Railway backend service from the latest commit, attach its public domain, update `API_URL`/`VITE_API_URL`, and confirm the Railway `/health` endpoint before calling production fully live.
+Repository-side deployment readiness is Railway-ready and no code-side blockers are currently open. The remaining release verification item is external: redeploy the Railway backend service from the latest commit, attach its public domain, update `API_URL`/`VITE_API_URL`, and confirm the Railway `/health` endpoint returns `database: "connected"` before calling production fully live.
 
 ---
 

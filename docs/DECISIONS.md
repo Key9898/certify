@@ -783,7 +783,8 @@ Move the production backend deployment target to Railway:
 - Use root `railway.json` for the active Railway service so Railway can deploy from the monorepo root without requiring dashboard Root Directory support
 - Keep `backend/railway.json` as a backend-local config for setups where Railway Root Directory is available
 - Use Railway's injected `PORT` and bind Express to `0.0.0.0`
-- Use `/health` as the Railway deployment healthcheck
+- Use `/health` as the Railway deployment healthcheck and keep it as a process liveness endpoint
+- Start the HTTP listener before MongoDB/template seeding so Railway can route healthchecks while external dependencies initialize
 - Keep secrets in Railway service variables, not in repository files
 
 ### Rationale
@@ -791,13 +792,14 @@ Move the production backend deployment target to Railway:
 - Railway supports GitHub-backed monorepo services, but the dashboard may not expose Root Directory editing in every service creation path
 - Config-as-code keeps build/start/healthcheck behavior reviewable in the repo
 - Root config using `npm --prefix backend ...` avoids relying on hidden UI controls while still deploying only the backend runtime
+- Railway healthchecks should verify that the service is listening; database readiness is still surfaced through the `/health` response body and logs
 - Railway public domains can replace the previous Render backend URL without changing the frontend architecture
 - Explicit `0.0.0.0:$PORT` binding aligns with Railway public networking requirements
 
 ### Consequences
 
 - **Positive:** Backend deployment is aligned with the chosen Railway platform, the repo preflight now checks the correct configs, and the first Railway import can build successfully from the monorepo root
-- **Negative:** The production `API_URL` and Vercel `VITE_API_URL` must be updated after Railway generates the public domain
+- **Negative:** The production `API_URL` and Vercel `VITE_API_URL` must be updated after Railway generates the public domain, and operators must confirm `/health` reports `database: "connected"` after deployment
 - **Alternative Considered:** Keep Render as backend hosting (rejected because the team wants Railway for production backend runtime)
 
 ---

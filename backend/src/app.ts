@@ -6,6 +6,7 @@ import swaggerUi from 'swagger-ui-express';
 import {
   connectDatabase,
   configureCloudinary,
+  getDatabaseStatus,
   logRuntimeEnvReadiness,
   swaggerSpec,
 } from './config';
@@ -61,7 +62,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Health check
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'ok',
+    database: getDatabaseStatus(),
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // 404 handler
@@ -70,21 +75,41 @@ app.use(notFound);
 // Error handler
 app.use(errorHandler);
 
-// Start server
-const start = async () => {
+const initializeRuntime = async () => {
   try {
     logRuntimeEnvReadiness();
-    await connectDatabase();
+    const isDatabaseConnected = await connectDatabase();
     configureCloudinary();
-    await seedDefaultTemplates();
 
-    app.listen(PORT, HOST, () => {
-      console.log(`Server running on ${HOST}:${PORT}`);
-    });
+    if (!isDatabaseConnected) {
+      console.warn(
+        '⚠️  Skipping default template seed because MongoDB is not connected.'
+      );
+      return;
+    }
+
+    try {
+      await seedDefaultTemplates();
+    } catch (error) {
+      console.error('Failed to seed default templates:', error);
+    }
   } catch (error) {
+    console.error('Runtime initialization failed:', error);
+  }
+};
+
+// Start server before external dependency checks so platform healthchecks verify
+// the HTTP process itself instead of blocking on MongoDB or seed data.
+const start = () => {
+  const server = app.listen(PORT, HOST, () => {
+    console.log(`Server running on ${HOST}:${PORT}`);
+    void initializeRuntime();
+  });
+
+  server.on('error', (error) => {
     console.error('Failed to start server:', error);
     process.exit(1);
-  }
+  });
 };
 
 start();

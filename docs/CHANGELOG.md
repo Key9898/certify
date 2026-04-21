@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **Railway Backend Deployment**: Replaced the Render backend deployment target with Railway config-as-code, added a root-level `railway.json` that builds and starts the backend via `npm --prefix backend ...`, updated the readiness preflight to require Railway deployment configs, and bound the Express server to `0.0.0.0:$PORT` for Railway public networking.
+- **Railway Healthcheck Startup**: Backend now starts the HTTP listener before external dependency initialization so Railway `/health` checks validate process liveness instead of failing when MongoDB or seed data setup is delayed.
 - **Security Maintenance**: Updated frontend Vite to `^8.0.9` and refreshed backend transitive dependency locks so `npm audit --omit=dev` reports 0 production vulnerabilities for both frontend and backend.
 - **Local CORS Fallback**: Backend CORS fallback now allows the supported local Vite range (`localhost`/`127.0.0.1` ports `5174-5180`) when `FRONTEND_URL` is not set.
 - **Bundle Size Optimization**: Implemented lazy loading for heavy libraries to eliminate Vite 500kB chunk warnings. ExcelJS dynamically imported in csvParser.ts for XLSX parsing. Recharts components (OverviewChart, UsageChart) lazy loaded via React.Suspense in Dashboard.tsx. Results: BatchGenerate chunk reduced from 955.96 kB to 26.36 kB (97% reduction), Dashboard chunk reduced from 417.81 kB to 16.03 kB (96% reduction). New lazy chunks: exceljs.min (929.91 kB), Chart (362.12 kB).
@@ -20,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **Production API 404s**: Frontend API base URL now normalizes production `VITE_API_URL` values that omit `/api`, preventing calls like `https://backend/templates` and routing them to `https://backend/api/templates` instead.
+- **Railway Healthcheck Failure**: MongoDB connection errors no longer terminate the process before the Railway healthcheck can reach `/health`; default template seeding is skipped when the database is unavailable and logged as a degraded startup state.
 - **Integration Webhook URLs**: Manage screen now copies and opens the backend-provided integration webhook URL instead of constructing a frontend-origin `/api/webhooks/*` URL that can 404 in production.
 - **Deep Scan Hygiene**: Fixed Prettier drift in Dashboard and backend v1 routes, and removed the non-component export from `IntegrationTabs.tsx` that caused a React Fast Refresh lint warning.
 - **Landing Page Dynamic Dates**: Fixed hardcoded dates in Home.tsx certificate preview carousel. Added `formatPreviewDate()` function to dynamically render dates using `new Date().toLocaleDateString()`. Previously showed static "Mar 28, 2026" - now displays current date in "Mon DD, YYYY" format.
