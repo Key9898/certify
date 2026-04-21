@@ -54,6 +54,7 @@ secrets*.json
 # Frontend and backend local-only artifacts
 .qa-screens/
 .vercel/
+.railway/
 backend/uploads/
 .claude/settings.local.json
 .claude/skills/

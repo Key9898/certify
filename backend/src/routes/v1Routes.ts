@@ -110,12 +110,10 @@ router.get(
         createdBy: req.user!._id,
       });
       if (!certificate) {
-        res
-          .status(404)
-          .json({
-            success: false,
-            error: { code: 'NOT_FOUND', message: 'Certificate not found.' },
-          });
+        res.status(404).json({
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'Certificate not found.' },
+        });
         return;
       }
       res.json({ success: true, data: certificate });

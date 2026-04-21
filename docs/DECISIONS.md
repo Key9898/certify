@@ -27,7 +27,7 @@ Need to select a technology stack for a certificate generator web application th
 **Auth:** Auth0
 **Storage:** Cloudinary
 **PDF:** Puppeteer
-**Deployment:** Vercel (frontend) + Render (backend)
+**Deployment:** Vercel (frontend) + Railway (backend)
 
 ### Rationale
 
@@ -761,6 +761,42 @@ Implement usage stats in two phases:
 - **Negative**: No revenue until Phase 2; potential abuse without limits
 - **Mitigation**: Rate limiting already in place; can fast-track Phase 2 if needed
 - **Alternative Considered**: Implement billing immediately (rejected — premature monetization)
+
+---
+
+## ADR-020: Railway for Production Backend Hosting
+
+**Date:** 2026-04-21
+
+**Status:** Accepted
+
+### Context
+
+The production backend was originally scaffolded for Render, but the team wants to run the Node/Express API on Railway instead while keeping the Vercel frontend and MongoDB Atlas database.
+
+### Decision
+
+Move the production backend deployment target to Railway:
+
+- Keep the frontend on Vercel
+- Deploy only the `backend/` service on Railway from the GitHub monorepo
+- Use `backend/railway.json` for Railway config-as-code
+- Use Railway's injected `PORT` and bind Express to `0.0.0.0`
+- Use `/health` as the Railway deployment healthcheck
+- Keep secrets in Railway service variables, not in repository files
+
+### Rationale
+
+- Railway supports GitHub-backed monorepo services with a service root directory
+- Config-as-code keeps build/start/healthcheck behavior reviewable in the repo
+- Railway public domains can replace the previous Render backend URL without changing the frontend architecture
+- Explicit `0.0.0.0:$PORT` binding aligns with Railway public networking requirements
+
+### Consequences
+
+- **Positive:** Backend deployment is aligned with the chosen Railway platform and the repo preflight now checks the correct config
+- **Negative:** The production `API_URL` and Vercel `VITE_API_URL` must be updated after Railway generates the public domain
+- **Alternative Considered:** Keep Render as backend hosting (rejected because the team wants Railway for production backend runtime)
 
 ---
 

@@ -41,8 +41,8 @@ const filePresenceChecks = [
     path: path.join(workspaceRoot, 'frontend', 'vercel.json'),
   },
   {
-    label: 'Render blueprint',
-    path: path.join(workspaceRoot, 'render.yaml'),
+    label: 'Railway backend config',
+    path: path.join(workspaceRoot, 'backend', 'railway.json'),
   },
   {
     label: 'GitHub CI workflow',
@@ -134,7 +134,10 @@ for (const fileCheck of filesToCheck) {
 
   if (!fs.existsSync(fileCheck.path)) {
     failureCount += 1;
-    printStatus('missing', `${path.relative(workspaceRoot, fileCheck.path)} not found`);
+    printStatus(
+      'missing',
+      `${path.relative(workspaceRoot, fileCheck.path)} not found`
+    );
     continue;
   }
 
@@ -166,7 +169,7 @@ printStatus('info', `${warningCount} warning(s)`);
 if (failureCount > 0) {
   printStatus(
     'next',
-    'Fill the remaining env values, provision Vercel/Render/Atlas, then rerun `npm run readiness:strict`.'
+    'Fill the remaining env values, provision Vercel/Railway/Atlas, then rerun `npm run readiness:strict`.'
   );
   process.exitCode = 1;
 } else if (warningCount > 0) {

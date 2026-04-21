@@ -31,17 +31,15 @@ import {
 import type { OverviewChartPoint } from '@/components/dashboard/Analytics/OverviewChart';
 import type { UsageChartPoint } from '@/components/dashboard/Analytics/UsageChart';
 
-const OverviewChart = React.lazy(
-  () =>
-    import('@/components/dashboard/Analytics/OverviewChart').then((m) => ({
-      default: m.OverviewChart,
-    }))
+const OverviewChart = React.lazy(() =>
+  import('@/components/dashboard/Analytics/OverviewChart').then((m) => ({
+    default: m.OverviewChart,
+  }))
 );
-const UsageChart = React.lazy(
-  () =>
-    import('@/components/dashboard/Analytics/UsageChart').then((m) => ({
-      default: m.UsageChart,
-    }))
+const UsageChart = React.lazy(() =>
+  import('@/components/dashboard/Analytics/UsageChart').then((m) => ({
+    default: m.UsageChart,
+  }))
 );
 
 interface AnalyticsResponse {

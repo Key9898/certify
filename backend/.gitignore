@@ -27,6 +27,7 @@ coverage/
 .env.staging.*
 *.local
 uploads/
+.railway/
 *.pem
 *.key
 *.crt

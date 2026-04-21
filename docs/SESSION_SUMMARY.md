@@ -1,6 +1,6 @@
 # Session Summary
 
-**Last Updated:** 2026-04-12
+**Last Updated:** 2026-04-21
 
 ---
 
@@ -9,7 +9,7 @@
 - Certify is functionally in late Phase 3 with MVP, batch generation, verification, PNG/PDF generation, API keys, webhooks, analytics, Team Collaboration, White Label, and Third-party Integrations implemented.
 - The app supports both real Auth0-backed operation and a local demo mode for UI exploration without credentials.
 - Frontend and backend are split into `frontend/` and `backend/` with shared documentation in `docs/`.
-- A repository-root `npm run readiness` script now checks env files, deployment config presence, and the current local rollout blocker set.
+- A repository-root `npm run readiness` script now checks env files, Railway/Vercel deployment config presence, and the current local rollout blocker set.
 
 ---
 
@@ -38,8 +38,8 @@
 
 ## Known Constraints
 
-- Deployment still depends on real environment credentials and account access for Vercel, Render, MongoDB Atlas, Google Cloud, and Canvas
-- The latest readiness run still reports placeholder or missing Auth0, Cloudinary, Google Sheets, Canvas, and production URL values in the local env files
+- Repository-side deployment readiness currently passes with 0 blocking items and 0 warnings
+- Production frontend reachability is verified; backend hosting is being moved from Render to Railway and still needs Railway service/domain verification from the dashboard
 - Demo mode is intended for safe UI walkthroughs and uses mock data instead of live integrations
 - The root `npm run dev` workflow now orchestrates frontend and backend together, but real Auth0/MongoDB/Cloudinary behavior still depends on env setup
 - Real external webhook callers and native provider callbacks still need manual QA against deployed credentials before production rollout
@@ -48,6 +48,10 @@
 
 ## This Session
 
+- Ran an April 21 deep scan across readiness, lint, Prettier, tests, build, production dependency audits, tracked-secret checks, and public frontend/backend reachability.
+- Updated Vite to a patched release and refreshed backend transitive dependency locks so frontend and backend production dependency audits report 0 vulnerabilities.
+- Removed a React Fast Refresh lint warning in the Integration Hub tabs component, fixed formatting drift, and aligned backend local CORS fallback with the supported Vite dev port range.
+- Prepared the backend for Railway deployment with `backend/railway.json`, Railway `/health` checks, and explicit `0.0.0.0:$PORT` binding; the Railway public domain remains the main external verification item.
 - Fixed all hardcoded dates and values in public-facing landing pages (Home, About, Privacy, Terms)
 - Added `formatPreviewDate()` function in Home.tsx for dynamic certificate preview dates
 - Changed "Since 2026" to dynamic year in About.tsx
@@ -69,7 +73,7 @@
 - Implemented Google Sheets API write-back so Apps Script-triggered rows can be queued and updated from the backend after issuance
 - Implemented Canvas API callbacks so certificate links can be returned to assignment submissions after issuing
 - Expanded automated coverage with frontend Integration Hub tests and backend connector/orchestration tests
-- Updated deployment scaffolding and env examples for Atlas-style MongoDB URIs, Render health checks, Google service account credentials, and Canvas API tokens
+- Updated deployment scaffolding and env examples for Atlas-style MongoDB URIs, Railway health checks, Google service account credentials, and Canvas API tokens
 - Refreshed the dashboard, layout shell, navigation, landing page messaging, and footer/header flows for a cleaner overall UX
 - Added a deployment readiness script, backend runtime env warnings, and GitHub CI workflow coverage for release preflight checks
 - Added app-wide Framer Motion route transitions plus animated shell, header, footer, sidebar, loading, and setup-screen states

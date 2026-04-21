@@ -1,6 +1,6 @@
 # Certify - Project Progress
 
-**Last Updated:** 2026-04-12
+**Last Updated:** 2026-04-21
 
 ---
 
@@ -8,7 +8,7 @@
 
 **Phase:** Phase 3 - Feature Complete (Polished)
 
-**Status:** All Phase 1, 2, and 3 product features are implemented and have undergone a comprehensive high-fidelity UI/UX overhaul. The application now features a premium corporate aesthetic with a finalized 0.25rem (rounded) design system. GitHub CI checks (frontend lint/build/test + backend lint/build/test) all pass green. Production readiness is verified with 0 blocking items.
+**Status:** All Phase 1, 2, and 3 product features are implemented and have undergone a comprehensive high-fidelity UI/UX overhaul. The application now features a premium corporate aesthetic with a finalized 0.25rem (rounded) design system. Local repository checks pass (`readiness:strict`, lint, Prettier checks, unit tests, build, and production dependency audits). Production frontend reachability is verified, and backend deployment has been migrated from Render scaffolding to Railway-ready config; the Railway service/domain still needs final dashboard deployment verification.
 
 ---
 
@@ -16,8 +16,11 @@
 
 | Date       | Task                                                                             | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ---------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-04-12 | Bundle Size Optimization                                                         | Eliminated Vite 500kB chunk warnings by implementing lazy loading. ExcelJS dynamically imported in csvParser.ts for XLSX parsing. Recharts components (OverviewChart, UsageChart) lazy loaded via React.Suspense in Dashboard.tsx. Results: BatchGenerate chunk 955.96 kB → 26.36 kB (97% reduction), Dashboard chunk 417.81 kB → 16.03 kB (96% reduction). New lazy chunks: exceljs.min (929.91 kB), Chart (362.12 kB).                                                                                                                                                                                                                   |
-| 2026-04-12 | Landing Page Dynamic Elements Fix                                                | Fixed all hardcoded values in public-facing pages: (1) Home.tsx certificate preview date - added `formatPreviewDate()` function, (2) About.tsx "Since 2026" → dynamic year, (3) PrivacyPolicy/TermsOfService last updated dates → dynamic, (4) Social proof text "Join 500+ organizations" → "Join Early Adopters", (5) Template count → API-based. Added Section 36 to project_rules.md documenting all dynamic elements with grep pre-commit check.                                                                                                                                                                                    |
+| 2026-04-21 | Deep scan security and release hygiene pass                                      | Verified repository readiness, lint, Prettier, tests, build, and production dependency audits; updated Vite to a patched release, refreshed backend vulnerable transitive locks, removed a Fast Refresh lint warning, fixed formatting drift, and aligned backend local CORS fallback with the supported Vite port range. Production frontend returned HTTP 200, and backend hosting verification moved into the Railway migration checklist.                                                                                                                                                                                             |
+| 2026-04-21 | Fix production API 404 routing                                                   | Confirmed live Vercel SPA routes return 200, identified production API calls were using the backend origin without `/api`, normalized `VITE_API_URL` in the frontend API client, and switched integration webhook links to the backend-provided webhook URL.                                                                                                                                                                                                                                                                                                                                                                              |
+| 2026-04-21 | Prepare Railway backend deployment migration                                     | Added Railway config-as-code for the backend, removed the Render blueprint, updated readiness checks to look for Railway deployment config, and made the Express server explicitly listen on `0.0.0.0:$PORT` for Railway public networking.                                                                                                                                                                                                                                                                                                                                                                                               |
+| 2026-04-12 | Bundle Size Optimization                                                         | Eliminated Vite 500kB chunk warnings by implementing lazy loading. ExcelJS dynamically imported in csvParser.ts for XLSX parsing. Recharts components (OverviewChart, UsageChart) lazy loaded via React.Suspense in Dashboard.tsx. Results: BatchGenerate chunk 955.96 kB → 26.36 kB (97% reduction), Dashboard chunk 417.81 kB → 16.03 kB (96% reduction). New lazy chunks: exceljs.min (929.91 kB), Chart (362.12 kB).                                                                                                                                                                                                                  |
+| 2026-04-12 | Landing Page Dynamic Elements Fix                                                | Fixed all hardcoded values in public-facing pages: (1) Home.tsx certificate preview date - added `formatPreviewDate()` function, (2) About.tsx "Since 2026" → dynamic year, (3) PrivacyPolicy/TermsOfService last updated dates → dynamic, (4) Social proof text "Join 500+ organizations" → "Join Early Adopters", (5) Template count → API-based. Added Section 36 to project_rules.md documenting all dynamic elements with grep pre-commit check.                                                                                                                                                                                     |
 | 2026-04-12 | UI Label Updates for Certificate Form                                            | Changed "Program & Branding" to "Program" and "Program Logo" to "Organization Logo" in CertificateForm.tsx, TemplateBuilder.tsx, and FileUpload.stories.tsx for consistency with organization-level branding terminology.                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | 2026-04-12 | Fix Google Sheets Default Sheet Name                                             | Reverted default sheet name from "Ready to Issue" back to "Ready to Create" in `integrationService.ts`. Tests define expected behavior - code should match tests, not the other way around. All 8 backend tests pass.                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | 2026-04-11 | Fix Usage Stats API 500 Error                                                    | Fixed three bugs in `usageController.ts`: (1) Wrong user ID type - used `req.user` (MongoDB ObjectId) instead of Auth0 ID string for `getWorkspaceMemberIds`, (2) Response format mismatch - wrapped in `ApiResponse` format, (3) Error response format - standardized with `{ success, error: { code, message } }`. TypeScript compiles clean on both frontend and backend.                                                                                                                                                                                                                                                              |
@@ -146,13 +149,13 @@
 
 ### Week 5-6: Testing & Deployment
 
-| Task                      | Status | Notes                                                                                                              |
-| ------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------ |
-| Write unit tests          | Done   | Frontend utility coverage expanded and backend connector services now ship with automated assertions               |
-| Write integration tests   | Done   | Added frontend Integration Hub workflow coverage and backend native connector orchestration tests                  |
-| Deploy frontend to Vercel | Done   | Deployed production frontend to Vercel and configured production environment variables                             |
-| Deploy backend to Render  | Done   | Deployed production backend to Render and configured environment variables (including CORS origins + API base URL) |
-| Setup MongoDB Atlas       | Done   | Provisioned Atlas cluster, database user, and network access for cloud deployments                                 |
+| Task                      | Status      | Notes                                                                                                                                |
+| ------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Write unit tests          | Done        | Frontend utility coverage expanded and backend connector services now ship with automated assertions                                 |
+| Write integration tests   | Done        | Added frontend Integration Hub workflow coverage and backend native connector orchestration tests                                    |
+| Deploy frontend to Vercel | Done        | Deployed production frontend to Vercel and configured production environment variables                                               |
+| Deploy backend to Railway | In Progress | Repository config is Railway-ready; Railway service, public domain, env variables, and `/health` verification remain dashboard steps |
+| Setup MongoDB Atlas       | Done        | Provisioned Atlas cluster, database user, and network access for cloud deployments                                                   |
 
 ---
 
@@ -186,26 +189,27 @@
 
 ## Next Steps
 
-1. Commit and push the latest repository changes, then confirm Vercel + Render have redeployed the newest build
-2. Run a full local authenticated smoke test with a real Auth0 user: sign in → confirm header avatar/name → confirm `/api/auth/sync` succeeds → verify dashboard/templates/certificates data loads from the backend (expected HTTP 200 now that Auth0 audience strategy is corrected)
-3. Confirm Auth0 Dashboard settings: Allowed Callback URLs, Logout URLs, and Web Origins include `http://localhost:5174` (and the port currently in use) for local dev
-4. Test the full verify flow end-to-end: issue a certificate → open public verify URL → confirm "Authentic & Verified" stamp → revoke via `PATCH /api/certificates/:id/revoke` → re-open public verify URL → confirm 410 "Certificate Revoked" state
-5. Run production QA for imported background templates: upload PNG → place fields → create single certificate → confirm certificateId stamp appears at bottom-right when no explicit id field is placed
-6. Tighten production security: rotate sensitive keys/tokens periodically and narrow MongoDB Atlas network access when stable
-7. Optional: add monitoring/alerts, review free-tier cold start behavior (Render spin-down), and evaluate Canva Connect as a future convenience integration rather than a core dependency
+1. Commit and push the latest repository changes, then create/update the Railway backend service from the GitHub repository
+2. In Railway, set the backend service Root Directory to `/backend`, config file path to `/backend/railway.json`, add production environment variables, generate a public domain, and verify `${API_URL}/health` returns HTTP 200
+3. Run a full local authenticated smoke test with a real Auth0 user: sign in -> confirm header avatar/name -> confirm `/api/auth/sync` succeeds -> verify dashboard/templates/certificates data loads from the backend
+4. Confirm Auth0 Dashboard settings: Allowed Callback URLs, Logout URLs, and Web Origins include `http://localhost:5174` (and the port currently in use) plus the production Vercel domain
+5. Test the full verify flow end-to-end: issue a certificate -> open public verify URL -> confirm "Authentic & Verified" stamp -> revoke via `PATCH /api/certificates/:id/revoke` -> re-open public verify URL -> confirm 410 "Certificate Revoked" state
+6. Run production QA for imported background templates: upload PNG -> place fields -> create single certificate -> confirm certificateId stamp appears at bottom-right when no explicit id field is placed
+7. Tighten production security: rotate sensitive keys/tokens periodically and narrow MongoDB Atlas network access when stable
+8. Optional: add monitoring/alerts, review Railway usage and cold-start behavior, and evaluate Canva Connect as a future convenience integration rather than a core dependency
 
 ---
 
 ## Blockers
 
-Repository-side deployment readiness passes and production environments have been provisioned. No code-side blockers are currently open, but local real-user auth still depends on the Auth0 SPA application being authorized for the `https://certify-api` audience and the local backend being available behind the Vite dev proxy.
+Repository-side deployment readiness is Railway-ready and no code-side blockers are currently open. The remaining release verification item is external: create/update the Railway backend service, attach its public domain, update `API_URL`/`VITE_API_URL`, and confirm the Railway `/health` endpoint before calling production fully live.
 
 ---
 
 ## Notes
 
-- All free tier services for $0/month cost
+- Railway offers free/trial credits for small apps, but usage should be monitored because backend hosting is usage-based after credits are consumed
 - Tailwind v4 + DaisyUI compatibility validated via lint/test/build in this workspace
 - Storybook excluded from production build (devDependencies)
 - Root `npm run test` is the stable verification entrypoint inside this workspace; folder-level frontend/backend commands were used for the added coverage work
-- Root `npm run readiness` is the repo-side deployment preflight command before attempting Vercel/Render rollout
+- Root `npm run readiness` is the repo-side deployment preflight command before attempting Vercel/Railway rollout

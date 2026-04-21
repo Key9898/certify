@@ -110,5 +110,3 @@ export const IntegrationTabs: React.FC<IntegrationTabsProps> = ({
     </div>
   );
 };
-
-export { tabs };

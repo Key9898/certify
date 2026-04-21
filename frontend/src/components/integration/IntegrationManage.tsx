@@ -97,8 +97,7 @@ export const IntegrationManage: React.FC<IntegrationManageProps> = ({
   };
 
   const copyWebhookUrl = (integration: Integration) => {
-    const url = `${window.location.origin}/api/webhooks/${integration._id}`;
-    navigator.clipboard.writeText(url);
+    navigator.clipboard.writeText(integration.webhookUrl);
     setMenuOpenId(null);
   };
 
@@ -333,12 +332,11 @@ export const IntegrationManage: React.FC<IntegrationManageProps> = ({
                       </p>
                       <div className="flex items-center gap-2">
                         <p className="flex-1 truncate font-mono text-sm text-base-content">
-                          {window.location.origin}/api/webhooks/
-                          {integration._id}
+                          {integration.webhookUrl}
                         </p>
                         <Tooltip content="Open webhook URL" position="top">
                           <a
-                            href={`/api/webhooks/${integration._id}`}
+                            href={integration.webhookUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Open webhook URL"

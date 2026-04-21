@@ -11,11 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Railway Backend Deployment**: Replaced the Render backend deployment target with Railway config-as-code, updated the readiness preflight to require `backend/railway.json`, and bound the Express server to `0.0.0.0:$PORT` for Railway public networking.
+- **Security Maintenance**: Updated frontend Vite to `^8.0.9` and refreshed backend transitive dependency locks so `npm audit --omit=dev` reports 0 production vulnerabilities for both frontend and backend.
+- **Local CORS Fallback**: Backend CORS fallback now allows the supported local Vite range (`localhost`/`127.0.0.1` ports `5174-5180`) when `FRONTEND_URL` is not set.
 - **Bundle Size Optimization**: Implemented lazy loading for heavy libraries to eliminate Vite 500kB chunk warnings. ExcelJS dynamically imported in csvParser.ts for XLSX parsing. Recharts components (OverviewChart, UsageChart) lazy loaded via React.Suspense in Dashboard.tsx. Results: BatchGenerate chunk reduced from 955.96 kB to 26.36 kB (97% reduction), Dashboard chunk reduced from 417.81 kB to 16.03 kB (96% reduction). New lazy chunks: exceljs.min (929.91 kB), Chart (362.12 kB).
 - **UI Label Updates**: Changed "Program & Branding" to "Program" and "Program Logo" to "Organization Logo" in CertificateForm and TemplateBuilder for consistency with organization-level branding terminology.
 
 ### Fixed
 
+- **Production API 404s**: Frontend API base URL now normalizes production `VITE_API_URL` values that omit `/api`, preventing calls like `https://backend/templates` and routing them to `https://backend/api/templates` instead.
+- **Integration Webhook URLs**: Manage screen now copies and opens the backend-provided integration webhook URL instead of constructing a frontend-origin `/api/webhooks/*` URL that can 404 in production.
+- **Deep Scan Hygiene**: Fixed Prettier drift in Dashboard and backend v1 routes, and removed the non-component export from `IntegrationTabs.tsx` that caused a React Fast Refresh lint warning.
 - **Landing Page Dynamic Dates**: Fixed hardcoded dates in Home.tsx certificate preview carousel. Added `formatPreviewDate()` function to dynamically render dates using `new Date().toLocaleDateString()`. Previously showed static "Mar 28, 2026" - now displays current date in "Mon DD, YYYY" format.
 - **About Page "Since Year"**: Fixed hardcoded "Since 2026" in About.tsx to use `new Date().getFullYear()` for dynamic year display.
 - **Privacy/Terms Last Updated Dates**: Fixed hardcoded dates in PrivacyPolicy.tsx and TermsOfService.tsx to dynamically render current date.
@@ -135,7 +141,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Framer Motion now drives the landing page, certificate creation flow, Integration Hub, batch progress states, template selection, upload surfaces, shared buttons, and other high-traffic interactions instead of scattered CSS-only transitions
 - Integration setup forms now capture native Google Sheets and Canvas settings, while sample payloads include row and learner identifiers for direct provider callbacks
 - Google Sheets onboarding now ships an Apps Script starter that sends spreadsheet context and row numbers so the backend can write statuses back natively
-- Backend env examples and Render deployment config now cover Atlas-style MongoDB URIs, Google service account credentials, Canvas API tokens, and the correct health check path
+- Backend env examples and Railway deployment config now cover Atlas-style MongoDB URIs, Google service account credentials, Canvas API tokens, and the correct health check path
 - Settings now persists user defaults and workspace white-label values through `/api/users/settings`
 - Certificate creation now respects saved workspace branding for live preview, defaults, and public verification UI
 - Dashboard charts now use live analytics data, and workspace members share analytics visibility
@@ -170,7 +176,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Auth0 sign-in, sign-up, and Google flows now attempt the correct hosted Auth0 popup forms first, preserve the intended `/dashboard` return path, surface localhost origin misconfiguration hints, and redirect protected pages without firing auth side effects during render
 - Production readiness checks now report the real local blocker set instead of relying on docs-only assumptions
 - Shared `Button` typing now supports motion props cleanly, and frontend tests now mock `IntersectionObserver` for Framer Motion viewport animations
-- Render health checks now target the live `/health` endpoint instead of a non-existent `/api/health` path
+- Deployment health checks now target the live `/health` endpoint instead of a non-existent `/api/health` path
 - API key settings now render the masked `keyPreview` returned by the backend
 - Webhook list responses no longer expose secrets after creation
 - Batch wizard completion now waits for real processing results
@@ -183,6 +189,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- `render.yaml` after switching the production backend deployment target from Render to Railway.
 - `frontend/.env.example` and `backend/.env.example` placeholder env files after production environments were provisioned and the team switched to real local/hosted secrets
 
 ---

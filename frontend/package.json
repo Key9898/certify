@@ -33,6 +33,7 @@
     "@tailwindcss/vite": "^4.2.2",
     "clsx": "^2.1.1",
     "daisyui": "^5.5.19",
+    "exceljs": "^4.4.0",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.7.0",
     "react": "^19.2.4",
@@ -40,8 +41,7 @@
     "react-router-dom": "^7.13.2",
     "recharts": "^3.8.1",
     "tailwind-merge": "^3.5.0",
-    "tailwindcss": "^4.2.2",
-    "exceljs": "^4.4.0"
+    "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.1.1",
@@ -76,7 +76,7 @@
     "storybook": "^10.3.3",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.57.2",
-    "vite": "^8.0.1",
+    "vite": "^8.0.9",
     "vitest": "^4.1.2"
   },
   "overrides": {

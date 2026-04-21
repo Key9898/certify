@@ -133,7 +133,7 @@ PDF certificates are generated server-side using Puppeteer with the following fe
 | ------------------- | ------------- |
 | Development         | Local Machine |
 | Production Frontend | Vercel        |
-| Production Backend  | Render        |
+| Production Backend  | Railway       |
 | Database            | MongoDB Atlas |
 
 ### Cost
@@ -141,11 +141,11 @@ PDF certificates are generated server-side using Puppeteer with the following fe
 | Service       | Cost               |
 | ------------- | ------------------ |
 | Vercel        | Free               |
-| Render        | Free               |
+| Railway       | Free plan/credits; usage-based if exceeded |
 | MongoDB Atlas | Free (512MB)       |
 | Auth0         | Free (7,000 users) |
 | Cloudinary    | Free (25GB)        |
-| **Total**     | **$0/month**       |
+| **Total**     | **Low/no-cost initial rollout; monitor Railway usage** |
 
 ### Development Configuration
 
@@ -1137,7 +1137,7 @@ Integration Hub UX should also provide:
 │  └── Vercel (certify.vercel.app)                           │
 │                                                             │
 │  Backend                                                    │
-│  └── Render (certify-api.onrender.com)                     │
+│  └── Railway (*.up.railway.app)                            │
 │                                                             │
 │  Database                                                   │
 │  └── MongoDB Atlas (Free - 512MB)                          │
@@ -1146,7 +1146,7 @@ Integration Hub UX should also provide:
 │  ├── Auth0 (Free - 7,000 users)                            │
 │  └── Cloudinary (Free - 25GB storage)                      │
 │                                                             │
-│  Cost: $0/month                                             │
+│  Cost: Monitor Railway usage credits                        │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -1226,9 +1226,9 @@ This keeps the main product reliable even without any direct Canva API dependenc
 │                                                             │
 │  DEPLOYMENT:                                                │
 │  ├── Development: Local Machine                             │
-│  └── Production: Vercel + Render + MongoDB Atlas            │
+│  └── Production: Vercel + Railway + MongoDB Atlas           │
 │                                                             │
-│  COST: $0/month (Free Tiers)                                │
+│  COST: Low/no-cost initial rollout; monitor usage           │
 │                                                             │
 │  PHASES:                                                    │
 │  ├── Phase 1 (MVP): 9 features - 4-6 weeks                 │

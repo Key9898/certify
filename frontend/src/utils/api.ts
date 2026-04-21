@@ -1,8 +1,32 @@
 import type { ApiResponse } from '@/types/api';
 
-const API_BASE_URL = import.meta.env.DEV
-  ? '/api'
-  : import.meta.env.VITE_API_URL || '/api';
+const withApiPrefix = (baseUrl: string): string => {
+  const normalized = baseUrl.trim().replace(/\/+$/, '');
+
+  if (!normalized || normalized.endsWith('/api')) {
+    return normalized;
+  }
+
+  return `${normalized}/api`;
+};
+
+const resolveApiBaseUrl = (): string => {
+  if (import.meta.env.DEV) {
+    return '/api';
+  }
+
+  const configuredUrl = import.meta.env.VITE_API_URL;
+
+  if (!configuredUrl) {
+    throw new Error(
+      'Missing VITE_API_URL. Set it to your backend URL, for example https://your-backend.up.railway.app/api.'
+    );
+  }
+
+  return withApiPrefix(configuredUrl);
+};
+
+export const API_BASE_URL = resolveApiBaseUrl();
 
 let getToken: (() => Promise<string>) | null = null;
 
