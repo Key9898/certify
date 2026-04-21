@@ -41,7 +41,11 @@ const filePresenceChecks = [
     path: path.join(workspaceRoot, 'frontend', 'vercel.json'),
   },
   {
-    label: 'Railway backend config',
+    label: 'Railway root deploy config',
+    path: path.join(workspaceRoot, 'railway.json'),
+  },
+  {
+    label: 'Railway backend deploy config',
     path: path.join(workspaceRoot, 'backend', 'railway.json'),
   },
   {

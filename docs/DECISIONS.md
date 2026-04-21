@@ -780,21 +780,23 @@ Move the production backend deployment target to Railway:
 
 - Keep the frontend on Vercel
 - Deploy only the `backend/` service on Railway from the GitHub monorepo
-- Use `backend/railway.json` for Railway config-as-code
+- Use root `railway.json` for the active Railway service so Railway can deploy from the monorepo root without requiring dashboard Root Directory support
+- Keep `backend/railway.json` as a backend-local config for setups where Railway Root Directory is available
 - Use Railway's injected `PORT` and bind Express to `0.0.0.0`
 - Use `/health` as the Railway deployment healthcheck
 - Keep secrets in Railway service variables, not in repository files
 
 ### Rationale
 
-- Railway supports GitHub-backed monorepo services with a service root directory
+- Railway supports GitHub-backed monorepo services, but the dashboard may not expose Root Directory editing in every service creation path
 - Config-as-code keeps build/start/healthcheck behavior reviewable in the repo
+- Root config using `npm --prefix backend ...` avoids relying on hidden UI controls while still deploying only the backend runtime
 - Railway public domains can replace the previous Render backend URL without changing the frontend architecture
 - Explicit `0.0.0.0:$PORT` binding aligns with Railway public networking requirements
 
 ### Consequences
 
-- **Positive:** Backend deployment is aligned with the chosen Railway platform and the repo preflight now checks the correct config
+- **Positive:** Backend deployment is aligned with the chosen Railway platform, the repo preflight now checks the correct configs, and the first Railway import can build successfully from the monorepo root
 - **Negative:** The production `API_URL` and Vercel `VITE_API_URL` must be updated after Railway generates the public domain
 - **Alternative Considered:** Keep Render as backend hosting (rejected because the team wants Railway for production backend runtime)
 

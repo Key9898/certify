@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Railway Backend Deployment**: Replaced the Render backend deployment target with Railway config-as-code, updated the readiness preflight to require `backend/railway.json`, and bound the Express server to `0.0.0.0:$PORT` for Railway public networking.
+- **Railway Backend Deployment**: Replaced the Render backend deployment target with Railway config-as-code, added a root-level `railway.json` that builds and starts the backend via `npm --prefix backend ...`, updated the readiness preflight to require Railway deployment configs, and bound the Express server to `0.0.0.0:$PORT` for Railway public networking.
 - **Security Maintenance**: Updated frontend Vite to `^8.0.9` and refreshed backend transitive dependency locks so `npm audit --omit=dev` reports 0 production vulnerabilities for both frontend and backend.
 - **Local CORS Fallback**: Backend CORS fallback now allows the supported local Vite range (`localhost`/`127.0.0.1` ports `5174-5180`) when `FRONTEND_URL` is not set.
 - **Bundle Size Optimization**: Implemented lazy loading for heavy libraries to eliminate Vite 500kB chunk warnings. ExcelJS dynamically imported in csvParser.ts for XLSX parsing. Recharts components (OverviewChart, UsageChart) lazy loaded via React.Suspense in Dashboard.tsx. Results: BatchGenerate chunk reduced from 955.96 kB to 26.36 kB (97% reduction), Dashboard chunk reduced from 417.81 kB to 16.03 kB (96% reduction). New lazy chunks: exceljs.min (929.91 kB), Chart (362.12 kB).
