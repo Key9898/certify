@@ -1,4 +1,5 @@
 import { isAuth0Configured } from './auth0';
+import { isDatabaseConfigured } from './database';
 
 const PLACEHOLDER_PATTERNS = [
   /your-/i,
@@ -35,14 +36,20 @@ export const logRuntimeEnvReadiness = (): void => {
     (key) => !hasRealValue(process.env[key])
   );
   const missingAuth = isAuth0Configured() ? [] : ['AUTH0_DOMAIN/AUDIENCE'];
+  const missingDatabase = isDatabaseConfigured() ? [] : ['MongoDB URI'];
   const missingConnectors = optionalConnectorKeys.filter(
     (key) => !hasRealValue(process.env[key])
   );
 
-  if (missingAuth.length > 0 || missingRequired.length > 0) {
+  if (
+    missingAuth.length > 0 ||
+    missingDatabase.length > 0 ||
+    missingRequired.length > 0
+  ) {
     console.warn(
       `[env] Missing or placeholder production settings: ${[
         ...missingAuth,
+        ...missingDatabase,
         ...missingRequired,
       ].join(', ')}`
     );
@@ -56,6 +63,7 @@ export const logRuntimeEnvReadiness = (): void => {
 
   if (
     missingAuth.length === 0 &&
+    missingDatabase.length === 0 &&
     missingRequired.length === 0 &&
     missingConnectors.length === 0
   ) {

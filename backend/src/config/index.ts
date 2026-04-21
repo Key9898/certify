@@ -1,5 +1,6 @@
 export {
   connectDatabase,
+  getDatabaseConfigSource,
   getDatabaseLastError,
   getDatabaseStatus,
   isDatabaseConfigured,

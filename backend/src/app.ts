@@ -6,6 +6,7 @@ import swaggerUi from 'swagger-ui-express';
 import {
   connectDatabase,
   configureCloudinary,
+  getDatabaseConfigSource,
   getDatabaseStatus,
   isAuth0Configured,
   isDatabaseConfigured,
@@ -113,6 +114,7 @@ app.get('/health', (_req, res) => {
     authConfigured: isAuth0Configured(),
     database,
     databaseConfigured: isDatabaseConfigured(),
+    databaseConfigSource: getDatabaseConfigSource(),
     databaseRetrying: database !== 'connected' && Boolean(databaseRetryTimer),
     timestamp: new Date().toISOString(),
   });
@@ -186,7 +188,7 @@ const initializeRuntime = async () => {
     if (!isDatabaseConnected) {
       if (!isDatabaseConfigured()) {
         console.warn(
-          '[db] Default template seed is waiting for a production MONGODB_URI.'
+          '[db] Default template seed is waiting for a production MongoDB URI.'
         );
         return;
       }

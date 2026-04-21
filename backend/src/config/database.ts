@@ -1,10 +1,36 @@
 import mongoose from 'mongoose';
 
 const LOCAL_MONGO_URI = 'mongodb://localhost:27017/certify';
+const DATABASE_URI_KEYS = [
+  'MONGODB_URI',
+  'MONGO_URI',
+  'MONGODB_URL',
+  'MONGO_URL',
+  'DATABASE_URL',
+] as const;
+
+type DatabaseConfig = {
+  source: (typeof DATABASE_URI_KEYS)[number] | 'local' | 'missing';
+  uri: string;
+};
 
 let listenersRegistered = false;
 let connectionAttempt: Promise<boolean> | null = null;
 let lastConnectionError: string | undefined;
+
+const isMongoUri = (value: string): boolean =>
+  /^mongodb(\+srv)?:\/\//i.test(value);
+
+const resolveDatabaseConfig = (): DatabaseConfig => {
+  for (const key of DATABASE_URI_KEYS) {
+    const value = process.env[key]?.trim();
+    if (value && isMongoUri(value)) {
+      return { source: key, uri: value };
+    }
+  }
+
+  return { source: 'local', uri: LOCAL_MONGO_URI };
+};
 
 export const getDatabaseStatus = (): string => {
   const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
@@ -12,9 +38,14 @@ export const getDatabaseStatus = (): string => {
 };
 
 export const isDatabaseConfigured = (): boolean => {
-  const mongoUri = process.env.MONGODB_URI;
-  return Boolean(mongoUri && mongoUri !== LOCAL_MONGO_URI);
+  const databaseConfig = resolveDatabaseConfig();
+  return (
+    databaseConfig.source !== 'local' && databaseConfig.uri !== LOCAL_MONGO_URI
+  );
 };
+
+export const getDatabaseConfigSource = (): string =>
+  isDatabaseConfigured() ? resolveDatabaseConfig().source : 'missing';
 
 export const getDatabaseLastError = (): string | undefined =>
   lastConnectionError;
@@ -54,11 +85,10 @@ export const connectDatabase = async (): Promise<boolean> => {
     return connectionAttempt;
   }
 
-  const mongoUri = process.env.MONGODB_URI;
-  const uri = mongoUri || LOCAL_MONGO_URI;
+  const databaseConfig = resolveDatabaseConfig();
 
   if (!isDatabaseConfigured() && isProductionLikeRuntime()) {
-    lastConnectionError = 'MONGODB_URI is missing or still set to local dev.';
+    lastConnectionError = `No production MongoDB URI found. Set one of: ${DATABASE_URI_KEYS.join(', ')}.`;
     console.warn(`[db] ${lastConnectionError}`);
     return false;
   }
@@ -66,7 +96,7 @@ export const connectDatabase = async (): Promise<boolean> => {
   registerDatabaseListeners();
 
   connectionAttempt = mongoose
-    .connect(uri, {
+    .connect(databaseConfig.uri, {
       serverSelectionTimeoutMS: isDatabaseConfigured() ? 5000 : 3000,
     })
     .then(() => {

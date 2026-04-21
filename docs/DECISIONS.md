@@ -789,6 +789,7 @@ Move the production backend deployment target to Railway:
 - Retry MongoDB connection in the background after a degraded startup and seed default templates once the database becomes reachable
 - Normalize `FRONTEND_URL`, support optional comma-separated `CORS_ORIGINS`, and keep the active Vercel production origin as a fallback so Railway deployments do not fail browser preflight when the dashboard variable is missing or formatted with a trailing slash
 - Centralize Auth0 runtime config and allow non-secret public Auth0 values to come from `AUTH0_*`, `VITE_AUTH0_*`, or project defaults while still requiring secrets such as MongoDB URI and Cloudinary API secret to remain in Railway variables
+- Resolve MongoDB connections from common Mongo URI aliases (`MONGODB_URI`, `MONGO_URI`, `MONGODB_URL`, `MONGO_URL`, Mongo-style `DATABASE_URL`) and expose only the selected env key name through `/health`
 - Keep secrets in Railway service variables, not in repository files
 
 ### Rationale
@@ -802,6 +803,7 @@ Move the production backend deployment target to Railway:
 - Explicit `0.0.0.0:$PORT` binding aligns with Railway public networking requirements
 - Browser API calls from Vercel depend on exact CORS origin matching, so production origin handling should be tolerant of trailing slashes and multi-origin environment values while still avoiding a wildcard policy
 - Auth0 domain and audience are public validation parameters, so providing project defaults improves deployment resilience without committing private secrets
+- Railway and third-party templates sometimes name MongoDB connection strings differently, so accepting safe aliases reduces deployment mistakes without committing or leaking the secret URI
 
 ### Consequences
 
