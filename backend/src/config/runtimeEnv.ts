@@ -1,3 +1,5 @@
+import { isAuth0Configured } from './auth0';
+
 const PLACEHOLDER_PATTERNS = [
   /your-/i,
   /your_/i,
@@ -18,8 +20,6 @@ const hasRealValue = (value?: string): boolean => {
 
 export const logRuntimeEnvReadiness = (): void => {
   const requiredKeys = [
-    'AUTH0_DOMAIN',
-    'AUTH0_AUDIENCE',
     'CLOUDINARY_CLOUD_NAME',
     'CLOUDINARY_API_KEY',
     'CLOUDINARY_API_SECRET',
@@ -34,13 +34,17 @@ export const logRuntimeEnvReadiness = (): void => {
   const missingRequired = requiredKeys.filter(
     (key) => !hasRealValue(process.env[key])
   );
+  const missingAuth = isAuth0Configured() ? [] : ['AUTH0_DOMAIN/AUDIENCE'];
   const missingConnectors = optionalConnectorKeys.filter(
     (key) => !hasRealValue(process.env[key])
   );
 
-  if (missingRequired.length > 0) {
+  if (missingAuth.length > 0 || missingRequired.length > 0) {
     console.warn(
-      `[env] Missing or placeholder production settings: ${missingRequired.join(', ')}`
+      `[env] Missing or placeholder production settings: ${[
+        ...missingAuth,
+        ...missingRequired,
+      ].join(', ')}`
     );
   }
 
@@ -50,7 +54,11 @@ export const logRuntimeEnvReadiness = (): void => {
     );
   }
 
-  if (missingRequired.length === 0 && missingConnectors.length === 0) {
+  if (
+    missingAuth.length === 0 &&
+    missingRequired.length === 0 &&
+    missingConnectors.length === 0
+  ) {
     console.log(
       '[env] Runtime configuration looks ready for full production feature coverage.'
     );

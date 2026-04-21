@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User';
 import { AuthenticatedRequest } from '../types';
 import { ensureUserWorkspace } from '../services/workspaceService';
+import { getAuth0RuntimeConfig, isAuth0Configured } from '../config/auth0';
 
 // Lazy-initialize checkJwt so the server can start even without credentials configured.
 // The middleware will return a 503 if Auth0 is not configured, instead of crashing at startup.
@@ -11,10 +12,9 @@ let _checkJwt: ReturnType<typeof auth> | null = null;
 const getCheckJwt = (): ReturnType<typeof auth> | null => {
   if (_checkJwt) return _checkJwt;
 
-  const audience = process.env.AUTH0_AUDIENCE;
-  const domain = process.env.AUTH0_DOMAIN;
+  const { audience, domain } = getAuth0RuntimeConfig();
 
-  if (!audience || !domain || audience === 'your-api-audience') {
+  if (!isAuth0Configured()) {
     return null;
   }
 

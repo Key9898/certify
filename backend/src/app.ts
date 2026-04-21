@@ -7,6 +7,7 @@ import {
   connectDatabase,
   configureCloudinary,
   getDatabaseStatus,
+  isAuth0Configured,
   isDatabaseConfigured,
   logRuntimeEnvReadiness,
   swaggerSpec,
@@ -109,6 +110,7 @@ app.get('/health', (_req, res) => {
 
   res.json({
     status: 'ok',
+    authConfigured: isAuth0Configured(),
     database,
     databaseConfigured: isDatabaseConfigured(),
     databaseRetrying: database !== 'connected' && Boolean(databaseRetryTimer),
