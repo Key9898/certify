@@ -7,6 +7,7 @@ import {
   connectDatabase,
   configureCloudinary,
   getDatabaseStatus,
+  isDatabaseConfigured,
   logRuntimeEnvReadiness,
   swaggerSpec,
 } from './config';
@@ -18,6 +19,17 @@ import routes from './routes';
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
+const configuredDatabaseRetryInterval = Number(
+  process.env.DATABASE_RETRY_INTERVAL_MS
+);
+const DATABASE_RETRY_INTERVAL_MS =
+  Number.isFinite(configuredDatabaseRetryInterval) &&
+  configuredDatabaseRetryInterval > 0
+    ? configuredDatabaseRetryInterval
+    : 15_000;
+let databaseRetryTimer: NodeJS.Timeout | undefined;
+let defaultTemplatesSeeded = false;
+const defaultProductionOrigins = ['https://certify-ecru-phi.vercel.app'];
 const defaultLocalOrigins = [
   'http://localhost:5174',
   'http://localhost:5175',
@@ -34,15 +46,46 @@ const defaultLocalOrigins = [
   'http://127.0.0.1:5179',
   'http://127.0.0.1:5180',
 ];
-const corsOrigins = process.env.FRONTEND_URL
-  ? [process.env.FRONTEND_URL]
-  : defaultLocalOrigins;
+const normalizeOrigin = (value: string): string | undefined => {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  try {
+    return new URL(trimmed).origin;
+  } catch {
+    return trimmed.replace(/\/+$/, '');
+  }
+};
+
+const parseOrigins = (value?: string): string[] =>
+  value
+    ? value
+        .split(',')
+        .map((origin) => normalizeOrigin(origin))
+        .filter((origin): origin is string => Boolean(origin))
+    : [];
+
+const corsOrigins = new Set([
+  ...defaultProductionOrigins,
+  ...defaultLocalOrigins,
+  ...parseOrigins(process.env.FRONTEND_URL),
+  ...parseOrigins(process.env.CORS_ORIGINS),
+]);
 
 // Security middleware
 app.use(helmet());
 app.use(
   cors({
-    origin: corsOrigins,
+    origin: (origin, callback) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      callback(null, corsOrigins.has(normalizeOrigin(origin) || origin));
+    },
     credentials: true,
   })
 );
@@ -62,9 +105,13 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Health check
 app.get('/health', (_req, res) => {
+  const database = getDatabaseStatus();
+
   res.json({
     status: 'ok',
-    database: getDatabaseStatus(),
+    database,
+    databaseConfigured: isDatabaseConfigured(),
+    databaseRetrying: database !== 'connected' && Boolean(databaseRetryTimer),
     timestamp: new Date().toISOString(),
   });
 });
@@ -75,24 +122,81 @@ app.use(notFound);
 // Error handler
 app.use(errorHandler);
 
+const stopDatabaseRetry = (): void => {
+  if (!databaseRetryTimer) {
+    return;
+  }
+
+  clearInterval(databaseRetryTimer);
+  databaseRetryTimer = undefined;
+};
+
+const seedDefaultTemplatesOnce = async (): Promise<void> => {
+  if (defaultTemplatesSeeded) {
+    return;
+  }
+
+  try {
+    await seedDefaultTemplates();
+    defaultTemplatesSeeded = true;
+  } catch (error) {
+    console.error('Failed to seed default templates:', error);
+  }
+};
+
+const retryDatabaseConnection = async (): Promise<void> => {
+  if (getDatabaseStatus() === 'connected') {
+    stopDatabaseRetry();
+    await seedDefaultTemplatesOnce();
+    return;
+  }
+
+  const isDatabaseConnected = await connectDatabase();
+  if (!isDatabaseConnected) {
+    return;
+  }
+
+  stopDatabaseRetry();
+  await seedDefaultTemplatesOnce();
+};
+
+const startDatabaseRetry = (): void => {
+  if (databaseRetryTimer || !isDatabaseConfigured()) {
+    return;
+  }
+
+  console.warn(
+    `[db] MongoDB is not connected yet. Retrying every ${DATABASE_RETRY_INTERVAL_MS}ms.`
+  );
+
+  databaseRetryTimer = setInterval(() => {
+    void retryDatabaseConnection();
+  }, DATABASE_RETRY_INTERVAL_MS);
+  databaseRetryTimer.unref?.();
+};
+
 const initializeRuntime = async () => {
   try {
     logRuntimeEnvReadiness();
-    const isDatabaseConnected = await connectDatabase();
     configureCloudinary();
+    const isDatabaseConnected = await connectDatabase();
 
     if (!isDatabaseConnected) {
+      if (!isDatabaseConfigured()) {
+        console.warn(
+          '[db] Default template seed is waiting for a production MONGODB_URI.'
+        );
+        return;
+      }
+
       console.warn(
-        '⚠️  Skipping default template seed because MongoDB is not connected.'
+        '[db] Default template seed is waiting for MongoDB connection.'
       );
+      startDatabaseRetry();
       return;
     }
 
-    try {
-      await seedDefaultTemplates();
-    } catch (error) {
-      console.error('Failed to seed default templates:', error);
-    }
+    await seedDefaultTemplatesOnce();
   } catch (error) {
     console.error('Runtime initialization failed:', error);
   }

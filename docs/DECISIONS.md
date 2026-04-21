@@ -785,6 +785,9 @@ Move the production backend deployment target to Railway:
 - Use Railway's injected `PORT` and bind Express to `0.0.0.0`
 - Use `/health` as the Railway deployment healthcheck and keep it as a process liveness endpoint
 - Start the HTTP listener before MongoDB/template seeding so Railway can route healthchecks while external dependencies initialize
+- Report `databaseConfigured` and `databaseRetrying` in `/health` so operators can distinguish a missing Railway `MONGODB_URI` from a temporary Atlas connectivity issue
+- Retry MongoDB connection in the background after a degraded startup and seed default templates once the database becomes reachable
+- Normalize `FRONTEND_URL`, support optional comma-separated `CORS_ORIGINS`, and keep the active Vercel production origin as a fallback so Railway deployments do not fail browser preflight when the dashboard variable is missing or formatted with a trailing slash
 - Keep secrets in Railway service variables, not in repository files
 
 ### Rationale
@@ -793,12 +796,14 @@ Move the production backend deployment target to Railway:
 - Config-as-code keeps build/start/healthcheck behavior reviewable in the repo
 - Root config using `npm --prefix backend ...` avoids relying on hidden UI controls while still deploying only the backend runtime
 - Railway healthchecks should verify that the service is listening; database readiness is still surfaced through the `/health` response body and logs
+- Railway deployments can start before Atlas is reachable, so background retries prevent a one-time connection failure from leaving the runtime permanently degraded
 - Railway public domains can replace the previous Render backend URL without changing the frontend architecture
 - Explicit `0.0.0.0:$PORT` binding aligns with Railway public networking requirements
+- Browser API calls from Vercel depend on exact CORS origin matching, so production origin handling should be tolerant of trailing slashes and multi-origin environment values while still avoiding a wildcard policy
 
 ### Consequences
 
-- **Positive:** Backend deployment is aligned with the chosen Railway platform, the repo preflight now checks the correct configs, and the first Railway import can build successfully from the monorepo root
+- **Positive:** Backend deployment is aligned with the chosen Railway platform, the repo preflight now checks the correct configs, the first Railway import can build successfully from the monorepo root, and MongoDB readiness can recover without manually restarting the service after transient failures
 - **Negative:** The production `API_URL` and Vercel `VITE_API_URL` must be updated after Railway generates the public domain, and operators must confirm `/health` reports `database: "connected"` after deployment
 - **Alternative Considered:** Keep Render as backend hosting (rejected because the team wants Railway for production backend runtime)
 

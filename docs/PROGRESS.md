@@ -8,7 +8,7 @@
 
 **Phase:** Phase 3 - Feature Complete (Polished)
 
-**Status:** All Phase 1, 2, and 3 product features are implemented and have undergone a comprehensive high-fidelity UI/UX overhaul. The application now features a premium corporate aesthetic with a finalized 0.25rem (rounded) design system. Local repository checks pass (`readiness:strict`, lint, Prettier checks, unit tests, build, and production dependency audits). Production frontend reachability is verified, and backend deployment has been migrated from Render scaffolding to Railway-ready config; the Railway service/domain still needs final dashboard deployment verification.
+**Status:** All Phase 1, 2, and 3 product features are implemented and have undergone a comprehensive high-fidelity UI/UX overhaul. The application now features a premium corporate aesthetic with a finalized 0.25rem (rounded) design system. Local repository checks pass (`readiness:strict`, lint, Prettier checks, unit tests, build, and production dependency audits). Production frontend reachability is verified, the backend deployment has been migrated from Render scaffolding to Railway, and the remaining production verification item is confirming the latest Railway deployment reports `database: "connected"` on `/health`.
 
 ---
 
@@ -16,6 +16,8 @@
 
 | Date       | Task                                                                             | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ---------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-04-22 | Fix Railway/Vercel CORS preflight                                                | Reproduced the live production preflight response and found Railway returned credentials/method headers without `Access-Control-Allow-Origin`. Hardened backend CORS origin handling by normalizing `FRONTEND_URL`, supporting comma-separated `CORS_ORIGINS`, keeping localhost dev origins, and including the active Vercel production origin as a safe fallback.                                                                                                                                                                                                                                                                       |
+| 2026-04-22 | Harden Railway MongoDB recovery                                                  | Confirmed the local Atlas URI connects successfully, verified the live Railway `/health` endpoint was still reporting `database: "disconnected"`, then added safe `/health` diagnostics (`databaseConfigured`, `databaseRetrying`) plus background MongoDB reconnect attempts so a configured Railway runtime can recover from degraded startup and seed templates once Atlas is reachable.                                                                                                                                                                                                                                               |
 | 2026-04-22 | Fix Railway healthcheck startup failure                                          | Railway build succeeded but `/health` never became reachable because backend startup waited on database initialization and seed data before opening the HTTP listener. The server now listens first, reports database status in `/health`, initializes external dependencies asynchronously, and skips default template seeding when MongoDB is unavailable.                                                                                                                                                                                                                                                                              |
 | 2026-04-21 | Deep scan security and release hygiene pass                                      | Verified repository readiness, lint, Prettier, tests, build, and production dependency audits; updated Vite to a patched release, refreshed backend vulnerable transitive locks, removed a Fast Refresh lint warning, fixed formatting drift, and aligned backend local CORS fallback with the supported Vite port range. Production frontend returned HTTP 200, and backend hosting verification moved into the Railway migration checklist.                                                                                                                                                                                             |
 | 2026-04-21 | Fix production API 404 routing                                                   | Confirmed live Vercel SPA routes return 200, identified production API calls were using the backend origin without `/api`, normalized `VITE_API_URL` in the frontend API client, and switched integration webhook links to the backend-provided webhook URL.                                                                                                                                                                                                                                                                                                                                                                              |
@@ -150,13 +152,13 @@
 
 ### Week 5-6: Testing & Deployment
 
-| Task                      | Status      | Notes                                                                                                                                |
-| ------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Write unit tests          | Done        | Frontend utility coverage expanded and backend connector services now ship with automated assertions                                 |
-| Write integration tests   | Done        | Added frontend Integration Hub workflow coverage and backend native connector orchestration tests                                    |
-| Deploy frontend to Vercel | Done        | Deployed production frontend to Vercel and configured production environment variables                                               |
-| Deploy backend to Railway | In Progress | Repository config is Railway-ready; Railway service, public domain, env variables, and `/health` verification remain dashboard steps |
-| Setup MongoDB Atlas       | Done        | Provisioned Atlas cluster, database user, and network access for cloud deployments                                                   |
+| Task                      | Status      | Notes                                                                                                                                                             |
+| ------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Write unit tests          | Done        | Frontend utility coverage expanded and backend connector services now ship with automated assertions                                                              |
+| Write integration tests   | Done        | Added frontend Integration Hub workflow coverage and backend native connector orchestration tests                                                                 |
+| Deploy frontend to Vercel | Done        | Deployed production frontend to Vercel and configured production environment variables                                                                            |
+| Deploy backend to Railway | In Progress | Railway service and public domain are live; latest backend retry diagnostics still need to be pushed/redeployed and `/health` must return `database: "connected"` |
+| Setup MongoDB Atlas       | Done        | Provisioned Atlas cluster, database user, and network access for cloud deployments                                                                                |
 
 ---
 
@@ -191,19 +193,20 @@
 ## Next Steps
 
 1. Commit and push the latest repository changes, then redeploy the Railway backend service from the GitHub repository
-2. In Railway, keep the service on the repo root and let root `railway.json` run `npm --prefix backend ...`; add production environment variables, generate a public domain, and verify `${API_URL}/health` returns HTTP 200 with `database: "connected"`
-3. Run a full local authenticated smoke test with a real Auth0 user: sign in -> confirm header avatar/name -> confirm `/api/auth/sync` succeeds -> verify dashboard/templates/certificates data loads from the backend
-4. Confirm Auth0 Dashboard settings: Allowed Callback URLs, Logout URLs, and Web Origins include `http://localhost:5174` (and the port currently in use) plus the production Vercel domain
-5. Test the full verify flow end-to-end: issue a certificate -> open public verify URL -> confirm "Authentic & Verified" stamp -> revoke via `PATCH /api/certificates/:id/revoke` -> re-open public verify URL -> confirm 410 "Certificate Revoked" state
-6. Run production QA for imported background templates: upload PNG -> place fields -> create single certificate -> confirm certificateId stamp appears at bottom-right when no explicit id field is placed
-7. Tighten production security: rotate sensitive keys/tokens periodically and narrow MongoDB Atlas network access when stable
-8. Optional: add monitoring/alerts, review Railway usage and cold-start behavior, and evaluate Canva Connect as a future convenience integration rather than a core dependency
+2. Verify Railway `/health` returns HTTP 200 with `databaseConfigured: true`, `databaseRetrying: false`, and `database: "connected"` after the latest deployment
+3. Verify production browser API calls from `https://certify-ecru-phi.vercel.app` no longer fail preflight and include `Access-Control-Allow-Origin`
+4. Run a full local authenticated smoke test with a real Auth0 user: sign in -> confirm header avatar/name -> confirm `/api/auth/sync` succeeds -> verify dashboard/templates/certificates data loads from the backend
+5. Confirm Auth0 Dashboard settings: Allowed Callback URLs, Logout URLs, and Web Origins include `http://localhost:5174` (and the port currently in use) plus the production Vercel domain
+6. Test the full verify flow end-to-end: issue a certificate -> open public verify URL -> confirm "Authentic & Verified" stamp -> revoke via `PATCH /api/certificates/:id/revoke` -> re-open public verify URL -> confirm 410 "Certificate Revoked" state
+7. Run production QA for imported background templates: upload PNG -> place fields -> create single certificate -> confirm certificateId stamp appears at bottom-right when no explicit id field is placed
+8. Tighten production security: rotate sensitive keys/tokens periodically and narrow MongoDB Atlas network access when stable
+9. Optional: add monitoring/alerts, review Railway usage and cold-start behavior, and evaluate Canva Connect as a future convenience integration rather than a core dependency
 
 ---
 
 ## Blockers
 
-Repository-side deployment readiness is Railway-ready and no code-side blockers are currently open. The remaining release verification item is external: redeploy the Railway backend service from the latest commit, attach its public domain, update `API_URL`/`VITE_API_URL`, and confirm the Railway `/health` endpoint returns `database: "connected"` before calling production fully live.
+Repository-side deployment readiness is Railway-ready and no code-side blockers are currently open. The remaining release verification item is external: redeploy the Railway backend service from the latest commit and confirm the Railway `/health` endpoint returns `databaseConfigured: true` and `database: "connected"` before calling production fully live.
 
 ---
 

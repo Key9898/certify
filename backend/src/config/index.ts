@@ -1,4 +1,9 @@
-export { connectDatabase, getDatabaseStatus } from './database';
+export {
+  connectDatabase,
+  getDatabaseLastError,
+  getDatabaseStatus,
+  isDatabaseConfigured,
+} from './database';
 export { configureCloudinary, cloudinary } from './cloudinary';
 export { auth0Config } from './auth0';
 export { swaggerSpec } from './swagger';
