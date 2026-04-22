@@ -18,6 +18,7 @@ const isAuth0Configured =
   clientId &&
   domain !== 'your-domain.auth0.com' &&
   clientId !== 'your-client-id';
+const CHUNK_RELOAD_RETRY_KEY = 'certify:chunk-reload-retry-path';
 
 const getCanonicalLocalhostUrl = () => {
   if (!import.meta.env.DEV || window.location.hostname !== '127.0.0.1') {
@@ -46,6 +47,25 @@ const resolveAppReturnPath = (returnTo?: string): string => {
     return returnTo.startsWith('/') ? returnTo : ROUTES.DASHBOARD;
   }
 };
+
+const registerChunkLoadRecovery = () => {
+  window.setTimeout(() => {
+    sessionStorage.removeItem(CHUNK_RELOAD_RETRY_KEY);
+  }, 10000);
+
+  window.addEventListener('vite:preloadError', (event) => {
+    event.preventDefault();
+    const retryPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (sessionStorage.getItem(CHUNK_RELOAD_RETRY_KEY) === retryPath) {
+      return;
+    }
+
+    sessionStorage.setItem(CHUNK_RELOAD_RETRY_KEY, retryPath);
+    window.location.reload();
+  });
+};
+
+registerChunkLoadRecovery();
 
 const SetupRequired: React.FC<{ onTryDemo: () => void }> = ({ onTryDemo }) => (
   <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-base-100 p-6">
