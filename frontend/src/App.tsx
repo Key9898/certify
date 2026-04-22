@@ -40,7 +40,7 @@ const Settings = lazy(() =>
   import('@/pages/Settings').then((m) => ({ default: m.Settings }))
 );
 const Verify = lazy(() =>
-  import('@/pages/Verify').then((m) => ({ default: m.VerifyPortal }))
+  import('@/pages/Verify').then((m) => ({ default: m.Verify }))
 );
 const VerifyPortal = lazy(() =>
   import('@/pages/Verify').then((m) => ({ default: m.VerifyPortal }))

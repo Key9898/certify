@@ -35,6 +35,8 @@
       .signature-img { max-height: 45px; max-width: 130px; object-fit: contain; }
       .sign-line { width: 50mm; height: 1px; background: #ccc; margin-bottom: 2mm; }
       .cert-id { font-size: 9px; color: #bbb; font-family: monospace; }
+      .qr-code { width: 22mm; height: 22mm; object-fit: contain; background: #fff; padding: 1mm; border: 1px solid rgba(0,0,0,0.08); }
+      .qr-label { font-size: 7px; color: #999; text-transform: uppercase; letter-spacing: 1px; margin: 1mm 0; }
     </style>
   </head>
   <body>
@@ -55,6 +57,8 @@
           <div class="footer-label">Date of Issue</div>
         </div>
         <div class="footer-item">
+          {{verifyQR}}
+          <div class="qr-label">Scan to verify</div>
           <div class="cert-id">ID: {{certificateId}}</div>
         </div>
         <div class="footer-item">

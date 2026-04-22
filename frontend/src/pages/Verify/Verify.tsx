@@ -8,7 +8,7 @@ import {
   ArrowLeft,
   ShieldAlert,
 } from 'lucide-react';
-import { get } from '@/utils/api';
+import { publicGet } from '@/utils/api';
 import { QUICK_SPRING } from '@/utils/motion';
 
 interface VerifyData {
@@ -52,9 +52,12 @@ export const Verify: React.FC = () => {
 
   useEffect(() => {
     if (!certificateId) return;
+    const normalizedCertificateId = certificateId.trim().toUpperCase();
     const load = async () => {
       try {
-        const res = await get<VerifyData>(`/verify/${certificateId}`);
+        const res = await publicGet<VerifyData>(
+          `/verify/${encodeURIComponent(normalizedCertificateId)}`
+        );
         setData(res.data ?? null);
       } catch (err: unknown) {
         const status = (err as { status?: number })?.status;

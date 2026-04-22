@@ -8,7 +8,18 @@ export const verifyCertificate = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { certificateId } = req.params;
+    const certificateId = req.params.certificateId?.trim().toUpperCase();
+
+    if (!certificateId) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Certificate ID is required.',
+        },
+      });
+      return;
+    }
 
     const certificate = await Certificate.findOne({ certificateId })
       .populate('templateId', 'name category')

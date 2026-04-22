@@ -23,7 +23,7 @@ export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({
     setIsSearching(true);
     // Visual delay to feel like a "verification process"
     setTimeout(() => {
-      navigate(`/verify/${id.trim()}`);
+      navigate(`/verify/${encodeURIComponent(id.trim().toUpperCase())}`);
       setIsSearching(false);
     }, 800);
   };

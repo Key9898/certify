@@ -67,12 +67,37 @@ const buildRequestHeaders = async (
   };
 };
 
+const buildPublicRequestHeaders = (
+  options: RequestInit = {}
+): Record<string, string> => {
+  const shouldSetJsonContentType =
+    options.body !== undefined && !(options.body instanceof FormData);
+
+  return {
+    ...(shouldSetJsonContentType ? { 'Content-Type': 'application/json' } : {}),
+    ...(options.headers as Record<string, string> | undefined),
+  };
+};
+
 export const fetchWithAuth = async (
   endpoint: string,
   options: RequestInit = {}
 ): Promise<Response> => {
   const url = `${API_BASE_URL}${endpoint}`;
   const headers = await buildRequestHeaders(options);
+
+  return fetch(url, {
+    ...options,
+    headers,
+  });
+};
+
+export const fetchPublic = (
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<Response> => {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const headers = buildPublicRequestHeaders(options);
 
   return fetch(url, {
     ...options,
@@ -126,7 +151,30 @@ export const apiRequest = async <T>(
   return data;
 };
 
+export const publicApiRequest = async <T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<ApiResponse<T>> => {
+  const response = await fetchPublic(endpoint, options);
+
+  const data = await parseApiResponse<T>(response);
+
+  if (!response.ok) {
+    const err = Object.assign(
+      new Error(
+        data.error?.message || `HTTP error! status: ${response.status}`
+      ),
+      { status: response.status, code: data.error?.code }
+    );
+    throw err;
+  }
+
+  return data;
+};
+
 export const get = <T>(endpoint: string) => apiRequest<T>(endpoint);
+
+export const publicGet = <T>(endpoint: string) => publicApiRequest<T>(endpoint);
 
 export const post = <T>(endpoint: string, body: unknown) =>
   apiRequest<T>(endpoint, {

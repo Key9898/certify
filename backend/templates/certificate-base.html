@@ -98,6 +98,20 @@
         opacity: 0.5;
         font-family: monospace;
       }
+      .qr-code {
+        width: 22mm;
+        height: 22mm;
+        object-fit: contain;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 1mm;
+      }
+      .qr-label {
+        font-size: 7px;
+        opacity: 0.7;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 1mm 0;
+      }
     </style>
   </head>
   <body>
@@ -114,6 +128,8 @@
           <div class="footer-label">Issue Date</div>
         </div>
         <div class="footer-section">
+          {{verifyQR}}
+          <div class="qr-label">Scan to verify</div>
           <div class="cert-id">ID: {{certificateId}}</div>
         </div>
         <div class="footer-section">
