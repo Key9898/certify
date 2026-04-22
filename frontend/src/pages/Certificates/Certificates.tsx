@@ -106,7 +106,7 @@ export const Certificates: React.FC = () => {
               transition={QUICK_SPRING}
             >
               <Link
-                to={ROUTES.TEMPLATES}
+                to={ROUTES.CREATE_CERTIFICATE}
                 className="btn btn-primary h-14 rounded px-10 text-[13px] font-black uppercase tracking-widest shadow-xl shadow-primary/20"
               >
                 <Plus size={20} className="mr-2" />
@@ -237,7 +237,7 @@ export const Certificates: React.FC = () => {
           className="fixed bottom-8 right-8 z-40 lg:hidden"
         >
           <Link
-            to={ROUTES.TEMPLATES}
+            to={ROUTES.CREATE_CERTIFICATE}
             className="btn btn-primary h-14 w-14 rounded p-0 shadow-2xl"
           >
             <Plus size={24} />

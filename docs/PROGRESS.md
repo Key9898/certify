@@ -8,7 +8,7 @@
 
 **Phase:** Phase 3 - Feature Complete (Polished)
 
-**Status:** All Phase 1, 2, and 3 product features are implemented and have undergone a comprehensive high-fidelity UI/UX overhaul. The application now features a premium corporate aesthetic with a finalized 0.25rem (rounded) design system. Local repository checks pass (`readiness:strict`, lint, Prettier checks, unit tests, build, and production dependency audits). Production frontend reachability is verified, the backend deployment has been migrated from Render scaffolding to Railway, and the remaining production verification item is confirming the latest Railway deployment reports `database: "connected"` on `/health`.
+**Status:** All Phase 1, 2, and 3 product features are implemented and have undergone a comprehensive high-fidelity UI/UX overhaul. The application now features a premium corporate aesthetic with a finalized 0.25rem (rounded) design system. Local repository checks pass (`readiness:strict`, lint, Prettier checks, unit tests, build, and production dependency audits). Production frontend reachability is verified, the backend deployment has been migrated from Render scaffolding to Railway, and the live Railway `/health` endpoint now reports Auth0 configured, MongoDB configured from `MONGODB_URI`, `databaseRetrying: false`, and `database: "connected"`.
 
 ---
 
@@ -16,6 +16,8 @@
 
 | Date       | Task                                                                             | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ---------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-04-22 | Fix Certificates create navigation                                               | Updated Certificates page create actions so "Create New" opens the certificate creation flow instead of sending users to the Templates page/template builder path.                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| 2026-04-22 | Confirm Railway production database health                                       | Verified the live Railway `/health` response reports `authConfigured: true`, `databaseConfigured: true`, `databaseConfigSource: "MONGODB_URI"`, `databaseRetrying: false`, and `database: "connected"`. This closes the previous external Railway database health blocker.                                                                                                                                                                                                                                                                                                                                                                |
 | 2026-04-22 | Harden Railway MongoDB env resolution                                            | API auth/CORS issues were resolved, but `/health` still reported `databaseConfigured: false`. Expanded MongoDB runtime resolution to support common Railway/env aliases (`MONGODB_URI`, `MONGO_URI`, `MONGODB_URL`, `MONGO_URL`, Mongo-style `DATABASE_URL`) and added non-secret `databaseConfigSource` to `/health` so production can confirm whether the Railway service actually exposes a recognized MongoDB URI.                                                                                                                                                                                                                    |
 | 2026-04-22 | Fix Railway Auth0 503 fallback                                                   | Production API calls reached the backend after CORS was resolved but returned `AUTH_NOT_CONFIGURED`. Centralized Auth0 runtime config so the backend can read `AUTH0_*`, `VITE_AUTH0_*`, or the project public Auth0 defaults, and added `authConfigured` to `/health` for production diagnostics. MongoDB remains a Railway secret variable and must be present in Railway for database-backed endpoints to work.                                                                                                                                                                                                                        |
 | 2026-04-22 | Fix Railway/Vercel CORS preflight                                                | Reproduced the live production preflight response and found Railway returned credentials/method headers without `Access-Control-Allow-Origin`. Hardened backend CORS origin handling by normalizing `FRONTEND_URL`, supporting comma-separated `CORS_ORIGINS`, keeping localhost dev origins, and including the active Vercel production origin as a safe fallback.                                                                                                                                                                                                                                                                       |
@@ -154,13 +156,13 @@
 
 ### Week 5-6: Testing & Deployment
 
-| Task                      | Status      | Notes                                                                                                                                                             |
-| ------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Write unit tests          | Done        | Frontend utility coverage expanded and backend connector services now ship with automated assertions                                                              |
-| Write integration tests   | Done        | Added frontend Integration Hub workflow coverage and backend native connector orchestration tests                                                                 |
-| Deploy frontend to Vercel | Done        | Deployed production frontend to Vercel and configured production environment variables                                                                            |
-| Deploy backend to Railway | In Progress | Railway service and public domain are live; latest backend retry diagnostics still need to be pushed/redeployed and `/health` must return `database: "connected"` |
-| Setup MongoDB Atlas       | Done        | Provisioned Atlas cluster, database user, and network access for cloud deployments                                                                                |
+| Task                      | Status | Notes                                                                                                                  |
+| ------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------- |
+| Write unit tests          | Done   | Frontend utility coverage expanded and backend connector services now ship with automated assertions                   |
+| Write integration tests   | Done   | Added frontend Integration Hub workflow coverage and backend native connector orchestration tests                      |
+| Deploy frontend to Vercel | Done   | Deployed production frontend to Vercel and configured production environment variables                                 |
+| Deploy backend to Railway | Done   | Railway service and public domain are live; `/health` reports Auth0 configured and MongoDB connected via `MONGODB_URI` |
+| Setup MongoDB Atlas       | Done   | Provisioned Atlas cluster, database user, and network access for cloud deployments                                     |
 
 ---
 
@@ -194,21 +196,19 @@
 
 ## Next Steps
 
-1. Commit and push the latest repository changes, then redeploy the Railway backend service from the GitHub repository
-2. Verify Railway `/health` returns HTTP 200 with `authConfigured: true`, `databaseConfigured: true`, `databaseConfigSource` set to a recognized MongoDB env key, `databaseRetrying: false`, and `database: "connected"` after the latest deployment
-3. Verify production browser API calls from `https://certify-ecru-phi.vercel.app` no longer fail preflight and include `Access-Control-Allow-Origin`
-4. Run a full local authenticated smoke test with a real Auth0 user: sign in -> confirm header avatar/name -> confirm `/api/auth/sync` succeeds -> verify dashboard/templates/certificates data loads from the backend
-5. Confirm Auth0 Dashboard settings: Allowed Callback URLs, Logout URLs, and Web Origins include `http://localhost:5174` (and the port currently in use) plus the production Vercel domain
-6. Test the full verify flow end-to-end: issue a certificate -> open public verify URL -> confirm "Authentic & Verified" stamp -> revoke via `PATCH /api/certificates/:id/revoke` -> re-open public verify URL -> confirm 410 "Certificate Revoked" state
-7. Run production QA for imported background templates: upload PNG -> place fields -> create single certificate -> confirm certificateId stamp appears at bottom-right when no explicit id field is placed
-8. Tighten production security: rotate sensitive keys/tokens periodically and narrow MongoDB Atlas network access when stable
-9. Optional: add monitoring/alerts, review Railway usage and cold-start behavior, and evaluate Canva Connect as a future convenience integration rather than a core dependency
+1. Verify production browser API calls from `https://certify-ecru-phi.vercel.app` continue to pass preflight and include `Access-Control-Allow-Origin`
+2. Run a full authenticated production smoke test with a real Auth0 user: sign in -> confirm header avatar/name -> confirm `/api/auth/sync` succeeds -> verify dashboard/templates/certificates data loads from the Railway backend
+3. Confirm Auth0 Dashboard settings remain current: Allowed Callback URLs, Logout URLs, and Web Origins include `http://localhost:5174` (and the port currently in use) plus the production Vercel domain
+4. Test the full verify flow end-to-end: issue a certificate -> open public verify URL -> confirm "Authentic & Verified" stamp -> revoke via `PATCH /api/certificates/:id/revoke` -> re-open public verify URL -> confirm 410 "Certificate Revoked" state
+5. Run production QA for imported background templates: upload PNG -> place fields -> create single certificate -> confirm certificateId stamp appears at bottom-right when no explicit id field is placed
+6. Tighten production security: rotate sensitive keys/tokens periodically and narrow MongoDB Atlas network access when stable
+7. Optional: add monitoring/alerts, review Railway usage and cold-start behavior, and evaluate Canva Connect as a future convenience integration rather than a core dependency
 
 ---
 
 ## Blockers
 
-Repository-side deployment readiness is Railway-ready and no code-side blockers are currently open. The remaining release verification item is external: redeploy the Railway backend service from the latest commit and confirm the Railway `/health` endpoint returns `databaseConfigured: true` and `database: "connected"` before calling production fully live.
+Repository-side deployment readiness is Railway-ready and no code-side blockers are currently open. The live Railway `/health` endpoint now confirms Auth0 configuration and MongoDB connectivity. Remaining release work is manual production QA of authenticated user flows, certificate issuance/export, provider callbacks, and ongoing security/usage monitoring.
 
 ---
 

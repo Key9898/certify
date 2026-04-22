@@ -74,7 +74,7 @@ export const CertificateList: React.FC<CertificateListProps> = ({
 
         <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }}>
           <Link
-            to={ROUTES.TEMPLATES}
+            to={ROUTES.CREATE_CERTIFICATE}
             className="btn btn-primary h-14 rounded px-10 font-black uppercase tracking-widest shadow-xl shadow-primary/20 gap-2"
           >
             <Plus size={20} />

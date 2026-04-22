@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Production CORS Origins**: Backend CORS now normalizes configured frontend origins, supports comma-separated `CORS_ORIGINS`, and includes the active Vercel production domain as a safe fallback for Railway deployments.
 - **Auth0 Runtime Defaults**: Backend Auth0 validation now accepts backend `AUTH0_*` env vars, frontend-style `VITE_AUTH0_*` aliases, or the project public Auth0 domain/audience defaults so Railway deployments do not return `AUTH_NOT_CONFIGURED` when only public auth values are missing.
 - **MongoDB Runtime Aliases**: Backend database config now accepts `MONGODB_URI`, `MONGO_URI`, `MONGODB_URL`, `MONGO_URL`, or Mongo-style `DATABASE_URL`, and `/health` reports the non-secret `databaseConfigSource` for Railway diagnostics.
+- **Production Progress Docs**: Updated production status notes to reflect the live Railway `/health` response reporting Auth0 configured, MongoDB configured from `MONGODB_URI`, and database connectivity established.
 - **Security Maintenance**: Updated frontend Vite to `^8.0.9` and refreshed backend transitive dependency locks so `npm audit --omit=dev` reports 0 production vulnerabilities for both frontend and backend.
 - **Local CORS Fallback**: Backend CORS fallback now allows the supported local Vite range (`localhost`/`127.0.0.1` ports `5174-5180`) when `FRONTEND_URL` is not set.
 - **Bundle Size Optimization**: Implemented lazy loading for heavy libraries to eliminate Vite 500kB chunk warnings. ExcelJS dynamically imported in csvParser.ts for XLSX parsing. Recharts components (OverviewChart, UsageChart) lazy loaded via React.Suspense in Dashboard.tsx. Results: BatchGenerate chunk reduced from 955.96 kB to 26.36 kB (97% reduction), Dashboard chunk reduced from 417.81 kB to 16.03 kB (96% reduction). New lazy chunks: exceljs.min (929.91 kB), Chart (362.12 kB).
@@ -24,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Certificate Create Navigation**: Fixed Certificates page "Create New" actions routing users to Templates instead of the actual certificate creation flow.
 - **Production API 404s**: Frontend API base URL now normalizes production `VITE_API_URL` values that omit `/api`, preventing calls like `https://backend/templates` and routing them to `https://backend/api/templates` instead.
 - **Railway Healthcheck Failure**: MongoDB connection errors no longer terminate the process before the Railway healthcheck can reach `/health`; default template seeding is skipped when the database is unavailable and logged as a degraded startup state.
 - **Railway MongoDB Degraded Startup**: A one-time MongoDB startup failure no longer leaves the service permanently disconnected; configured Railway services continue retrying until Atlas becomes reachable.

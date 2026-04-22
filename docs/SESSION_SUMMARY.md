@@ -1,6 +1,6 @@
 # Session Summary
 
-**Last Updated:** 2026-04-21
+**Last Updated:** 2026-04-22
 
 ---
 
@@ -39,7 +39,7 @@
 ## Known Constraints
 
 - Repository-side deployment readiness currently passes with 0 blocking items and 0 warnings
-- Production frontend reachability is verified; backend hosting is being moved from Render to Railway and still needs Railway service/domain verification from the dashboard
+- Production frontend reachability is verified; Railway backend `/health` is live and reports Auth0 configured plus MongoDB connected via `MONGODB_URI`
 - Demo mode is intended for safe UI walkthroughs and uses mock data instead of live integrations
 - The root `npm run dev` workflow now orchestrates frontend and backend together, but real Auth0/MongoDB/Cloudinary behavior still depends on env setup
 - Real external webhook callers and native provider callbacks still need manual QA against deployed credentials before production rollout
@@ -51,7 +51,7 @@
 - Ran an April 21 deep scan across readiness, lint, Prettier, tests, build, production dependency audits, tracked-secret checks, and public frontend/backend reachability.
 - Updated Vite to a patched release and refreshed backend transitive dependency locks so frontend and backend production dependency audits report 0 vulnerabilities.
 - Removed a React Fast Refresh lint warning in the Integration Hub tabs component, fixed formatting drift, and aligned backend local CORS fallback with the supported Vite dev port range.
-- Prepared the backend for Railway deployment with `backend/railway.json`, Railway `/health` checks, and explicit `0.0.0.0:$PORT` binding; the Railway public domain remains the main external verification item.
+- Prepared and verified the backend on Railway with `/health` checks, explicit `0.0.0.0:$PORT` binding, Auth0 configured, and MongoDB connected through the production `MONGODB_URI`.
 - Fixed all hardcoded dates and values in public-facing landing pages (Home, About, Privacy, Terms)
 - Added `formatPreviewDate()` function in Home.tsx for dynamic certificate preview dates
 - Changed "Since 2026" to dynamic year in About.tsx
