@@ -9,12 +9,16 @@ import type { User } from '@/types';
 
 interface AuthContextValue {
   appUser: User | null;
+  isApiAuthReady: boolean;
+  apiAuthError: string | null;
   isLoadingUser: boolean;
   setAppUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
   appUser: null,
+  isApiAuthReady: false,
+  apiAuthError: null,
   isLoadingUser: true,
   setAppUser: () => undefined,
 });
@@ -57,30 +61,70 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const auth0Audience = import.meta.env.VITE_AUTH0_AUDIENCE || '';
   const { isDemoMode, mockUser } = useDemo();
   const [appUser, setAppUser] = useState<User | null>(null);
+  const [isApiAuthReady, setIsApiAuthReady] = useState(false);
+  const [apiAuthError, setApiAuthError] = useState<string | null>(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
 
-  // In demo mode, use mock user directly — skip all API calls
+  // In demo mode, use mock user directly and skip all API calls.
   useEffect(() => {
     if (isDemoMode) {
       setAppUser(mockUser);
       setIsLoadingUser(false);
+      setIsApiAuthReady(true);
+      setApiAuthError(null);
       setTokenGetter(async () => 'mock-demo-token');
     }
   }, [isDemoMode, mockUser]);
 
   useEffect(() => {
     if (isDemoMode) return;
-    if (!isLoading && isAuthenticated) {
-      setTokenGetter(() =>
-        getAccessTokenSilently(
-          auth0Audience
-            ? { authorizationParams: { audience: auth0Audience } }
-            : undefined
-        )
-      );
-    } else if (!isLoading && !isAuthenticated) {
+    let isCancelled = false;
+
+    const resetApiAuth = () => {
       setTokenGetter(null);
+      setIsApiAuthReady(false);
+    };
+
+    if (isLoading) {
+      resetApiAuth();
+      setApiAuthError(null);
+      return;
     }
+
+    if (!isAuthenticated) {
+      resetApiAuth();
+      setApiAuthError(null);
+      return;
+    }
+
+    const getApiToken = () =>
+      getAccessTokenSilently(
+        auth0Audience
+          ? { authorizationParams: { audience: auth0Audience } }
+          : undefined
+      );
+
+    setTokenGetter(getApiToken);
+    setIsApiAuthReady(false);
+    setApiAuthError(null);
+
+    void getApiToken()
+      .then(() => {
+        if (isCancelled) return;
+        setIsApiAuthReady(true);
+      })
+      .catch((error) => {
+        if (isCancelled) return;
+        console.error('Failed to prepare API access token:', error);
+        resetApiAuth();
+        setApiAuthError(
+          'We could not prepare your secure API session. Please sign in again.'
+        );
+      });
+
+    return () => {
+      isCancelled = true;
+    };
   }, [
     isDemoMode,
     isAuthenticated,
@@ -91,6 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (isDemoMode) return;
+    if (!isApiAuthReady) return;
     const syncUserData = async () => {
       if (!isLoading && isAuthenticated && user) {
         setIsLoadingUser(true);
@@ -115,10 +160,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     };
     syncUserData();
-  }, [isDemoMode, isAuthenticated, isLoading, user]);
+  }, [isDemoMode, isApiAuthReady, isAuthenticated, isLoading, user]);
 
   return (
-    <AuthContext.Provider value={{ appUser, isLoadingUser, setAppUser }}>
+    <AuthContext.Provider
+      value={{
+        appUser,
+        isApiAuthReady,
+        apiAuthError,
+        isLoadingUser,
+        setAppUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

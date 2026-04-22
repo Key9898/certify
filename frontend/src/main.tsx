@@ -13,6 +13,7 @@ import './global.css';
 
 const domain = import.meta.env.VITE_AUTH0_DOMAIN || '';
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID || '';
+const audience = import.meta.env.VITE_AUTH0_AUDIENCE || '';
 const isAuth0Configured =
   domain &&
   clientId &&
@@ -192,8 +193,15 @@ const Root: React.FC = () => {
       clientId={clientId}
       onRedirectCallback={handleRedirectCallback}
       useRefreshTokens={true}
+      useRefreshTokensFallback={true}
       authorizationParams={{
         redirect_uri: window.location.origin,
+        ...(audience
+          ? {
+              audience,
+              scope: 'openid profile email offline_access',
+            }
+          : {}),
       }}
     >
       <App />

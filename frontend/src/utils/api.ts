@@ -41,8 +41,15 @@ const getAuthHeaders = async (): Promise<Record<string, string>> => {
   try {
     const token = await getToken();
     return { Authorization: `Bearer ${token}` };
-  } catch {
-    return {};
+  } catch (error) {
+    throw Object.assign(
+      new Error('Unable to get an API access token. Please sign in again.'),
+      {
+        status: 401,
+        code: 'AUTH_TOKEN_UNAVAILABLE',
+        cause: error,
+      }
+    );
   }
 };
 

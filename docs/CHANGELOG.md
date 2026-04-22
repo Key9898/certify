@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Production API 401 Race**: Protected dashboard routes now wait until the Auth0 API access token is prepared before rendering data-fetching pages, Auth0 login requests include the API audience/scope up front, and frontend API calls no longer silently drop failed token acquisition into unauthenticated backend requests.
 - **Auth0 Google Redirect Loop**: Replaced the post-login callback full-page reload with same-origin history replacement so Auth0's in-memory SPA session state survives the callback and authenticated users can land on Dashboard instead of re-entering the login loop.
 - **Vercel Dynamic Chunk MIME Errors**: Restricted Vercel SPA rewrites to known app routes so missing `/assets/*.js` files no longer return `index.html`, and added a one-time Vite chunk-load recovery reload for stale browser caches after deployments.
 - **Background Template QR Placement**: Background template rendering now supports explicit `verifyQR` image fields while preserving the automatic fallback QR stamp when users do not place a QR field.

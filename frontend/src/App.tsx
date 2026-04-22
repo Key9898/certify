@@ -8,7 +8,7 @@ import {
   useLocation,
 } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
-import { AuthProvider } from '@/context/AuthContext';
+import { AuthProvider, useAppUser } from '@/context/AuthContext';
 import { Loading } from '@/components/common/Loading';
 import { ROUTES } from '@/utils/constants';
 import { PAGE_VARIANTS } from '@/utils/motion';
@@ -69,7 +69,9 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+  const { isApiAuthReady, apiAuthError } = useAppUser();
   const location = useLocation();
+  const returnTo = `${location.pathname}${location.search}${location.hash}`;
 
   useEffect(() => {
     if (isLoading || isAuthenticated) {
@@ -78,17 +80,10 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
 
     void loginWithRedirect({
       appState: {
-        returnTo: `${location.pathname}${location.search}${location.hash}`,
+        returnTo,
       },
     });
-  }, [
-    isAuthenticated,
-    isLoading,
-    location.hash,
-    location.pathname,
-    location.search,
-    loginWithRedirect,
-  ]);
+  }, [isAuthenticated, isLoading, loginWithRedirect, returnTo]);
 
   if (isLoading) {
     return (
@@ -99,6 +94,40 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   }
 
   if (!isAuthenticated) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loading size="lg" />
+      </div>
+    );
+  }
+
+  if (apiAuthError) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-base-100 p-6">
+        <div className="card max-w-md border border-base-200 bg-base-100 p-6 text-center shadow-xl">
+          <p className="text-lg font-bold text-base-content">
+            Secure session needs a refresh
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-base-content/65">
+            {apiAuthError}
+          </p>
+          <button
+            className="btn btn-primary mt-5"
+            onClick={() =>
+              void loginWithRedirect({
+                appState: { returnTo },
+                authorizationParams: { prompt: 'login' },
+              })
+            }
+          >
+            Sign in again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isApiAuthReady) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loading size="lg" />
