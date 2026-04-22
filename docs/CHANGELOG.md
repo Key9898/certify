@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **Certificate Create Navigation**: Fixed Certificates page "Create New" actions routing users to Templates instead of the actual certificate creation flow.
+- **Certificate Create Navigation**: Fixed Certificates page "Create New" actions so they open the Background Template Builder directly instead of stopping on the Templates gallery or the Quick Create form.
 - **Production API 404s**: Frontend API base URL now normalizes production `VITE_API_URL` values that omit `/api`, preventing calls like `https://backend/templates` and routing them to `https://backend/api/templates` instead.
 - **Railway Healthcheck Failure**: MongoDB connection errors no longer terminate the process before the Railway healthcheck can reach `/health`; default template seeding is skipped when the database is unavailable and logged as a degraded startup state.
 - **Railway MongoDB Degraded Startup**: A one-time MongoDB startup failure no longer leaves the service permanently disconnected; configured Railway services continue retrying until Atlas becomes reachable.
