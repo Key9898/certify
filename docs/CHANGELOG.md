@@ -25,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Deep QA Auth0 Token Handling**: Removed frontend Auth0 `localstorage` token caching and stopped sending the API audience during the initial login redirect; API audience tokens are requested only through `getAccessTokenSilently()` for backend calls.
+- **Certificate QR Verify URLs**: PDF/PNG QR generation now falls back to the configured `FRONTEND_URL` instead of the placeholder `https://certify.app`, preventing exported certificates from embedding broken verification links.
+- **API Error Resilience**: Frontend API helpers now handle empty or non-JSON server responses with a friendly `INVALID_RESPONSE` error instead of crashing on `response.json()`.
+- **Auth0 Settings Runtime Config**: Account settings password/account flows now use the centralized Auth0 runtime config and support `VITE_AUTH0_CLIENT_ID` as a public client ID fallback instead of accidentally treating the API audience as a client ID.
 - **Certificate Create Navigation**: Fixed Certificates page "Create New" actions so they open the Background Template Builder directly instead of stopping on the Templates gallery or the Quick Create form.
 - **Production API 404s**: Frontend API base URL now normalizes production `VITE_API_URL` values that omit `/api`, preventing calls like `https://backend/templates` and routing them to `https://backend/api/templates` instead.
 - **Railway Healthcheck Failure**: MongoDB connection errors no longer terminate the process before the Railway healthcheck can reach `/health`; default template seeding is skipped when the database is unavailable and logged as a degraded startup state.
@@ -194,7 +198,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Batch wizard completion now waits for real processing results
 - Protected raw downloads and uploads now consistently send Auth0 bearer tokens
 - Dashboard no longer crashes in demo mode because chart errors are isolated and React StrictMode was removed for the incompatible dev-only path
-- **`consent_required` silent auth failure (white screen / app crash):** Added `useRefreshTokens={true}` + `cacheLocation="localstorage"` to `Auth0Provider` — Chrome 80+ blocks third-party cookies used for iframe-based silent auth; refresh token rotation bypasses this entirely
+- **`consent_required` silent auth failure (white screen / app crash):** Added refresh token rotation support to `Auth0Provider` while keeping token caching out of `localStorage`; API audience tokens are requested only when backend calls need them
 - App no longer shows white screen on unhandled render errors — top-level `ErrorBoundary` in `main.tsx` now catches all crashes and shows "Something went wrong" + Reload button
 - **Settings Implementation Gaps**: Restored missing React hooks imports and Lucide icons following the modular refactor; fixed prop assignment errors on the FileUpload component.
 - **Lint & Clean-up**: Eliminated all unused imports (SOFT_SPRING, Palette, Globe, etc.) and implicit 'any' types introduced during the architectural split.

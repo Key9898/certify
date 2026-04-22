@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from '../types';
 import { User } from '../models/User';
 import { Organization } from '../models/Organization';
 import { buildAppUser, isWorkspaceAdmin } from '../services/workspaceService';
+import { getAuth0RuntimeConfig } from '../config/auth0';
 
 interface Auth0ManagementToken {
   access_token?: string;
@@ -21,7 +22,7 @@ interface Auth0Error {
 const getAuth0ManagementToken = async (): Promise<string | null> => {
   const mgmtClientId = process.env.AUTH0_MGMT_CLIENT_ID;
   const mgmtClientSecret = process.env.AUTH0_MGMT_CLIENT_SECRET;
-  const domain = process.env.AUTH0_DOMAIN;
+  const { domain } = getAuth0RuntimeConfig();
 
   if (!mgmtClientId || !mgmtClientSecret || !domain) {
     return null;
@@ -93,7 +94,7 @@ export const changePassword = async (
 
     const user = req.user!;
     const auth0Id = user.auth0Id;
-    const domain = process.env.AUTH0_DOMAIN;
+    const { domain } = getAuth0RuntimeConfig();
 
     if (!domain) {
       res.status(500).json({
@@ -106,11 +107,10 @@ export const changePassword = async (
       return;
     }
 
-    const clientId = process.env.AUTH0_CLIENT_ID;
-    const clientIdForVerification =
-      process.env.AUTH0_CLIENT_ID || process.env.AUTH0_AUDIENCE;
+    const clientId =
+      process.env.AUTH0_CLIENT_ID || process.env.VITE_AUTH0_CLIENT_ID;
 
-    if (!clientIdForVerification) {
+    if (!clientId) {
       res.status(500).json({
         success: false,
         error: {
@@ -127,7 +127,7 @@ export const changePassword = async (
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           grant_type: 'password',
-          client_id: clientId || clientIdForVerification,
+          client_id: clientId,
           username: user.email,
           password: currentPassword,
           scope: 'openid',
@@ -245,7 +245,7 @@ export const deleteAccount = async (
 
     const mgmtClientId = process.env.AUTH0_MGMT_CLIENT_ID;
     const mgmtClientSecret = process.env.AUTH0_MGMT_CLIENT_SECRET;
-    const domain = process.env.AUTH0_DOMAIN;
+    const { domain } = getAuth0RuntimeConfig();
 
     if (mgmtClientId && mgmtClientSecret && domain) {
       try {

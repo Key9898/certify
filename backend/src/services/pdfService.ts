@@ -133,11 +133,18 @@ const escapeHtml = (value: string): string =>
 const escapeMultilineText = (value: string): string =>
   escapeHtml(value).replace(/\n/g, '<br />');
 
+const getVerificationBaseUrl = (): string =>
+  (process.env.FRONTEND_URL || 'https://certify-ecru-phi.vercel.app').replace(
+    /\/+$/,
+    ''
+  );
+
 const generateQRCodeDataUrl = async (
   certificateId: string,
   verifyUrl?: string
 ): Promise<string> => {
-  const url = verifyUrl || `https://certify.app/verify/${certificateId}`;
+  const url =
+    verifyUrl || `${getVerificationBaseUrl()}/verify/${certificateId}`;
   try {
     return await QRCode.toDataURL(url, {
       width: 150,

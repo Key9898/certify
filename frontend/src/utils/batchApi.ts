@@ -1,4 +1,4 @@
-import { apiRequest, fetchWithAuth, post } from './api';
+import { apiRequest, fetchWithAuth, parseApiResponse, post } from './api';
 import type { ApiResponse } from '@/types/api';
 import type {
   BatchJob,
@@ -17,7 +17,7 @@ export const uploadBatchCsv = async (
     body: formData,
   });
 
-  const data: ApiResponse<BatchUploadPreview> = await response.json();
+  const data = await parseApiResponse<BatchUploadPreview>(response);
 
   if (!response.ok) {
     throw new Error(

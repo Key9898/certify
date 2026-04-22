@@ -73,13 +73,38 @@ export const fetchWithAuth = async (
   });
 };
 
+export const parseApiResponse = async <T>(
+  response: Response
+): Promise<ApiResponse<T>> => {
+  const rawBody = await response.text();
+
+  if (!rawBody) {
+    return { success: response.ok };
+  }
+
+  try {
+    return JSON.parse(rawBody) as ApiResponse<T>;
+  } catch {
+    return {
+      success: false,
+      error: {
+        code: 'INVALID_RESPONSE',
+        message:
+          response.status >= 500
+            ? 'The server returned an unexpected response. Please try again in a moment.'
+            : 'The server returned an invalid response.',
+      },
+    };
+  }
+};
+
 export const apiRequest = async <T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> => {
   const response = await fetchWithAuth(endpoint, options);
 
-  const data: ApiResponse<T> = await response.json();
+  const data = await parseApiResponse<T>(response);
 
   if (!response.ok) {
     const err = Object.assign(

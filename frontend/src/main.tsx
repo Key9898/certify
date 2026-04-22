@@ -159,10 +159,8 @@ const Root: React.FC = () => {
       clientId={clientId}
       onRedirectCallback={handleRedirectCallback}
       useRefreshTokens={true}
-      cacheLocation="localstorage"
       authorizationParams={{
         redirect_uri: window.location.origin,
-        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
       }}
     >
       <App />
