@@ -28,6 +28,25 @@ const getCanonicalLocalhostUrl = () => {
   return `${window.location.protocol}//localhost${port}${window.location.pathname}${window.location.search}${window.location.hash}`;
 };
 
+const resolveAppReturnPath = (returnTo?: string): string => {
+  if (!returnTo || returnTo === '/') {
+    return ROUTES.DASHBOARD;
+  }
+
+  try {
+    const parsed = new URL(returnTo, window.location.origin);
+    if (parsed.origin !== window.location.origin) {
+      return ROUTES.DASHBOARD;
+    }
+
+    return (
+      `${parsed.pathname}${parsed.search}${parsed.hash}` || ROUTES.DASHBOARD
+    );
+  } catch {
+    return returnTo.startsWith('/') ? returnTo : ROUTES.DASHBOARD;
+  }
+};
+
 const SetupRequired: React.FC<{ onTryDemo: () => void }> = ({ onTryDemo }) => (
   <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-base-100 p-6">
     <motion.div
@@ -126,17 +145,11 @@ const Root: React.FC = () => {
   }
 
   const handleRedirectCallback = (appState?: { returnTo?: string }) => {
-    const target =
-      appState?.returnTo && appState.returnTo !== '/'
-        ? appState.returnTo
-        : window.location.pathname && window.location.pathname !== '/'
-          ? window.location.pathname
-          : ROUTES.DASHBOARD;
-    const resolvedTarget = target.startsWith('http')
-      ? target
-      : `${window.location.origin}${target}`;
-
-    window.location.replace(resolvedTarget);
+    const target = resolveAppReturnPath(appState?.returnTo);
+    window.history.replaceState({}, document.title, target);
+    window.dispatchEvent(
+      new PopStateEvent('popstate', { state: window.history.state })
+    );
   };
 
   if (isDemoMode) {

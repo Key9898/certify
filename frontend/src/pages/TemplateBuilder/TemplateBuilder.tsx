@@ -96,6 +96,23 @@ const createPreviewAsset = (
     </svg>
   `)}`;
 
+const createQrPreviewAsset = () =>
+  `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+      <rect width="160" height="160" fill="#ffffff" />
+      <rect x="10" y="10" width="42" height="42" fill="#111827" />
+      <rect x="18" y="18" width="26" height="26" fill="#ffffff" />
+      <rect x="26" y="26" width="10" height="10" fill="#111827" />
+      <rect x="108" y="10" width="42" height="42" fill="#111827" />
+      <rect x="116" y="18" width="26" height="26" fill="#ffffff" />
+      <rect x="124" y="26" width="10" height="10" fill="#111827" />
+      <rect x="10" y="108" width="42" height="42" fill="#111827" />
+      <rect x="18" y="116" width="26" height="26" fill="#ffffff" />
+      <rect x="26" y="124" width="10" height="10" fill="#111827" />
+      <path fill="#111827" d="M70 12h10v10H70zM90 12h8v18h-8zM64 34h28v8H64zM70 60h10v12H70zM92 58h18v10H92zM118 64h20v8h-20zM62 82h12v20H62zM82 78h10v10H82zM100 82h10v12h-10zM120 88h26v10h-26zM78 108h12v12H78zM98 106h8v30h-8zM116 112h10v10h-10zM136 124h14v10h-14zM66 136h20v10H66z" />
+    </svg>
+  `)}`;
+
 const SAMPLE_PREVIEW_DATA = {
   recipientName: 'Alex Morgan',
   certificateTitle: 'Certificate of Outstanding Completion',
@@ -105,6 +122,7 @@ const SAMPLE_PREVIEW_DATA = {
   expiryDate: 'April 6, 2027',
   issuerName: 'Certify Academy',
   certificateId: 'CERT-2026-0421',
+  verifyQR: createQrPreviewAsset(),
   organizationLogo: createPreviewAsset('LOGO', '#0F172A', '#F8FAFC'),
   issuerSignature: createPreviewAsset('SIGN', '#FFFFFF', '#1E293B'),
 };
@@ -266,6 +284,16 @@ const DEFAULT_BACKGROUND_FIELDS: TemplateField[] = [
     defaultValue: SAMPLE_PREVIEW_DATA.organizationLogo,
     position: { x: 16, y: 15 },
     size: { width: 14, height: 12 },
+  },
+  {
+    name: 'verifyQR',
+    label: 'Verification QR',
+    type: 'image',
+    required: false,
+    visible: false,
+    defaultValue: SAMPLE_PREVIEW_DATA.verifyQR,
+    position: { x: 13, y: 85 },
+    size: { width: 12, height: 14 },
   },
   {
     name: 'issuerSignature',

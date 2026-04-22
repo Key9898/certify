@@ -96,6 +96,7 @@ const VALID_TEMPLATE_FIELD_NAMES = [
   'issuerSignature',
   'organizationLogo',
   'certificateId',
+  'verifyQR',
 ] as const;
 
 const FIELD_TYPE_BY_NAME: Record<
@@ -111,6 +112,7 @@ const FIELD_TYPE_BY_NAME: Record<
   issuerSignature: 'image',
   organizationLogo: 'image',
   certificateId: 'text',
+  verifyQR: 'image',
 };
 
 const REQUIRED_FIELD_NAMES = new Set([

@@ -270,6 +270,14 @@ const renderBackgroundTemplateHtml = (
     .map((field) => {
       const value = resolveFieldValue(field, data);
 
+      if (field.name === 'verifyQR') {
+        if (!qrCodeDataUrl) {
+          return '';
+        }
+
+        return `<img src="${qrCodeDataUrl}" alt="${escapeHtml(field.label)}" style="${buildImageFieldStyle(field)}" />`;
+      }
+
       if (field.type === 'image') {
         if (!value) {
           return '';
