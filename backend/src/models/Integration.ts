@@ -17,9 +17,7 @@ export interface IIntegrationDefaults {
 }
 
 export type CanvasCompletionPreset =
-  | 'course_completion'
-  | 'module_completion'
-  | 'capstone_completion';
+  'course_completion' | 'module_completion' | 'capstone_completion';
 
 export type CanvasReturnMode = 'response_only' | 'submission_comment';
 

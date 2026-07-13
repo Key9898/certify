@@ -27,6 +27,7 @@ requires_tools: []
 Jest is the industry-standard testing framework with 70% market share, providing a mature, battle-tested ecosystem for TypeScript projects. It offers comprehensive testing capabilities with built-in snapshot testing, mocking, and coverage reporting.
 
 **Key Features**:
+
 - 🏆 **Industry Standard**: 70% market share, widely adopted
 - 📦 **All-in-One**: Test runner, assertions, mocks, coverage in one package
 - 📸 **Snapshot Testing**: Built-in snapshot support for UI testing
@@ -37,6 +38,7 @@ Jest is the industry-standard testing framework with 70% market share, providing
 - 🌐 **Multi-Platform**: Node.js, browser (jsdom), React Native
 
 **Installation**:
+
 ```bash
 npm install -D jest @types/jest ts-jest
 npm install -D @testing-library/react @testing-library/jest-dom  # For React
@@ -51,30 +53,32 @@ npx ts-jest config:init
 ```
 
 This creates **jest.config.js**:
+
 ```javascript
 module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
+  preset: "ts-jest",
+  testEnvironment: "node",
 };
 ```
 
 ### 2. Manual Configuration
 
 **jest.config.ts** (TypeScript config):
+
 ```typescript
-import type { Config } from 'jest';
+import type { Config } from "jest";
 
 const config: Config = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  roots: ['<rootDir>/src'],
-  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+  preset: "ts-jest",
+  testEnvironment: "node",
+  roots: ["<rootDir>/src"],
+  testMatch: ["**/__tests__/**/*.ts", "**/?(*.)+(spec|test).ts"],
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"],
   collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/**/*.test.{ts,tsx}',
-    '!src/**/__tests__/**',
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/**/*.test.{ts,tsx}",
+    "!src/**/__tests__/**",
   ],
   coverageThreshold: {
     global: {
@@ -92,6 +96,7 @@ export default config;
 ### 3. TypeScript Configuration
 
 **tsconfig.json**:
+
 ```json
 {
   "compilerOptions": {
@@ -102,6 +107,7 @@ export default config;
 ```
 
 **tsconfig.test.json** (test-specific):
+
 ```json
 {
   "extends": "./tsconfig.json",
@@ -130,9 +136,9 @@ export default config;
 ### Basic Test Structure
 
 ```typescript
-import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterEach } from "@jest/globals";
 
-describe('Calculator', () => {
+describe("Calculator", () => {
   let calculator: Calculator;
 
   beforeEach(() => {
@@ -143,12 +149,12 @@ describe('Calculator', () => {
     // Cleanup
   });
 
-  it('adds two numbers correctly', () => {
+  it("adds two numbers correctly", () => {
     const result = calculator.add(2, 3);
     expect(result).toBe(5);
   });
 
-  it('handles negative numbers', () => {
+  it("handles negative numbers", () => {
     expect(calculator.add(-5, 3)).toBe(-2);
   });
 
@@ -156,7 +162,7 @@ describe('Calculator', () => {
     [1, 1, 2],
     [2, 3, 5],
     [10, -5, 5],
-  ])('adds %i + %i to equal %i', (a, b, expected) => {
+  ])("adds %i + %i to equal %i", (a, b, expected) => {
     expect(calculator.add(a, b)).toBe(expected);
   });
 });
@@ -169,16 +175,16 @@ interface User {
   id: number;
   name: string;
   email: string;
-  role: 'admin' | 'user';
+  role: "admin" | "user";
 }
 
-describe('User Service', () => {
-  it('creates user with correct types', () => {
+describe("User Service", () => {
+  it("creates user with correct types", () => {
     const user: User = {
       id: 1,
-      name: 'Alice',
-      email: 'alice@example.com',
-      role: 'admin',
+      name: "Alice",
+      email: "alice@example.com",
+      role: "admin",
     };
 
     // Type-safe assertions
@@ -187,13 +193,13 @@ describe('User Service', () => {
     expect(user.role).toMatch(/^(admin|user)$/);
   });
 
-  it('validates user object shape', () => {
-    const user = createUser('Bob', 'bob@example.com');
+  it("validates user object shape", () => {
+    const user = createUser("Bob", "bob@example.com");
 
     expect(user).toMatchObject({
       id: expect.any(Number),
-      name: 'Bob',
-      email: 'bob@example.com',
+      name: "Bob",
+      email: "bob@example.com",
     });
   });
 });
@@ -204,20 +210,20 @@ describe('User Service', () => {
 ### jest.mock for Module Mocking
 
 ```typescript
-import { jest } from '@jest/globals';
-import { UserService } from './UserService';
-import * as userApi from './api/userApi';
+import { jest } from "@jest/globals";
+import { UserService } from "./UserService";
+import * as userApi from "./api/userApi";
 
 // Mock entire module
-jest.mock('./api/userApi');
+jest.mock("./api/userApi");
 
-describe('UserService with Mocks', () => {
+describe("UserService with Mocks", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('fetches user data', async () => {
-    const mockUser = { id: 1, name: 'Alice', email: 'alice@example.com' };
+  it("fetches user data", async () => {
+    const mockUser = { id: 1, name: "Alice", email: "alice@example.com" };
 
     // Type-safe mock
     const mockedFetchUser = jest.mocked(userApi.fetchUser);
@@ -235,7 +241,7 @@ describe('UserService with Mocks', () => {
 ### jest.spyOn for Method Spying
 
 ```typescript
-import { jest } from '@jest/globals';
+import { jest } from "@jest/globals";
 
 class Logger {
   log(message: string): void {
@@ -247,35 +253,35 @@ class Logger {
   }
 }
 
-describe('Logger Spy', () => {
+describe("Logger Spy", () => {
   let logger: Logger;
   let logSpy: jest.SpyInstance;
 
   beforeEach(() => {
     logger = new Logger();
-    logSpy = jest.spyOn(logger, 'log');
+    logSpy = jest.spyOn(logger, "log");
   });
 
   afterEach(() => {
     logSpy.mockRestore();
   });
 
-  it('tracks method calls', () => {
-    logger.log('Hello');
-    logger.log('World');
+  it("tracks method calls", () => {
+    logger.log("Hello");
+    logger.log("World");
 
     expect(logSpy).toHaveBeenCalledTimes(2);
-    expect(logSpy).toHaveBeenCalledWith('Hello');
-    expect(logSpy).toHaveBeenLastCalledWith('World');
+    expect(logSpy).toHaveBeenCalledWith("Hello");
+    expect(logSpy).toHaveBeenLastCalledWith("World");
   });
 
-  it('provides custom implementation', () => {
+  it("provides custom implementation", () => {
     logSpy.mockImplementation((msg: string) => {
       console.log(`[CUSTOM] ${msg}`);
     });
 
-    logger.log('Test');
-    expect(logSpy).toHaveBeenCalledWith('Test');
+    logger.log("Test");
+    expect(logSpy).toHaveBeenCalledWith("Test");
   });
 });
 ```
@@ -283,7 +289,7 @@ describe('Logger Spy', () => {
 ### Type-Safe Mock Functions
 
 ```typescript
-import { jest } from '@jest/globals';
+import { jest } from "@jest/globals";
 
 interface ApiResponse<T> {
   data: T;
@@ -292,23 +298,23 @@ interface ApiResponse<T> {
 
 type FetchUserFn = (id: number) => Promise<ApiResponse<User>>;
 
-describe('Type-Safe Mocks', () => {
-  it('creates typed mock function', async () => {
-    const mockFetchUser = jest.fn<FetchUserFn>()
-      .mockResolvedValue({
-        data: { id: 1, name: 'Alice', email: 'alice@example.com', role: 'user' },
-        status: 200,
-      });
+describe("Type-Safe Mocks", () => {
+  it("creates typed mock function", async () => {
+    const mockFetchUser = jest.fn<FetchUserFn>().mockResolvedValue({
+      data: { id: 1, name: "Alice", email: "alice@example.com", role: "user" },
+      status: 200,
+    });
 
     const result = await mockFetchUser(1);
 
-    expect(result.data.name).toBe('Alice');
+    expect(result.data.name).toBe("Alice");
     expect(result.status).toBe(200);
     expect(mockFetchUser).toHaveBeenCalledWith(1);
   });
 
-  it('uses mock implementation', () => {
-    const mockCalculate = jest.fn<(x: number, y: number) => number>()
+  it("uses mock implementation", () => {
+    const mockCalculate = jest
+      .fn<(x: number, y: number) => number>()
       .mockImplementation((x, y) => x + y);
 
     expect(mockCalculate(5, 3)).toBe(8);
@@ -320,9 +326,9 @@ describe('Type-Safe Mocks', () => {
 ### Mocking Timers
 
 ```typescript
-import { jest } from '@jest/globals';
+import { jest } from "@jest/globals";
 
-describe('Timer Mocking', () => {
+describe("Timer Mocking", () => {
   beforeEach(() => {
     jest.useFakeTimers();
   });
@@ -331,7 +337,7 @@ describe('Timer Mocking', () => {
     jest.useRealTimers();
   });
 
-  it('fast-forwards time', () => {
+  it("fast-forwards time", () => {
     const callback = jest.fn();
     setTimeout(callback, 1000);
 
@@ -342,7 +348,7 @@ describe('Timer Mocking', () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it('runs all timers', () => {
+  it("runs all timers", () => {
     const callback = jest.fn();
     setTimeout(callback, 1000);
     setTimeout(callback, 2000);
@@ -351,7 +357,7 @@ describe('Timer Mocking', () => {
     expect(callback).toHaveBeenCalledTimes(2);
   });
 
-  it('handles intervals', () => {
+  it("handles intervals", () => {
     const callback = jest.fn();
     setInterval(callback, 1000);
 
@@ -373,23 +379,27 @@ npm install -D jest-environment-jsdom
 ```
 
 **jest.config.ts** (React):
+
 ```typescript
-import type { Config } from 'jest';
+import type { Config } from "jest";
 
 const config: Config = {
-  preset: 'ts-jest',
-  testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
+  preset: "ts-jest",
+  testEnvironment: "jsdom",
+  setupFilesAfterEnv: ["<rootDir>/src/test/setup.ts"],
   moduleNameMapper: {
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/__mocks__/fileMock.js',
+    "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+    "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/__mocks__/fileMock.js",
   },
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: {
-        jsx: 'react-jsx',
+    "^.+\\.tsx?$": [
+      "ts-jest",
+      {
+        tsconfig: {
+          jsx: "react-jsx",
+        },
       },
-    }],
+    ],
   },
 };
 
@@ -397,10 +407,11 @@ export default config;
 ```
 
 **src/test/setup.ts**:
+
 ```typescript
-import '@testing-library/jest-dom';
-import { cleanup } from '@testing-library/react';
-import { afterEach } from '@jest/globals';
+import "@testing-library/jest-dom";
+import { cleanup } from "@testing-library/react";
+import { afterEach } from "@jest/globals";
 
 afterEach(() => {
   cleanup();
@@ -454,16 +465,16 @@ describe('Counter Component', () => {
 ### Testing Hooks
 
 ```typescript
-import { renderHook, act } from '@testing-library/react';
-import { useCounter } from './useCounter';
+import { renderHook, act } from "@testing-library/react";
+import { useCounter } from "./useCounter";
 
-describe('useCounter Hook', () => {
-  it('initializes with default value', () => {
+describe("useCounter Hook", () => {
+  it("initializes with default value", () => {
     const { result } = renderHook(() => useCounter(0));
     expect(result.current.count).toBe(0);
   });
 
-  it('increments counter', () => {
+  it("increments counter", () => {
     const { result } = renderHook(() => useCounter(0));
 
     act(() => {
@@ -473,7 +484,7 @@ describe('useCounter Hook', () => {
     expect(result.current.count).toBe(1);
   });
 
-  it('decrements counter', () => {
+  it("decrements counter", () => {
     const { result } = renderHook(() => useCounter(5));
 
     act(() => {
@@ -483,7 +494,7 @@ describe('useCounter Hook', () => {
     expect(result.current.count).toBe(4);
   });
 
-  it('resets to initial value', () => {
+  it("resets to initial value", () => {
     const { result } = renderHook(() => useCounter(10));
 
     act(() => {
@@ -613,9 +624,10 @@ export default {
 ```
 
 **jest.config.ts**:
+
 ```typescript
 const config: Config = {
-  snapshotSerializers: ['<rootDir>/__tests__/serializers/dateSerializer.ts'],
+  snapshotSerializers: ["<rootDir>/__tests__/serializers/dateSerializer.ts"],
 };
 ```
 
@@ -624,28 +636,25 @@ const config: Config = {
 ### Testing Promises
 
 ```typescript
-import { fetchData, saveData } from './api';
+import { fetchData, saveData } from "./api";
 
-describe('Async Operations', () => {
-  it('resolves with data', async () => {
+describe("Async Operations", () => {
+  it("resolves with data", async () => {
     const data = await fetchData(1);
     expect(data).toBeDefined();
     expect(data.id).toBe(1);
   });
 
-  it('handles promise rejection', async () => {
-    await expect(fetchData(-1)).rejects.toThrow('Invalid ID');
+  it("handles promise rejection", async () => {
+    await expect(fetchData(-1)).rejects.toThrow("Invalid ID");
   });
 
-  it('uses resolves matcher', async () => {
-    await expect(fetchData(1)).resolves.toHaveProperty('id', 1);
+  it("uses resolves matcher", async () => {
+    await expect(fetchData(1)).resolves.toHaveProperty("id", 1);
   });
 
-  it('tests multiple async operations', async () => {
-    const [user, posts] = await Promise.all([
-      fetchUser(1),
-      fetchPosts(1),
-    ]);
+  it("tests multiple async operations", async () => {
+    const [user, posts] = await Promise.all([fetchUser(1), fetchPosts(1)]);
 
     expect(user.id).toBe(1);
     expect(posts).toHaveLength(expect.any(Number));
@@ -656,18 +665,18 @@ describe('Async Operations', () => {
 ### Testing Callbacks
 
 ```typescript
-describe('Callback Testing', () => {
-  it('calls callback with correct arguments', (done) => {
+describe("Callback Testing", () => {
+  it("calls callback with correct arguments", (done) => {
     function fetchWithCallback(id: number, callback: (data: any) => void) {
       setTimeout(() => {
-        callback({ id, name: 'Test' });
+        callback({ id, name: "Test" });
       }, 100);
     }
 
     fetchWithCallback(1, (data) => {
       try {
         expect(data.id).toBe(1);
-        expect(data.name).toBe('Test');
+        expect(data.name).toBe("Test");
         done();
       } catch (error) {
         done(error);
@@ -682,19 +691,20 @@ describe('Callback Testing', () => {
 ### Advanced Coverage Setup
 
 **jest.config.ts**:
+
 ```typescript
 const config: Config = {
   collectCoverage: true,
-  coverageDirectory: 'coverage',
-  coverageProvider: 'v8', // or 'babel' for compatibility
-  coverageReporters: ['text', 'lcov', 'html', 'json'],
+  coverageDirectory: "coverage",
+  coverageProvider: "v8", // or 'babel' for compatibility
+  coverageReporters: ["text", "lcov", "html", "json"],
   collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/**/*.test.{ts,tsx}',
-    '!src/**/__tests__/**',
-    '!src/index.ts',
-    '!src/types/**',
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/**/*.test.{ts,tsx}",
+    "!src/**/__tests__/**",
+    "!src/index.ts",
+    "!src/types/**",
   ],
   coverageThreshold: {
     global: {
@@ -703,18 +713,14 @@ const config: Config = {
       lines: 80,
       statements: 80,
     },
-    './src/core/': {
+    "./src/core/": {
       branches: 90,
       functions: 90,
       lines: 90,
       statements: 90,
     },
   },
-  coveragePathIgnorePatterns: [
-    '/node_modules/',
-    '/dist/',
-    '/__tests__/',
-  ],
+  coveragePathIgnorePatterns: ["/node_modules/", "/dist/", "/__tests__/"],
 };
 ```
 
@@ -739,54 +745,58 @@ open coverage/lcov-report/index.html
 ### Key Differences
 
 **API Changes**:
+
 ```typescript
 // Vitest
-import { vi } from 'vitest';
+import { vi } from "vitest";
 const mockFn = vi.fn();
-vi.spyOn(obj, 'method');
+vi.spyOn(obj, "method");
 
 // Jest
-import { jest } from '@jest/globals';
+import { jest } from "@jest/globals";
 const mockFn = jest.fn();
-jest.spyOn(obj, 'method');
+jest.spyOn(obj, "method");
 ```
 
 ### Migration Checklist
 
 **1. Update Dependencies**:
+
 ```bash
 npm uninstall vitest @vitest/ui
 npm install -D jest @types/jest ts-jest
 ```
 
 **2. Update package.json**:
+
 ```json
 {
   "scripts": {
-    "test": "jest",           // Was: vitest run
-    "test:watch": "jest --watch"  // Was: vitest
+    "test": "jest", // Was: vitest run
+    "test:watch": "jest --watch" // Was: vitest
   }
 }
 ```
 
 **3. Replace vitest.config.ts with jest.config.ts**:
+
 ```typescript
 // Old: vitest.config.ts
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'jsdom',
+    environment: "jsdom",
   },
 });
 
 // New: jest.config.ts
-import type { Config } from 'jest';
+import type { Config } from "jest";
 const config: Config = {
-  preset: 'ts-jest',
-  testEnvironment: 'jsdom',
+  preset: "ts-jest",
+  testEnvironment: "jsdom",
   globals: {
-    'ts-jest': {
+    "ts-jest": {
       isolatedModules: true,
     },
   },
@@ -795,6 +805,7 @@ export default config;
 ```
 
 **4. Update Test Files**:
+
 ```typescript
 // Change imports
 - import { vi } from 'vitest';
@@ -819,10 +830,11 @@ export default config;
 ```
 
 **5. Update tsconfig.json**:
+
 ```json
 {
   "compilerOptions": {
-    "types": ["jest", "@testing-library/jest-dom"]  // Was: vitest/globals
+    "types": ["jest", "@testing-library/jest-dom"] // Was: vitest/globals
   }
 }
 ```
@@ -832,11 +844,13 @@ export default config;
 ### Performance
 
 **Jest**:
+
 - Slower initial startup (no HMR)
 - Sequential test execution by default
 - 1-5 seconds for medium projects
 
 **Vitest**:
+
 - Instant HMR-based execution
 - Parallel by default
 - 100-500ms for same projects
@@ -844,12 +858,14 @@ export default config;
 ### Ecosystem
 
 **Jest**:
+
 - ✅ 70% market share
 - ✅ Mature ecosystem (8+ years)
 - ✅ More Stack Overflow answers
 - ✅ Better corporate support
 
 **Vitest**:
+
 - ✅ Modern, growing adoption
 - ✅ Vite-native integration
 - ⚠️ Smaller ecosystem
@@ -858,11 +874,13 @@ export default config;
 ### TypeScript Support
 
 **Jest**:
+
 - Requires ts-jest configuration
 - Extra transform step
 - Slower compilation
 
 **Vitest**:
+
 - Built-in TypeScript support
 - No configuration needed
 - Faster through Vite
@@ -870,6 +888,7 @@ export default config;
 ### When to Use Jest
 
 Choose Jest for:
+
 - ✅ Existing projects already using Jest
 - ✅ Corporate environments requiring proven tools
 - ✅ Projects requiring extensive ecosystem support
@@ -877,6 +896,7 @@ Choose Jest for:
 - ✅ Non-Vite build systems (Webpack, Rollup)
 
 Choose Vitest for:
+
 - ✅ New projects with modern tooling
 - ✅ Vite-based applications
 - ✅ Performance-critical test suites
@@ -898,10 +918,11 @@ Choose Vitest for:
 ## Common Pitfalls
 
 ❌ **Not clearing mocks between tests**:
+
 ```typescript
 // WRONG - mocks leak between tests
-it('test 1', () => {
-  jest.spyOn(api, 'fetch');
+it("test 1", () => {
+  jest.spyOn(api, "fetch");
   // No cleanup!
 });
 
@@ -912,22 +933,24 @@ afterEach(() => {
 ```
 
 ❌ **Forgetting to await async tests**:
+
 ```typescript
 // WRONG - test completes before assertion
-it('fetches data', () => {
-  fetchData().then(data => {
-    expect(data).toBeDefined();  // Never runs!
+it("fetches data", () => {
+  fetchData().then((data) => {
+    expect(data).toBeDefined(); // Never runs!
   });
 });
 
 // CORRECT
-it('fetches data', async () => {
+it("fetches data", async () => {
   const data = await fetchData();
   expect(data).toBeDefined();
 });
 ```
 
 ❌ **Using wrong test environment**:
+
 ```typescript
 // WRONG - testing DOM without jsdom
 // jest.config.ts
@@ -938,6 +961,7 @@ testEnvironment: 'jsdom',
 ```
 
 ❌ **Not using TypeScript types for mocks**:
+
 ```typescript
 // WRONG - no type safety
 const mockFn = jest.fn();
@@ -969,23 +993,24 @@ When using Jest, consider these complementary skills:
 function createMockUser<T extends Partial<User>>(overrides: T): User & T {
   return {
     id: 1,
-    name: 'Test User',
-    email: 'test@example.com',
-    ...overrides
+    name: "Test User",
+    email: "test@example.com",
+    ...overrides,
   };
 }
 
 // Usage with type inference
-const adminUser = createMockUser({ role: 'admin' });
+const adminUser = createMockUser({ role: "admin" });
 // Type: User & { role: string }
 
 // Type-safe mock functions
 const mockFetch = jest.fn<typeof fetch>();
-mockFetch.mockResolvedValue(new Response('{}'));
+mockFetch.mockResolvedValue(new Response("{}"));
 
 // Const type parameters for literal types
-const createConfig = <const T extends Record<string, unknown>>(config: T): T => config;
-const testConfig = createConfig({ environment: 'test', debug: true });
+const createConfig = <const T extends Record<string, unknown>>(config: T): T =>
+  config;
+const testConfig = createConfig({ environment: "test", debug: true });
 // Type: { environment: "test"; debug: true } (literals preserved)
 ```
 
@@ -1050,18 +1075,21 @@ test('useAuth hook with context', () => {
 ### Quick Vitest Comparison (Inlined for Standalone Use)
 
 **When to Choose Vitest over Jest:**
+
 - New Vite/Vite-based projects (Next.js with Turbopack, SvelteKit)
 - Need faster test execution (10-100x faster)
 - ESM-first architecture
 - Hot Module Replacement for tests
 
 **When to Stick with Jest:**
+
 - Existing large codebases with Jest already configured
 - Corporate environments with established Jest workflows
 - Need mature ecosystem and extensive plugins
 - React apps with Create React App (default Jest setup)
 
 **Migration Snippet (Jest → Vitest):**
+
 ```typescript
 // Jest: import from '@testing-library/jest-dom'
 import '@testing-library/jest-dom';

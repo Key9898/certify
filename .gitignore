@@ -82,3 +82,6 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+# Local session logging (not for version control)
+docs/sessions/

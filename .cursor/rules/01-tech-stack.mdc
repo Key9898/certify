@@ -1,0 +1,45 @@
+---
+description: Tailwind v4 + DaisyUI + TypeScript + Express + Puppeteer specific patterns. Auto-attached when editing frontend/ or backend/ files.
+globs:
+  - "frontend/src/**/*.{ts,tsx,css}"
+  - "backend/src/**/*.{ts,js}"
+alwaysApply: false
+---
+
+# Tech stack specifics
+
+## Tailwind CSS v4 & DaisyUI
+
+- **NO `tailwind.config.js`** — configuration lives in `frontend/src/global.css` via `@theme { }` and plugin definition.
+- Plugin: `@tailwindcss/vite` in `frontend/vite.config.ts`. No PostCSS config.
+- Use `@import 'tailwindcss';` and `@plugin 'daisyui';` at the top of the CSS entry.
+- **Design System Rounding:** All roundings must strictly use `0.25rem` (`--radius-selector: 0.25rem; --radius-field: 0.25rem; --radius-box: 0.25rem;`).
+- **Theme:** Corporate theme only, light mode (prefersdark: false, color-scheme: 'light').
+
+## TypeScript
+
+- Strict mode ON in both frontend and backend (`strict`, `noUnusedLocals`, `noUnusedParameters`).
+- `@/` alias maps to `frontend/src/` (configured in `frontend/tsconfig.json` + `frontend/vite.config.ts`).
+- Prefer `type` imports for types-only: `import { type Foo } from '...'`.
+
+## Backend & Database (Express + MongoDB)
+
+- Mongoose is used as the ODM. Connects via `connectDatabase()` in `backend/src/config/database.ts`.
+- Handles reconnection attempts asynchronously if database is disconnected, checking environment variables sequentially.
+- `/health` endpoint exposes authentication configuration, database status, and connectivity retry states.
+
+## PDF & PNG Generation (Puppeteer)
+
+- Run headless browser instances in a pooled, cached browserInstance in `backend/src/services/pdfService.ts`.
+- Reuses browser pages safely. If a page timeout occurs, the page is closed, the browser is closed and recycled on the next call.
+- Generates base64 QR codes using `qrcode` points to `/verify/{certificateId}` and embeds them into HTML templates.
+- Renders A4 landscape prints (`format: 'A4', landscape: true, printBackground: true`).
+
+## Authentication & Security (Auth0)
+
+- SPA Auth0 redirect callback must replace state instead of page reload to prevent Auth0 redirect loops:
+  ```typescript
+  window.history.replaceState({}, document.title, target);
+  ```
+- Backend enforces API authorization using JWT verification middleware.
+- Never store tokens in localStorage — use memory storage.

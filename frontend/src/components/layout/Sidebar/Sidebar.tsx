@@ -54,7 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const brandName =
     appUser?.organization?.whiteLabel.brandName ||
     appUser?.organization?.name ||
-    'Certify';
+    'Qubit Certify';
   const brandLogo = appUser?.organization?.whiteLabel.logoUrl;
 
   const sidebarContent = (
@@ -82,7 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <img
               src="/Logo/logo.svg"
-              alt="Certify"
+              alt="Qubit Certify"
               className="h-5 w-5 brightness-0 invert"
             />
           </motion.div>
@@ -94,7 +94,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       <div className="flex items-center justify-between border-b border-base-200 px-6 py-4 lg:hidden">
         <Link to={ROUTES.HOME} className="flex items-center gap-2">
-          <img src="/Logo/logo.svg" alt="Certify" className="h-5 w-5" />
+          <img src="/Logo/logo.svg" alt="Qubit Certify" className="h-5 w-5" />
           <span className="text-lg font-black tracking-tighter">
             {brandName}
           </span>

@@ -1,0 +1,43 @@
+---
+description: Testing conventions with Vitest for frontend and ts-node assertions for backend. Auto-attached when editing test files.
+globs:
+  - "frontend/src/**/*.test.{ts,tsx}"
+  - "backend/src/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing
+
+## Frontend setup (Vitest)
+
+- Runner: **Vitest** (Vite-native unit testing)
+- Environment: `jsdom`
+- Globals: enabled (`describe`, `it`, `expect`, `beforeEach` etc. — no imports needed)
+- Setup file: `frontend/src/test/setup.ts` loads `@testing-library/jest-dom/vitest`
+
+### Component Test Example:
+```tsx
+import { render, screen } from '@testing-library/react';
+import { Button } from '../Button';
+
+describe('Button', () => {
+  it('renders children correctly', () => {
+    render(<Button>Click me</Button>);
+    expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument();
+  });
+});
+```
+
+## Backend setup (Unit & Integration tests)
+
+- Backend tests reside alongside services and utils (`backend/src/services/*.test.ts`).
+- Uses custom assertion methods. Run via:
+  ```bash
+  npm --prefix backend run test
+  ```
+
+## What to test
+
+- **Frontend:** Component renders, loading/error states, user interactions (click, inputs), form validators, and CSV/XLSX parser logic.
+- **Backend:** Data transformations, sheet column mapping conversions, JWT signature mockings, integration callback messages, and database seeding states.
+- Avoid writing snapshot tests due to low signal-to-noise.

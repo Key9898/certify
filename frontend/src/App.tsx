@@ -12,6 +12,7 @@ import { AuthProvider, useAppUser } from '@/context/AuthContext';
 import { Loading } from '@/components/common/Loading';
 import { ROUTES } from '@/utils/constants';
 import { PAGE_VARIANTS } from '@/utils/motion';
+import { IS_PHASE2 } from '@/config/features';
 
 const Home = lazy(() =>
   import('@/pages/Home').then((m) => ({ default: m.Home }))
@@ -155,13 +156,20 @@ const AppRoutes: React.FC = () => {
   const scene = (children: React.ReactNode) => (
     <RouteScene>{children}</RouteScene>
   );
-  const protectedScene = (children: React.ReactNode) =>
-    scene(<ProtectedRoute>{children}</ProtectedRoute>);
+  const protectedScene = (children: React.ReactNode) => {
+    if (!IS_PHASE2) {
+      return <Navigate to={ROUTES.HOME} replace />;
+    }
+    return scene(<ProtectedRoute>{children}</ProtectedRoute>);
+  };
 
   return (
     <AnimatePresence initial={false} mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path={ROUTES.HOME} element={scene(<Home />)} />
+        <Route
+          path={ROUTES.HOME}
+          element={scene(IS_PHASE2 ? <Home /> : <VerifyPortal />)}
+        />
         <Route
           path={ROUTES.DASHBOARD}
           element={protectedScene(<Dashboard />)}

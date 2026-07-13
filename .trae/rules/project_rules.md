@@ -529,23 +529,24 @@ transition={{ duration: 0.15 }}
 
 **Solution - Always use user-friendly names:**
 
-| Legacy Name (DO NOT USE) | Current Name (USE THIS) |
-| ------------------------ | ----------------------- |
-| ledger / Ledger          | registry / Registry     |
-| library / Library        | templates / Templates   |
+| Legacy Name (DO NOT USE) | Current Name (USE THIS)   |
+| ------------------------ | ------------------------- |
+| ledger / Ledger          | registry / Registry       |
+| library / Library        | templates / Templates     |
 | automation / Automation  | integration / Integration |
-| Design Library           | Template Gallery        |
-| Automation Center        | Integration Center      |
-| Automations (label)      | Sync Runs               |
-| Excel automation         | Excel integration       |
-| automation health        | integration health      |
-| automation sequences     | integration sequences   |
-| issuance / Issuance      | creation / Creation     |
-| New Issuance             | Create New              |
-| Begin Issuance           | Create New              |
-| issuance records         | certificate records     |
+| Design Library           | Template Gallery          |
+| Automation Center        | Integration Center        |
+| Automations (label)      | Sync Runs                 |
+| Excel automation         | Excel integration         |
+| automation health        | integration health        |
+| automation sequences     | integration sequences     |
+| issuance / Issuance      | creation / Creation       |
+| New Issuance             | Create New                |
+| Begin Issuance           | Create New                |
+| issuance records         | certificate records       |
 
 **Files to check when adding new UI text:**
+
 - `src/pages/` - All page components
 - `src/components/` - All shared components
 - Run grep search before committing: `grep -r "ledger\|Library\|automation\|issuance" src/`
@@ -600,12 +601,12 @@ const statusCode = err.statusCode || err.status || 500;
 // JWT errors need code mapping
 const getErrorCode = (err: AppError): string => {
   if (err.code) return err.code;
-  if (err.name === 'UnauthorizedError') return 'UNAUTHORIZED';
-  if (err.message?.includes('invalid token')) return 'INVALID_TOKEN';
-  if (err.message?.includes('jwt expired')) return 'TOKEN_EXPIRED';
-  if (err.message?.includes('jwt malformed')) return 'INVALID_TOKEN';
-  if (err.message?.includes('no authorization token')) return 'TOKEN_MISSING';
-  return 'INTERNAL_ERROR';
+  if (err.name === "UnauthorizedError") return "UNAUTHORIZED";
+  if (err.message?.includes("invalid token")) return "INVALID_TOKEN";
+  if (err.message?.includes("jwt expired")) return "TOKEN_EXPIRED";
+  if (err.message?.includes("jwt malformed")) return "INVALID_TOKEN";
+  if (err.message?.includes("no authorization token")) return "TOKEN_MISSING";
+  return "INTERNAL_ERROR";
 };
 ```
 
@@ -682,16 +683,16 @@ function App() {
 
 Heavy libraries (>500kB) must be lazy-loaded to avoid Vite chunk warnings:
 
-| Library   | Lazy Load Method              | Used In           |
-| --------- | ----------------------------- | ----------------- |
-| ExcelJS   | Dynamic import (`import()`)   | csvParser.ts      |
-| Recharts  | React.lazy() + Suspense       | Dashboard.tsx     |
+| Library  | Lazy Load Method            | Used In       |
+| -------- | --------------------------- | ------------- |
+| ExcelJS  | Dynamic import (`import()`) | csvParser.ts  |
+| Recharts | React.lazy() + Suspense     | Dashboard.tsx |
 
 **Pattern - Dynamic Import for Utilities:**
 
 ```typescript
 const parseXLSX = async (file: File) => {
-  const ExcelJS = await import('exceljs');
+  const ExcelJS = await import("exceljs");
   const workbook = new ExcelJS.default.Workbook();
   // ... parsing logic
 };
@@ -700,7 +701,7 @@ const parseXLSX = async (file: File) => {
 **Pattern - React.lazy for Components:**
 
 ```tsx
-const OverviewChart = React.lazy(() => import('./OverviewChart'));
+const OverviewChart = React.lazy(() => import("./OverviewChart"));
 
 <Suspense fallback={<div className="loading loading-spinner" />}>
   <OverviewChart data={data} />
@@ -1429,12 +1430,12 @@ const CertificateEditor = lazy(() => import("@/components/CertificateEditor"));
 
 ### Required Attributes Summary
 
-| Element Type | Required Attributes |
-| ------------ | ------------------- |
-| `<select>` | `aria-label` + `title` |
-| `<input type="checkbox">` | `aria-label` |
-| `<input type="radio">` | `aria-label` |
-| `<input type="text">` | `placeholder` or wrapped `<label>` |
+| Element Type              | Required Attributes                |
+| ------------------------- | ---------------------------------- |
+| `<select>`                | `aria-label` + `title`             |
+| `<input type="checkbox">` | `aria-label`                       |
+| `<input type="radio">`    | `aria-label`                       |
+| `<input type="text">`     | `placeholder` or wrapped `<label>` |
 
 ### Files to Check
 
@@ -1469,11 +1470,11 @@ Set-Location backend; npm run dev
 
 ### Common Issues
 
-| Issue | Solution |
-| ----- | -------- |
-| Port 3000 in use | Kill existing process or change PORT in .env |
-| MongoDB not running | Start MongoDB service |
-| Missing .env | Copy .env.example to .env and fill values |
+| Issue               | Solution                                     |
+| ------------------- | -------------------------------------------- |
+| Port 3000 in use    | Kill existing process or change PORT in .env |
+| MongoDB not running | Start MongoDB service                        |
+| Missing .env        | Copy .env.example to .env and fill values    |
 
 ### When Making Frontend Changes
 
@@ -1489,38 +1490,38 @@ The following elements on public-facing pages must remain dynamic. Do NOT replac
 
 ### Home.tsx (Landing Page)
 
-| Element | Location | Dynamic Implementation |
-| ------- | -------- | ---------------------- |
+| Element                  | Location        | Dynamic Implementation                                    |
+| ------------------------ | --------------- | --------------------------------------------------------- |
 | Certificate Preview Date | Carousel footer | `formatPreviewDate()` - `new Date().toLocaleDateString()` |
-| Template Count | Stats section | API call to `/api/templates/count` |
-| Social Proof Text | Hero section | "Join Early Adopters" (no badge) |
+| Template Count           | Stats section   | API call to `/api/templates/count`                        |
+| Social Proof Text        | Hero section    | "Join Early Adopters" (no badge)                          |
 
 ### About.tsx
 
-| Element | Location | Dynamic Implementation |
-| ------- | -------- | ---------------------- |
+| Element      | Location     | Dynamic Implementation     |
+| ------------ | ------------ | -------------------------- |
 | "Since" Year | Hero section | `new Date().getFullYear()` |
 
 ### Privacy.tsx & Terms.tsx
 
-| Element | Location | Dynamic Implementation |
-| ------- | -------- | ---------------------- |
+| Element           | Location        | Dynamic Implementation            |
+| ----------------- | --------------- | --------------------------------- |
 | Last Updated Date | Document header | `new Date().toLocaleDateString()` |
 
 ### Footer.tsx
 
-| Element | Location | Dynamic Implementation |
-| ------- | -------- | ---------------------- |
+| Element        | Location      | Dynamic Implementation     |
+| -------------- | ------------- | -------------------------- |
 | Copyright Year | Footer bottom | `new Date().getFullYear()` |
 
 ### formatPreviewDate Function (Home.tsx)
 
 ```tsx
 const formatPreviewDate = () => {
-  return new Date().toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+  return new Date().toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 };
 ```

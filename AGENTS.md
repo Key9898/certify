@@ -1215,13 +1215,13 @@ utils/
 
 ### What to Test
 
-| Target                  | Priority | Notes                                |
-| ----------------------- | -------- | ------------------------------------ |
-| Pure utils (csvParser, formatters, validators) | High | No mocking needed — test all branches |
-| Custom hooks            | High     | Use `renderHook` from @testing-library/react |
-| Complex components      | Medium   | Test behaviour, not implementation   |
-| API call wrappers       | Low      | Mock `fetch`; test error handling    |
-| Simple presentational components | Skip | Covered by Storybook stories |
+| Target                                         | Priority | Notes                                        |
+| ---------------------------------------------- | -------- | -------------------------------------------- |
+| Pure utils (csvParser, formatters, validators) | High     | No mocking needed — test all branches        |
+| Custom hooks                                   | High     | Use `renderHook` from @testing-library/react |
+| Complex components                             | Medium   | Test behaviour, not implementation           |
+| API call wrappers                              | Low      | Mock `fetch`; test error handling            |
+| Simple presentational components               | Skip     | Covered by Storybook stories                 |
 
 ### What NOT to Test
 
@@ -1233,18 +1233,18 @@ utils/
 ### Test Structure
 
 ```ts
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "vitest";
 
-describe('functionName', () => {
-  it('does X when given Y', () => {
+describe("functionName", () => {
+  it("does X when given Y", () => {
     // Arrange
-    const input = 'value';
+    const input = "value";
 
     // Act
     const result = functionName(input);
 
     // Assert
-    expect(result).toBe('expected');
+    expect(result).toBe("expected");
   });
 });
 ```

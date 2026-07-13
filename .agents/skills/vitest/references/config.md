@@ -6,13 +6,13 @@ Vitest reads from `vitest.config.ts` or `vite.config.ts`.
 
 ```ts
 // vitest.config.ts
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
     // test options
   },
-})
+});
 ```
 
 With existing Vite config:
@@ -20,25 +20,28 @@ With existing Vite config:
 ```ts
 // vite.config.ts
 /// <reference types="vitest/config" />
-import { defineConfig } from 'vite'
+import { defineConfig } from "vite";
 
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'jsdom',
+    environment: "jsdom",
   },
-})
+});
 ```
 
 Merge configs:
 
 ```ts
-import { defineConfig, mergeConfig } from 'vitest/config'
-import viteConfig from './vite.config'
+import { defineConfig, mergeConfig } from "vitest/config";
+import viteConfig from "./vite.config";
 
-export default mergeConfig(viteConfig, defineConfig({
-  test: { environment: 'jsdom' },
-}))
+export default mergeConfig(
+  viteConfig,
+  defineConfig({
+    test: { environment: "jsdom" },
+  }),
+);
 ```
 
 ## Common Options
@@ -46,22 +49,22 @@ export default mergeConfig(viteConfig, defineConfig({
 ```ts
 defineConfig({
   test: {
-    globals: true,                    // Enable global APIs without imports
-    environment: 'node',              // 'node', 'jsdom', 'happy-dom'
-    setupFiles: ['./tests/setup.ts'], // Run before each test file
-    include: ['**/*.{test,spec}.{js,ts,jsx,tsx}'],
-    exclude: ['**/node_modules/**', '**/dist/**'],
+    globals: true, // Enable global APIs without imports
+    environment: "node", // 'node', 'jsdom', 'happy-dom'
+    setupFiles: ["./tests/setup.ts"], // Run before each test file
+    include: ["**/*.{test,spec}.{js,ts,jsx,tsx}"],
+    exclude: ["**/node_modules/**", "**/dist/**"],
     testTimeout: 5000,
     hookTimeout: 10000,
     watch: true,
     coverage: {
-      provider: 'v8',                 // or 'istanbul'
-      reporter: ['text', 'html'],
-      include: ['src/**/*.ts'],
+      provider: "v8", // or 'istanbul'
+      reporter: ["text", "html"],
+      include: ["src/**/*.ts"],
     },
-    isolate: true,                    // Each file in separate process
-    fileParallelism: true,            // Run test files in parallel
-    pool: 'threads',                  // 'threads', 'forks', 'vmThreads'
+    isolate: true, // Each file in separate process
+    fileParallelism: true, // Run test files in parallel
+    pool: "threads", // 'threads', 'forks', 'vmThreads'
     poolOptions: {
       threads: { maxThreads: 4, minThreads: 1 },
     },
@@ -70,16 +73,16 @@ defineConfig({
     retry: 0,
     bail: 0,
   },
-})
+});
 ```
 
 ## Conditional Config
 
 ```ts
 export default defineConfig(({ mode }) => ({
-  plugins: mode === 'test' ? [] : [myPlugin()],
-  test: { /* options */ },
-}))
+  plugins: mode === "test" ? [] : [myPlugin()],
+  test: {/* options */},
+}));
 ```
 
 ## Projects (Monorepos)
@@ -88,24 +91,24 @@ export default defineConfig(({ mode }) => ({
 defineConfig({
   test: {
     projects: [
-      'packages/*',
+      "packages/*",
       {
         test: {
-          name: 'unit',
-          include: ['tests/unit/**/*.test.ts'],
-          environment: 'node',
+          name: "unit",
+          include: ["tests/unit/**/*.test.ts"],
+          environment: "node",
         },
       },
       {
         test: {
-          name: 'integration',
-          include: ['tests/integration/**/*.test.ts'],
-          environment: 'jsdom',
+          name: "integration",
+          include: ["tests/integration/**/*.test.ts"],
+          environment: "jsdom",
         },
       },
     ],
   },
-})
+});
 ```
 
 ## CLI Commands

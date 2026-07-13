@@ -53,8 +53,8 @@ export const VerifyPortal: React.FC = () => {
             variants={REVEAL_ITEM}
             className="text-xl md:text-3xl font-medium text-base-content/60 mb-20 leading-tight max-w-3xl mx-auto"
           >
-            Instantly validate any certificate issued via the Certify platform.
-            Enter the unique ID below to begin the audit.
+            Instantly validate any certificate issued via the Qubit Certify
+            platform. Enter the unique ID below to begin the audit.
           </motion.p>
 
           <motion.div
@@ -153,7 +153,7 @@ export const VerifyPortal: React.FC = () => {
                   {[
                     {
                       step: '01',
-                      text: 'Download your official PDF/PNG from Certify.',
+                      text: 'Download your official PDF/PNG from Qubit Certify.',
                     },
                     {
                       step: '02',

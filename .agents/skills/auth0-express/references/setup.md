@@ -90,6 +90,7 @@ echo "✅ Auth0 credentials written to $TARGET_FILE"
 ```
 
 After the script runs, remind the user to:
+
 1. Open the env file that was written and replace `YOUR_CLIENT_SECRET` with the actual client secret from Auth0.
 2. Ensure the env file is listed in `.gitignore` to avoid accidentally committing secrets.
 

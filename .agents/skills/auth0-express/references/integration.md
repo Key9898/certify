@@ -9,9 +9,9 @@ Server-side authentication patterns for Express.js.
 ### Single Route
 
 ```javascript
-const { requiresAuth } = require('express-openid-connect');
+const { requiresAuth } = require("express-openid-connect");
 
-app.get('/admin', requiresAuth(), (req, res) => {
+app.get("/admin", requiresAuth(), (req, res) => {
   res.send(`Admin: ${req.oidc.user.name}`);
 });
 ```
@@ -20,27 +20,29 @@ app.get('/admin', requiresAuth(), (req, res) => {
 
 ```javascript
 // Protect all /admin routes
-app.use('/admin', requiresAuth());
+app.use("/admin", requiresAuth());
 
-app.get('/admin/dashboard', (req, res) => {
-  res.send('Dashboard');
+app.get("/admin/dashboard", (req, res) => {
+  res.send("Dashboard");
 });
 
-app.get('/admin/settings', (req, res) => {
-  res.send('Settings');
+app.get("/admin/settings", (req, res) => {
+  res.send("Settings");
 });
 ```
 
 ### Require Auth Globally
 
 ```javascript
-app.use(auth({
-  authRequired: true  // All routes require authentication
-}));
+app.use(
+  auth({
+    authRequired: true, // All routes require authentication
+  }),
+);
 
 // Make specific routes public
-app.get('/public', (req, res) => {
-  res.send('Public page');
+app.get("/public", (req, res) => {
+  res.send("Public page");
 });
 ```
 
@@ -51,11 +53,11 @@ app.get('/public', (req, res) => {
 ### Get Access Token
 
 ```javascript
-app.get('/api-call', requiresAuth(), async (req, res) => {
+app.get("/api-call", requiresAuth(), async (req, res) => {
   const { access_token } = req.oidc.accessToken;
 
-  const response = await fetch('https://your-api.com/data', {
-    headers: { Authorization: `Bearer ${access_token}` }
+  const response = await fetch("https://your-api.com/data", {
+    headers: { Authorization: `Bearer ${access_token}` },
   });
 
   const data = await response.json();
@@ -66,12 +68,14 @@ app.get('/api-call', requiresAuth(), async (req, res) => {
 Configure audience in middleware:
 
 ```javascript
-app.use(auth({
-  authorizationParams: {
-    audience: 'https://your-api-identifier'
-  },
-  // ... other config
-}));
+app.use(
+  auth({
+    authorizationParams: {
+      audience: "https://your-api-identifier",
+    },
+    // ... other config
+  }),
+);
 ```
 
 ---
@@ -81,12 +85,12 @@ app.use(auth({
 ### Custom Login Handler
 
 ```javascript
-app.get('/custom-login', (req, res) => {
+app.get("/custom-login", (req, res) => {
   res.oidc.login({
-    returnTo: '/dashboard',
+    returnTo: "/dashboard",
     authorizationParams: {
-      connection: 'google-oauth2'
-    }
+      connection: "google-oauth2",
+    },
   });
 });
 ```
@@ -94,9 +98,9 @@ app.get('/custom-login', (req, res) => {
 ### Custom Logout Handler
 
 ```javascript
-app.get('/custom-logout', (req, res) => {
+app.get("/custom-logout", (req, res) => {
   res.oidc.logout({
-    returnTo: '/goodbye'
+    returnTo: "/goodbye",
   });
 });
 ```
@@ -110,17 +114,19 @@ app.get('/custom-logout', (req, res) => {
 Check if user is already authenticated at their IDP without forcing a login prompt.
 
 ```javascript
-const { auth, attemptSilentLogin } = require('express-openid-connect');
+const { auth, attemptSilentLogin } = require("express-openid-connect");
 
-app.use(auth({
-  authRequired: false
-}));
+app.use(
+  auth({
+    authRequired: false,
+  }),
+);
 
 // Try silent authentication on first visit
 app.use(attemptSilentLogin());
 
 // Your routes
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
   if (req.oidc.isAuthenticated()) {
     res.send(`Welcome back, ${req.oidc.user.name}!`);
   } else {
@@ -130,12 +136,14 @@ app.get('/', (req, res) => {
 ```
 
 **How it works:**
+
 - On the user's first visit, redirects to Auth0 with `prompt=none`
 - If user has active IDP session, they're silently logged in
 - If not, they see your page as anonymous
 - Uses a cookie to prevent repeated silent login attempts
 
 **Use cases:**
+
 - Show login/logout button based on IDP session status
 - Pre-authenticate users who have existing IDP sessions
 - Provide seamless experience for returning users
@@ -147,12 +155,12 @@ app.get('/', (req, res) => {
 ### Access User Info
 
 ```javascript
-app.get('/user', requiresAuth(), (req, res) => {
+app.get("/user", requiresAuth(), (req, res) => {
   res.json({
     isAuthenticated: req.oidc.isAuthenticated(),
     user: req.oidc.user,
     idToken: req.oidc.idToken,
-    accessToken: req.oidc.accessToken
+    accessToken: req.oidc.accessToken,
   });
 });
 ```
@@ -160,14 +168,16 @@ app.get('/user', requiresAuth(), (req, res) => {
 ### Refresh Tokens
 
 ```javascript
-app.use(auth({
-  authorizationParams: {
-    scope: 'openid profile email offline_access'
-  }
-}));
+app.use(
+  auth({
+    authorizationParams: {
+      scope: "openid profile email offline_access",
+    },
+  }),
+);
 
 // Access refresh token
-app.get('/refresh', requiresAuth(), (req, res) => {
+app.get("/refresh", requiresAuth(), (req, res) => {
   const refreshToken = req.oidc.refreshToken;
   // Use refresh token
 });
@@ -179,8 +189,8 @@ app.get('/refresh', requiresAuth(), (req, res) => {
 
 ```javascript
 app.use((err, req, res, next) => {
-  if (err.name === 'UnauthorizedError') {
-    res.status(401).send('Unauthorized');
+  if (err.name === "UnauthorizedError") {
+    res.status(401).send("Unauthorized");
   } else {
     next(err);
   }
@@ -191,11 +201,11 @@ app.use((err, req, res, next) => {
 
 ## Common Issues
 
-| Issue | Solution |
-|-------|----------|
-| "Invalid state" | Regenerate SECRET |
+| Issue                  | Solution                                       |
+| ---------------------- | ---------------------------------------------- |
+| "Invalid state"        | Regenerate SECRET                              |
 | Session not persisting | Check cookie settings, use HTTPS in production |
-| Redirect loop | Verify callback URL matches Auth0 config |
+| Redirect loop          | Verify callback URL matches Auth0 config       |
 
 ---
 

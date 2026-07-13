@@ -56,29 +56,32 @@ Generate secret: `openssl rand -hex 32`
 Update your Express app (`app.js` or `index.js`):
 
 ```javascript
-require('dotenv').config();
-const express = require('express');
-const { auth, requiresAuth } = require('express-openid-connect');
+require("dotenv").config();
+const express = require("express");
+const { auth, requiresAuth } = require("express-openid-connect");
 
 const app = express();
 
 // Configure Auth0 middleware
-app.use(auth({
-  authRequired: false,  // Don't require auth for all routes
-  auth0Logout: true,    // Enable logout endpoint
-  secret: process.env.SECRET,
-  baseURL: process.env.BASE_URL,
-  clientID: process.env.CLIENT_ID,
-  issuerBaseURL: process.env.ISSUER_BASE_URL,
-  clientSecret: process.env.CLIENT_SECRET
-}));
+app.use(
+  auth({
+    authRequired: false, // Don't require auth for all routes
+    auth0Logout: true, // Enable logout endpoint
+    secret: process.env.SECRET,
+    baseURL: process.env.BASE_URL,
+    clientID: process.env.CLIENT_ID,
+    issuerBaseURL: process.env.ISSUER_BASE_URL,
+    clientSecret: process.env.CLIENT_SECRET,
+  }),
+);
 
 app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000');
+  console.log("Server running on http://localhost:3000");
 });
 ```
 
 This automatically creates:
+
 - `/login` - Login endpoint
 - `/logout` - Logout endpoint
 - `/callback` - OAuth callback
@@ -87,12 +90,12 @@ This automatically creates:
 
 ```javascript
 // Public route
-app.get('/', (req, res) => {
-  res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
+app.get("/", (req, res) => {
+  res.send(req.oidc.isAuthenticated() ? "Logged in" : "Logged out");
 });
 
 // Protected route
-app.get('/profile', requiresAuth(), (req, res) => {
+app.get("/profile", requiresAuth(), (req, res) => {
   res.send(`
     <h1>Profile</h1>
     <p>Name: ${req.oidc.user.name}</p>
@@ -103,15 +106,19 @@ app.get('/profile', requiresAuth(), (req, res) => {
 });
 
 // Login/logout links
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
   res.send(`
-    ${req.oidc.isAuthenticated() ? `
+    ${
+      req.oidc.isAuthenticated()
+        ? `
       <p>Welcome, ${req.oidc.user.name}!</p>
       <a href="/profile">Profile</a>
       <a href="/logout">Logout</a>
-    ` : `
+    `
+        : `
       <a href="/login">Login</a>
-    `}
+    `
+    }
   `);
 });
 ```
@@ -138,15 +145,15 @@ Visit `http://localhost:3000` and test the login flow.
 
 ## Common Mistakes
 
-| Mistake | Fix |
-|---------|-----|
+| Mistake                                       | Fix                                                                                    |
+| --------------------------------------------- | -------------------------------------------------------------------------------------- |
 | Forgot to add callback URL in Auth0 Dashboard | Add `/callback` path to Allowed Callback URLs (e.g., `http://localhost:3000/callback`) |
-| Missing or weak SECRET | Generate secure secret with `openssl rand -hex 32` and store in .env as `SECRET` |
-| Setting authRequired: true globally | Set to false and use `requiresAuth()` middleware on specific routes |
-| App created as SPA type in Auth0 | Must be Regular Web Application type for server-side auth |
-| Session secret exposed in code | Always use environment variables, never hardcode secrets |
-| Wrong baseURL for production | Update BASE_URL to match your production domain |
-| Not handling logout returnTo | Add your domain to Allowed Logout URLs in Auth0 Dashboard |
+| Missing or weak SECRET                        | Generate secure secret with `openssl rand -hex 32` and store in .env as `SECRET`       |
+| Setting authRequired: true globally           | Set to false and use `requiresAuth()` middleware on specific routes                    |
+| App created as SPA type in Auth0              | Must be Regular Web Application type for server-side auth                              |
+| Session secret exposed in code                | Always use environment variables, never hardcode secrets                               |
+| Wrong baseURL for production                  | Update BASE_URL to match your production domain                                        |
+| Not handling logout returnTo                  | Add your domain to Allowed Logout URLs in Auth0 Dashboard                              |
 
 ---
 
@@ -161,6 +168,7 @@ Visit `http://localhost:3000` and test the login flow.
 ## Quick Reference
 
 **Middleware Options:**
+
 - `authRequired` - Require auth for all routes (default: false)
 - `auth0Logout` - Enable /logout endpoint (default: false)
 - `secret` - Session secret (required)
@@ -169,6 +177,7 @@ Visit `http://localhost:3000` and test the login flow.
 - `issuerBaseURL` - Auth0 tenant URL (required)
 
 **Request Properties:**
+
 - `req.oidc.isAuthenticated()` - Check if user is logged in
 - `req.oidc.user` - User profile object
 - `req.oidc.accessToken` - Access token for API calls
@@ -176,6 +185,7 @@ Visit `http://localhost:3000` and test the login flow.
 - `req.oidc.refreshToken` - Refresh token
 
 **Common Use Cases:**
+
 - Protected routes → Use `requiresAuth()` middleware (see Step 4)
 - Check auth status → `req.oidc.isAuthenticated()`
 - Get user info → `req.oidc.user`

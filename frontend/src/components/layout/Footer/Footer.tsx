@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/utils/constants';
 import type { FooterProps } from './Footer.types';
+import { IS_PHASE2 } from '@/config/features';
 import {
   QUICK_SPRING,
   REVEAL_ITEM,
@@ -23,7 +24,7 @@ export const Footer: React.FC<FooterProps> = ({ minimal = false }) => {
       >
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 md:px-6">
           <p className="text-sm font-medium text-base-content/40">
-            © {currentYear} Certify Platforms. Developed by Wunna Aung.
+            © {currentYear} Qubit Certify Platforms. Developed by Wunna Aung.
           </p>
         </div>
       </motion.footer>
@@ -51,12 +52,12 @@ export const Footer: React.FC<FooterProps> = ({ minimal = false }) => {
               >
                 <img
                   src="/Logo/logo.svg"
-                  alt="Certify"
+                  alt="Qubit Certify"
                   className="h-5 w-5 brightness-0 invert"
                 />
               </motion.div>
               <span className="text-2xl font-black tracking-tighter text-base-content">
-                Certify
+                Qubit Certify
               </span>
             </div>
             <p className="mb-8 font-medium leading-relaxed text-base-content/50 pr-4">
@@ -65,20 +66,21 @@ export const Footer: React.FC<FooterProps> = ({ minimal = false }) => {
             </p>
           </motion.div>
 
-          {/* ProductCategory */}
           <motion.div variants={REVEAL_ITEM}>
             <h4 className="mb-8 text-xs font-black uppercase tracking-[0.3em] text-primary">
               Product
             </h4>
             <ul className="space-y-4">
-              <li>
-                <a
-                  className="font-bold text-base-content/60 transition-colors hover:text-primary text-sm uppercase tracking-wide"
-                  href="/#features"
-                >
-                  Features
-                </a>
-              </li>
+              {IS_PHASE2 && (
+                <li>
+                  <a
+                    className="font-bold text-base-content/60 transition-colors hover:text-primary text-sm uppercase tracking-wide"
+                    href="/#features"
+                  >
+                    Features
+                  </a>
+                </li>
+              )}
               <li>
                 <Link
                   to={ROUTES.VERIFY_PORTAL}
@@ -87,14 +89,16 @@ export const Footer: React.FC<FooterProps> = ({ minimal = false }) => {
                   Verification Portal
                 </Link>
               </li>
-              <li>
-                <Link
-                  to={ROUTES.TEMPLATES}
-                  className="font-bold text-base-content/60 transition-colors hover:text-primary text-sm uppercase tracking-wide"
-                >
-                  Browse Templates
-                </Link>
-              </li>
+              {IS_PHASE2 && (
+                <li>
+                  <Link
+                    to={ROUTES.TEMPLATES}
+                    className="font-bold text-base-content/60 transition-colors hover:text-primary text-sm uppercase tracking-wide"
+                  >
+                    Browse Templates
+                  </Link>
+                </li>
+              )}
             </ul>
           </motion.div>
 
@@ -145,14 +149,16 @@ export const Footer: React.FC<FooterProps> = ({ minimal = false }) => {
                   FAQs
                 </Link>
               </li>
-              <li>
-                <Link
-                  to={ROUTES.DASHBOARD}
-                  className="font-bold text-base-content/60 transition-colors hover:text-primary text-sm uppercase tracking-wide"
-                >
-                  User Dashboard
-                </Link>
-              </li>
+              {IS_PHASE2 && (
+                <li>
+                  <Link
+                    to={ROUTES.DASHBOARD}
+                    className="font-bold text-base-content/60 transition-colors hover:text-primary text-sm uppercase tracking-wide"
+                  >
+                    User Dashboard
+                  </Link>
+                </li>
+              )}
               <li>
                 <a
                   href="mailto:support@certify.ink"
@@ -171,7 +177,7 @@ export const Footer: React.FC<FooterProps> = ({ minimal = false }) => {
         >
           <div className="flex flex-col items-center md:items-start gap-1">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-base-content/30">
-              © {currentYear} Certify Platforms. Developed by Wunna Aung.
+              © {currentYear} Qubit Certify Platforms. Developed by Wunna Aung.
             </p>
           </div>
 

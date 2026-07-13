@@ -3,11 +3,7 @@ import type { ApiKeyListItem } from '@/utils/apiKeyApi';
 import type { Webhook as WebhookType, WebhookEvent } from '@/utils/webhookApi';
 
 export type SettingsTab =
-  | 'general'
-  | 'workspace'
-  | 'branding'
-  | 'developer'
-  | 'security';
+  'general' | 'workspace' | 'branding' | 'developer' | 'security';
 
 export interface GeneralTabProps {
   displayName: string;

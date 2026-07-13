@@ -1,0 +1,53 @@
+---
+description: Project overview, entry points, and core commands for the Certify monorepo app. Always attached as base context.
+globs: []
+alwaysApply: true
+---
+
+# Project: Certify
+
+Certify is a web application for generating professional certificates. It supports single certificate creation, batch generation from CSV/Excel data, and integrations for third-party platforms.
+
+## Stack at a glance
+
+- **Frontend:** React 18 + TypeScript 5 + Vite 6 — styled with Tailwind CSS v4 & DaisyUI (corporate theme). Lazy loads ExcelJS and Recharts.
+- **Backend:** Node.js + Express + TypeScript — connects to MongoDB via Mongoose. Generates PDFs and PNGs using a Puppeteer browser pool.
+- **Authentication:** Auth0 for single-page SPA login and API token authorization.
+- **Asset Storage:** Cloudinary for logos and signature images.
+
+## Entry points
+
+- **Frontend:** `frontend/index.html` → `frontend/src/main.tsx` → `<App />` (`frontend/src/App.tsx`)
+- **Backend:** `backend/src/app.ts` — starts Express server and database retries.
+- **PDF Template:** `backend/templates/` — holds HTML templates and CSS styles for PDF generation.
+
+## Top-level commands
+
+```bash
+npm run dev          # orchestrates frontend + backend dev servers (port 5174 frontend, 3000 backend)
+npm run dev:frontend # starts only the frontend dev server
+npm run dev:backend  # starts only the backend dev server
+npm run build        # builds both backend and frontend output
+npm run lint         # runs eslint on both frontend and backend
+npm run test         # runs tests on both backend and frontend
+npm run readiness    # runs deployment readiness checks on environment variables and configs
+npm run readiness:strict # strict deployment readiness checks
+```
+
+## Where things live
+
+| Area | Location |
+|---|---|
+| Frontend Source | `frontend/src/` |
+| Backend Source | `backend/src/` |
+| PDF Templates | `backend/templates/` |
+| Wiki (AI knowledge base) | `wiki/` |
+| Session summaries | `docs/sessions/` |
+| Project rules (Cursor) | `.cursor/rules/` |
+| Project skills (Cursor) | `.cursor/skills/` |
+| Project skills (Trae) | `.trae/skills/` |
+| Project skills (Antigravity)| `.antigravity/skills/` |
+
+## Conventions in one line
+
+Strict TS, React 18, Tailwind v4 and DaisyUI classes with 0.25rem roundings, Jest/Vitest tests colocated or in test directories, knowledge persisted in `wiki/`.

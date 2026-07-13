@@ -1,0 +1,43 @@
+---
+description: Git workflow with husky pre-commit + pre-push hooks. Auto-attached when committing or pushing.
+globs:
+  - ".husky/**"
+  - "package.json"
+alwaysApply: false
+---
+
+# Git workflow
+
+## Hooks (husky)
+
+### pre-commit
+
+Runs `npx lint-staged` — only touches **staged files**:
+
+| Pattern | Task |
+|---|---|
+| `**/*.{ts,tsx,js,jsx}` | `npm run prettier` → `eslint --fix` |
+| `**/*.{json,css,md}` | `npm run prettier` |
+
+### manual check / pre-push
+
+Runs full project validation check:
+1. `npm run readiness:strict` — checks environmental placeholders.
+2. `npm run lint` — ESLint on both frontend and backend.
+3. `npm run test` — Vitest unit tests (frontend) and backend integration tests.
+4. `npm run build` — compiles TypeScript and runs Vite build.
+
+If any check fails, resolve all warnings and lint errors before pushing.
+
+## Branching
+
+- `main` — production / stable
+- Feature: `feat/<scope>`, `fix/<scope>`, `chore/<scope>`
+
+## Standard flow
+
+```bash
+git add <files>
+git commit -m "feat(auth): add logout trigger"   # pre-commit runs lint-staged
+git push origin <branch>
+```

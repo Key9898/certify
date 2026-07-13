@@ -41,9 +41,7 @@ export interface IntegrationFormData {
   canvasAssignmentId: string;
   canvasModuleId: string;
   canvasCompletionPreset:
-    | 'course_completion'
-    | 'module_completion'
-    | 'capstone_completion';
+    'course_completion' | 'module_completion' | 'capstone_completion';
   canvasReturnMode: 'response_only' | 'submission_comment';
 }
 

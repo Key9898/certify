@@ -5,9 +5,7 @@ export type IntegrationProvider = 'google_sheets' | 'canvas' | 'custom';
 export type IntegrationMode = 'single' | 'batch';
 export type IntegrationStatus = 'active' | 'paused';
 export type CanvasCompletionPreset =
-  | 'course_completion'
-  | 'module_completion'
-  | 'capstone_completion';
+  'course_completion' | 'module_completion' | 'capstone_completion';
 export type CanvasReturnMode = 'response_only' | 'submission_comment';
 
 export interface IntegrationDefaults {

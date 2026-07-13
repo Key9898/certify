@@ -221,8 +221,7 @@ export const buildAppUser = async (userOrId: IUserDocument | string) => {
     organizationId:
       organization?._id?.toString() || plainUser.organizationId?.toString(),
     organizationRole: plainUser.organizationRole as
-      | OrganizationRole
-      | undefined,
+      OrganizationRole | undefined,
     organization: serializeOrganization(organization),
   };
 };

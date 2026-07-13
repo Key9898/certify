@@ -1,0 +1,44 @@
+---
+description: Mandatory post-work documentation — wiki + docs/sessions auto-update after implementation. Always attached.
+globs: []
+alwaysApply: true
+---
+
+# Documentation hygiene (always on)
+
+After completing implementation work (code changes, bugfix batch, new Impl phase, convention change), **without the user asking**:
+
+1. **Wiki** — follow wiki skill format:
+   - Create or update `wiki/notes/YYYY-MM-DD-<slug>.md` with full YAML frontmatter (committed summary).
+   - Update touched `wiki/conventions/*.md` when UI/behavior conventions change.
+2. **Session** — update `docs/sessions/YYYY-MM-DD-session-summary.md` (today's date or active work end date) with full detail: phases, key files, test count, QA notes. `docs/sessions/` is gitignored — local mirror only.
+3. **Index drift** — if phase/row counts change, update `wiki/README.md`, `wiki/02-workflow.md`, and session evidence tables in documentation.
+4. **Confirm** briefly at end of task: which wiki + session paths were updated.
+
+**Never skip** because the user did not say "မှတ်ထား" / "save to wiki".
+
+## Session file convention
+
+| Rule | Value |
+| ---- | ----- |
+| Path | `docs/sessions/YYYY-MM-DD-session-summary.md` |
+| Date key | Primary work **end date**; multi-day batch → one file with dated `## Phase N (YYYY-MM-DD)` sections |
+| Git | `docs/sessions/` gitignored — local only |
+| Wiki mirror | Same batch → `wiki/notes/YYYY-MM-DD-<slug>.md` (committed) |
+
+### Session template (lighter frontmatter)
+
+```yaml
+---
+title: Session summary YYYY-MM-DD
+date: YYYY-MM-DD
+phases: [<n>, ...]
+wiki_mirror: wiki/notes/YYYY-MM-DD-<slug>.md
+---
+```
+
+## Dual-track reminder
+
+- Wiki skill entries → `wiki/` only (frontmatter, English slug).
+- Session detail → `docs/sessions/` (not a wiki skill save target).
+- Both are required after implementation work.

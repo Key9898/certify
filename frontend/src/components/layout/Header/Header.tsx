@@ -10,6 +10,7 @@ import {
 } from '@/utils/formatters';
 import type { HeaderProps } from './Header.types';
 import { QUICK_SPRING, SOFT_SPRING, TAP_PRESS } from '@/utils/motion';
+import { IS_PHASE2 } from '@/config/features';
 
 export const Header: React.FC<HeaderProps> = ({
   onMenuToggle,
@@ -42,7 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
     >
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-6">
         <div className="flex min-w-0 items-center gap-3">
-          {isAuthenticated && (
+          {isAuthenticated && IS_PHASE2 && (
             <motion.button
               className="btn btn-ghost btn-sm rounded lg:hidden"
               onClick={onMenuToggle}
@@ -71,36 +72,38 @@ export const Header: React.FC<HeaderProps> = ({
                 />
               </motion.div>
               <span className="text-2xl font-black tracking-tighter text-base-content">
-                Certify
+                Qubit Certify
               </span>
             </Link>
           </motion.div>
         </div>
 
-        <div className="hidden flex-1 justify-center lg:flex">
-          <div className="flex items-center gap-1 rounded border border-base-200 bg-base-100/85 px-2 py-1.5 shadow-sm">
-            <a
-              href="/#features"
-              className="rounded px-4 py-2 text-sm font-bold text-base-content/55 transition-colors hover:bg-base-200 hover:text-base-content"
-            >
-              Features
-            </a>
-            <Link
-              to={ROUTES.VERIFY_PORTAL}
-              className="rounded px-4 py-2 text-sm font-bold text-base-content/55 transition-colors hover:bg-base-200 hover:text-base-content"
-            >
-              Verification
-            </Link>
-            {isAuthenticated ? (
-              <Link
-                to={ROUTES.TEMPLATES}
+        {IS_PHASE2 && (
+          <div className="hidden flex-1 justify-center lg:flex">
+            <div className="flex items-center gap-1 rounded border border-base-200 bg-base-100/85 px-2 py-1.5 shadow-sm">
+              <a
+                href="/#features"
                 className="rounded px-4 py-2 text-sm font-bold text-base-content/55 transition-colors hover:bg-base-200 hover:text-base-content"
               >
-                Templates
+                Features
+              </a>
+              <Link
+                to={ROUTES.VERIFY_PORTAL}
+                className="rounded px-4 py-2 text-sm font-bold text-base-content/55 transition-colors hover:bg-base-200 hover:text-base-content"
+              >
+                Verification
               </Link>
-            ) : null}
+              {isAuthenticated ? (
+                <Link
+                  to={ROUTES.TEMPLATES}
+                  className="rounded px-4 py-2 text-sm font-bold text-base-content/55 transition-colors hover:bg-base-200 hover:text-base-content"
+                >
+                  Templates
+                </Link>
+              ) : null}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex items-center gap-2 sm:gap-3">
           {onOpenVerifyModal && (
@@ -116,107 +119,108 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="hidden sm:inline">Verify</span>
             </motion.button>
           )}
-          {isAuthenticated ? (
-            <>
-              <motion.div
-                whileHover={{ y: -2, transition: SOFT_SPRING }}
-                whileTap={TAP_PRESS}
-                className="block"
-              >
-                <Link
-                  to={ROUTES.DASHBOARD}
-                  className="btn btn-ghost rounded border border-base-200 bg-base-100/80 px-3 font-bold shadow-sm hover:border-primary/30 hover:bg-primary/5 hover:text-primary sm:px-5"
-                >
-                  <LayoutDashboard size={16} />
-                  <span className="hidden sm:inline">Dashboard</span>
-                </Link>
-              </motion.div>
-
-              <div className="dropdown dropdown-end">
+          {IS_PHASE2 &&
+            (isAuthenticated ? (
+              <>
                 <motion.div
-                  tabIndex={0}
-                  role="button"
-                  className="btn btn-ghost rounded avatar p-0.5 ring-1 ring-primary/20 ring-offset-1 hover:ring-primary"
-                  whileHover={{ y: -2, scale: 1.03 }}
-                  transition={SOFT_SPRING}
+                  whileHover={{ y: -2, transition: SOFT_SPRING }}
+                  whileTap={TAP_PRESS}
+                  className="block"
                 >
-                  <div className="w-10 overflow-hidden rounded">
-                    {user?.picture ? (
-                      <img
-                        src={user.picture}
-                        alt={displayName || 'User avatar'}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-primary text-base font-bold text-primary-content">
-                        {getAuthProfileInitial(user)}
-                      </div>
-                    )}
-                  </div>
+                  <Link
+                    to={ROUTES.DASHBOARD}
+                    className="btn btn-ghost rounded border border-base-200 bg-base-100/80 px-3 font-bold shadow-sm hover:border-primary/30 hover:bg-primary/5 hover:text-primary sm:px-5"
+                  >
+                    <LayoutDashboard size={16} />
+                    <span className="hidden sm:inline">Dashboard</span>
+                  </Link>
                 </motion.div>
-                <ul
-                  tabIndex={0}
-                  className="menu menu-md dropdown-content z-[100] mt-4 w-64 rounded border border-base-200 bg-base-100 p-2 shadow-2xl"
-                >
-                  <li className="mb-2 border-b border-base-100 px-4 py-3">
-                    <div className="flex flex-col items-start gap-1 p-0">
-                      <span className="leading-none font-black text-base-content">
-                        {displayName}
-                      </span>
-                      <span className="w-full truncate text-xs font-medium text-base-content/40">
-                        {user?.email || 'Authenticated account'}
-                      </span>
+
+                <div className="dropdown dropdown-end">
+                  <motion.div
+                    tabIndex={0}
+                    role="button"
+                    className="btn btn-ghost rounded avatar p-0.5 ring-1 ring-primary/20 ring-offset-1 hover:ring-primary"
+                    whileHover={{ y: -2, scale: 1.03 }}
+                    transition={SOFT_SPRING}
+                  >
+                    <div className="w-10 overflow-hidden rounded">
+                      {user?.picture ? (
+                        <img
+                          src={user.picture}
+                          alt={displayName || 'User avatar'}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-primary text-base font-bold text-primary-content">
+                          {getAuthProfileInitial(user)}
+                        </div>
+                      )}
                     </div>
-                  </li>
-                  <li>
-                    <Link
-                      to={ROUTES.DASHBOARD}
-                      className="rounded py-3 font-semibold transition-colors hover:bg-primary/10 hover:text-primary"
-                    >
-                      Dashboard
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to={ROUTES.INTEGRATIONS}
-                      className="rounded py-3 font-semibold transition-colors hover:bg-primary/10 hover:text-primary"
-                    >
-                      Integrations
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to={ROUTES.SETTINGS}
-                      className="rounded py-3 font-semibold transition-colors hover:bg-primary/10 hover:text-primary"
-                    >
-                      Account Settings
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </>
-          ) : (
-            <>
-              <motion.button
-                type="button"
-                onClick={() => handleAuthEntry('signin')}
-                className="btn btn-ghost btn-sm rounded border border-base-200 bg-base-100/70 px-3 shadow-sm sm:btn-md"
-                whileHover={{ y: -2, scale: 1.01, transition: SOFT_SPRING }}
-                whileTap={TAP_PRESS}
-              >
-                Sign In
-              </motion.button>
-              <motion.button
-                type="button"
-                onClick={() => handleAuthEntry('signup')}
-                className="btn btn-primary btn-sm rounded px-3 shadow-lg shadow-primary/10 sm:btn-md sm:px-4"
-                whileHover={{ y: -2, scale: 1.01, transition: SOFT_SPRING }}
-                whileTap={TAP_PRESS}
-              >
-                Start Free
-              </motion.button>
-            </>
-          )}
+                  </motion.div>
+                  <ul
+                    tabIndex={0}
+                    className="menu menu-md dropdown-content z-[100] mt-4 w-64 rounded border border-base-200 bg-base-100 p-2 shadow-2xl"
+                  >
+                    <li className="mb-2 border-b border-base-100 px-4 py-3">
+                      <div className="flex flex-col items-start gap-1 p-0">
+                        <span className="leading-none font-black text-base-content">
+                          {displayName}
+                        </span>
+                        <span className="w-full truncate text-xs font-medium text-base-content/40">
+                          {user?.email || 'Authenticated account'}
+                        </span>
+                      </div>
+                    </li>
+                    <li>
+                      <Link
+                        to={ROUTES.DASHBOARD}
+                        className="rounded py-3 font-semibold transition-colors hover:bg-primary/10 hover:text-primary"
+                      >
+                        Dashboard
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to={ROUTES.INTEGRATIONS}
+                        className="rounded py-3 font-semibold transition-colors hover:bg-primary/10 hover:text-primary"
+                      >
+                        Integrations
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to={ROUTES.SETTINGS}
+                        className="rounded py-3 font-semibold transition-colors hover:bg-primary/10 hover:text-primary"
+                      >
+                        Account Settings
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              </>
+            ) : (
+              <>
+                <motion.button
+                  type="button"
+                  onClick={() => handleAuthEntry('signin')}
+                  className="btn btn-ghost btn-sm rounded border border-base-200 bg-base-100/70 px-3 shadow-sm sm:btn-md"
+                  whileHover={{ y: -2, scale: 1.01, transition: SOFT_SPRING }}
+                  whileTap={TAP_PRESS}
+                >
+                  Sign In
+                </motion.button>
+                <motion.button
+                  type="button"
+                  onClick={() => handleAuthEntry('signup')}
+                  className="btn btn-primary btn-sm rounded px-3 shadow-lg shadow-primary/10 sm:btn-md sm:px-4"
+                  whileHover={{ y: -2, scale: 1.01, transition: SOFT_SPRING }}
+                  whileTap={TAP_PRESS}
+                >
+                  Start Free
+                </motion.button>
+              </>
+            ))}
         </div>
       </div>
     </motion.header>

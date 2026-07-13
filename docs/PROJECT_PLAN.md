@@ -42,16 +42,16 @@
 
 Heavy libraries are lazy-loaded to keep initial bundle size under 500kB:
 
-| Library   | Lazy Load Method              | Used In           |
-| --------- | ----------------------------- | ----------------- |
-| ExcelJS   | Dynamic import (`import()`)   | csvParser.ts      |
-| Recharts  | React.lazy() + Suspense       | Dashboard.tsx     |
+| Library  | Lazy Load Method            | Used In       |
+| -------- | --------------------------- | ------------- |
+| ExcelJS  | Dynamic import (`import()`) | csvParser.ts  |
+| Recharts | React.lazy() + Suspense     | Dashboard.tsx |
 
 **Pattern - Dynamic Import for Utilities:**
 
 ```typescript
 const parseXLSX = async (file: File) => {
-  const ExcelJS = await import('exceljs');
+  const ExcelJS = await import("exceljs");
   const workbook = new ExcelJS.default.Workbook();
   // ... parsing logic
 };
@@ -60,8 +60,8 @@ const parseXLSX = async (file: File) => {
 **Pattern - React.lazy for Components:**
 
 ```tsx
-const OverviewChart = React.lazy(() => import('./OverviewChart'));
-const UsageChart = React.lazy(() => import('./UsageChart'));
+const OverviewChart = React.lazy(() => import("./OverviewChart"));
+const UsageChart = React.lazy(() => import("./UsageChart"));
 
 <Suspense fallback={<LoadingSpinner />}>
   <OverviewChart data={data} />
@@ -138,13 +138,13 @@ PDF certificates are generated server-side using Puppeteer with the following fe
 
 ### Cost
 
-| Service       | Cost               |
-| ------------- | ------------------ |
-| Vercel        | Free               |
-| Railway       | Free plan/credits; usage-based if exceeded |
-| MongoDB Atlas | Free (512MB)       |
-| Auth0         | Free (7,000 users) |
-| Cloudinary    | Free (25GB)        |
+| Service       | Cost                                                   |
+| ------------- | ------------------------------------------------------ |
+| Vercel        | Free                                                   |
+| Railway       | Free plan/credits; usage-based if exceeded             |
+| MongoDB Atlas | Free (512MB)                                           |
+| Auth0         | Free (7,000 users)                                     |
+| Cloudinary    | Free (25GB)                                            |
 | **Total**     | **Low/no-cost initial rollout; monitor Railway usage** |
 
 ### Development Configuration
@@ -727,12 +727,7 @@ interface Integration {
   createdBy: ObjectId; // User who configured it
   name: string; // Human-readable integration name
   provider:
-    | "zapier"
-    | "make"
-    | "google_sheets"
-    | "moodle"
-    | "canvas"
-    | "custom";
+    "zapier" | "make" | "google_sheets" | "moodle" | "canvas" | "custom";
   status: "active" | "paused";
   mode: "single" | "batch";
   templateId: ObjectId; // Default certificate template

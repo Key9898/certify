@@ -1,0 +1,64 @@
+---
+description: Project wiki curation — when and how to save knowledge to wiki/. Auto-attached when user asks to remember/note/record decisions.
+globs:
+  - "wiki/**"
+  - ".cursor/skills/wiki/**"
+  - ".trae/skills/wiki/**"
+  - ".antigravity/skills/wiki/**"
+alwaysApply: false
+---
+
+# Wiki skill (auto-trigger surface)
+
+When the user says things like the phrases below, route to the **wiki skill** and persist to `wiki/`. Do NOT invent file paths — always go through the skill.
+
+## Trigger phrases
+
+- "မှတ်ထားစမ်း", "wiki ထဲ save လုပ်ပါ", "note ယူထား"
+- "decision တစ်ခုယူထား", "ADR ရေးပါ"
+- "remember this", "save to wiki", "remember this for next time"
+- "convention သတ်မှတ်ထား", "naming rule remember လုပ်ထား"
+- "snippet သိမ်းထား", "code လေး save ပါ"
+- "reference attach လုပ်ပါ"
+- "architecture diagram သိမ်းထားပါ"
+
+## Dual-track (wiki vs session)
+
+| Track | Path | Git | Role |
+| ----- | ---- | --- | ---- |
+| **Wiki** | `wiki/` | Committed | Skill entries — frontmatter, English slug, classify → folder |
+| **Session** | `docs/sessions/` | Gitignored | Local detail after implementation — **not** a wiki skill save target |
+
+- Wiki skill: **never** save skill entries into `docs/`.
+- After implementation work, **both** tracks are mandatory — see always-on rule [`06-documentation-hygiene.mdc`](06-documentation-hygiene.mdc).
+
+## Classification → folder mapping
+
+| Intent | Folder | Filename |
+|---|---|---|
+| "Why we chose X" / trade-off | `wiki/decisions/` | `NNN-<slug>.md` |
+| "We always do X like this" | `wiki/conventions/` | `<slug>.md` |
+| Architecture / diagrams | `wiki/architecture/` | `<slug>.md` |
+| Reusable code snippet | `wiki/snippets/` | `<slug>.md` (markdown only — code in fenced block) |
+| Loose note / idea / TODO | `wiki/notes/` | `YYYY-MM-DD-<slug>.md` |
+| External link / doc | `wiki/references/` | `<slug>.md` |
+
+## Required frontmatter
+
+```yaml
+---
+title: <title>
+type: <decision|convention|architecture|snippet|note|reference>
+date: YYYY-MM-DD
+tags: [<tag>, <tag>]
+---
+```
+
+## Rules
+
+1. **Always** use absolute paths in Write tool calls.
+2. **Always** include the frontmatter block.
+3. **Never** save wiki skill entries into `src/`, `docs/` (outside wiki), or repo root.
+4. Filename slug = lowercase kebab-case, English only.
+5. **Never** use `.ts`/`.tsx` for snippets — markdown `.md` only (frontmatter breaks Prettier).
+6. After writing, confirm to user with the file path.

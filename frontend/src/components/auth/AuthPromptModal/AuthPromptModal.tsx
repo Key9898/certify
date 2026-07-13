@@ -21,15 +21,17 @@ export const AuthPromptModal: React.FC<AuthPromptModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={
-        isSignupMode ? 'Create your Certify account' : 'Sign in to Certify'
+        isSignupMode
+          ? 'Create your Qubit Certify account'
+          : 'Sign in to Qubit Certify'
       }
       size="md"
     >
       <div className="space-y-5">
         <p className="text-sm leading-relaxed text-base-content/60">
           {isSignupMode
-            ? 'Choose how you want to start. Certify will open a secure Auth0 sign-up page so you can enter your email and password, or continue with Google.'
-            : 'Choose how you want to continue. Certify will open a secure Auth0 sign-in page so you can enter your account details, then take you straight to your dashboard.'}
+            ? 'Choose how you want to start. Qubit Certify will open a secure Auth0 sign-up page so you can enter your email and password, or continue with Google.'
+            : 'Choose how you want to continue. Qubit Certify will open a secure Auth0 sign-in page so you can enter your account details, then take you straight to your dashboard.'}
         </p>
 
         <div className="space-y-3">

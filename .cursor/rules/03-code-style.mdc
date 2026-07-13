@@ -1,0 +1,71 @@
+---
+description: Code style conventions — formatting, naming, and component structure. Auto-attached when editing TS/JSX files.
+globs:
+  - "frontend/src/**/*.{ts,tsx}"
+  - "backend/src/**/*.ts"
+alwaysApply: false
+---
+
+# Code style
+
+## Formatting (Prettier-enforced)
+
+- 2-space indentation
+- Semi-colons required (`semi: true`)
+- Single quotes for TS files, double for JSX attributes (`singleQuote: true`)
+- Trailing commas: ES5 style (`trailingComma: "es5"`)
+- Tab width: 2
+
+## Naming
+
+| Type | Convention | Example |
+|---|---|---|
+| Components | PascalCase | `CertificateCard.tsx` |
+| Hooks | camelCase, `use` prefix | `useCertificates.ts` |
+| Utilities | camelCase | `formatDate.ts` |
+| Constants | UPPER_SNAKE_CASE | `MAX_FILE_SIZE` |
+| Types/Interfaces | PascalCase | `CertificateData` |
+| Files/Folders | PascalCase for Component folders | `CertificateCard/` |
+
+## Component structure
+
+Each component should reside in its own folder with a standard layout:
+```
+ComponentName/
+├── ComponentName.tsx        # Main component
+├── ComponentName.types.ts   # Component-specific types
+├── ComponentName.stories.tsx # Storybook story
+└── index.ts                 # Barrel export
+```
+
+### Component template example:
+```tsx
+import type { ComponentNameProps } from './ComponentName.types';
+
+export const ComponentName: React.FC<ComponentNameProps> = ({ label }) => {
+  return <button className="btn btn-primary">{label}</button>;
+};
+```
+
+- Use named exports for components (e.g., `export const ComponentName`).
+- No inline CSS styles — use Tailwind utility and DaisyUI classes.
+
+## Import Order
+
+```tsx
+// 1. External libraries
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+
+// 2. Internal components
+import { Button } from '@/components/common/Button';
+
+// 3. Hooks
+import { useAuth } from '@/hooks/useAuth';
+
+// 4. Utils
+import { formatDate } from '@/utils/formatters';
+
+// 5. Types
+import type { Certificate } from '@/types/certificate';
+```
