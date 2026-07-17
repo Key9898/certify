@@ -34,8 +34,8 @@ export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({
         <div
           className={`
           relative flex items-center transition-all duration-300
-          bg-base-100 border rounded shadow-2xl overflow-hidden
-          ${variant === 'large' ? 'h-16 md:h-18 border-base-200/80' : 'h-14 border-base-200'}
+          bg-white border rounded shadow-md overflow-hidden
+          ${variant === 'large' ? 'h-16 md:h-18 border-slate-200' : 'h-14 border-base-200'}
           group-focus-within:border-primary group-focus-within:ring-4 group-focus-within:ring-primary/10
         `}
         >
@@ -60,7 +60,7 @@ export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({
             placeholder={placeholder}
             className={`
               flex-1 bg-transparent border-none outline-none font-medium text-base-content
-              ${variant === 'large' ? 'text-lg placeholder:text-base-content/30' : 'text-base placeholder:text-base-content/40'}
+              ${variant === 'large' ? 'text-lg placeholder:text-base-content/40' : 'text-base placeholder:text-base-content/40'}
             `}
           />
 
@@ -70,7 +70,7 @@ export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({
             className={`
               h-full flex items-center justify-center gap-2 font-black uppercase tracking-wider transition-all
               ${variant === 'large' ? 'px-8 md:px-10 text-base' : 'px-6 text-sm'}
-              ${id.trim() ? 'bg-primary text-white hover:bg-primary/90' : 'bg-base-200 text-base-content/20 border-l border-base-200/40 cursor-not-allowed'}
+              ${id.trim() ? 'bg-primary text-white hover:bg-primary/90' : 'bg-slate-50 text-slate-400 border-l border-slate-250/50 cursor-not-allowed'}
             `}
           >
             <span

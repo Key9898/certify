@@ -16,34 +16,13 @@ import { REVEAL_ITEM, STAGGER_CONTAINER, VIEWPORT_ONCE } from '@/utils/motion';
 
 export const VerifyPortal: React.FC = () => {
   return (
-    <div
-      className="min-h-screen bg-base-100 flex flex-col relative z-10 selection:bg-primary/30"
-      style={
-        {
-          '--color-base-100': 'oklch(12% 0.015 256)',
-          '--color-base-200': 'oklch(20% 0.025 256)',
-          '--color-base-300': 'oklch(28% 0.03 256)',
-          '--color-base-content': 'oklch(96% 0.005 256)',
-          '--color-primary': 'oklch(56% 0.18 250)', // Rich indigo primary
-          '--color-accent': 'oklch(62% 0.12 200)', // Teal/blue accent
-          '--radius-box': '0.5rem', // Softer rounded corners (0.5rem)
-          '--radius-selector': '0.5rem',
-          '--radius-field': '0.5rem',
-        } as React.CSSProperties
-      }
-    >
+    <div className="min-h-screen bg-slate-50 flex flex-col relative z-10 selection:bg-primary/20">
       <Header />
 
       {/* Dynamic Background Elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 bg-[#040612]">
-        <div
-          className="absolute top-[-10%] left-[-10%] w-[65%] h-[65%] bg-primary/5 rounded-full blur-[140px] animate-pulse"
-          style={{ animationDuration: '10s' }}
-        />
-        <div
-          className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] bg-accent/5 rounded-full blur-[120px] animate-pulse"
-          style={{ animationDuration: '15s' }}
-        />
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 bg-[#f8fafc]">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-50 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px]" />
       </div>
 
       <motion.main
@@ -51,13 +30,13 @@ export const VerifyPortal: React.FC = () => {
         whileInView="visible"
         viewport={VIEWPORT_ONCE}
         variants={STAGGER_CONTAINER}
-        className="container mx-auto px-4 md:px-6 relative z-10 py-24 flex-1"
+        className="container mx-auto px-4 md:px-6 relative z-10 py-20 flex-1"
       >
         {/* Core Verification Hero */}
-        <section className="text-center mb-28 max-w-5xl mx-auto">
+        <section className="text-center mb-24 max-w-5xl mx-auto">
           <motion.div
             variants={REVEAL_ITEM}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded bg-primary/10 text-primary font-black text-xs uppercase tracking-[0.25em] mb-10 shadow-lg shadow-primary/5 border border-primary/10"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded bg-indigo-50 text-indigo-700 font-black text-xs uppercase tracking-[0.25em] mb-10 shadow-sm border border-indigo-100/80"
           >
             <ShieldCheck size={16} />
             <span>Official Identity Gateway</span>
@@ -65,17 +44,17 @@ export const VerifyPortal: React.FC = () => {
 
           <motion.h1
             variants={REVEAL_ITEM}
-            className="text-6xl md:text-8xl font-black text-base-content leading-[0.9] tracking-tighter mb-10"
+            className="text-6xl md:text-8xl font-black text-slate-900 leading-[0.9] tracking-tighter mb-8"
           >
             Verify <br className="hidden md:block" />{' '}
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-indigo-700 bg-clip-text text-transparent">
               Authenticity.
             </span>
           </motion.h1>
 
           <motion.p
             variants={REVEAL_ITEM}
-            className="text-lg md:text-2xl font-medium text-base-content/60 mb-16 leading-relaxed max-w-2xl mx-auto"
+            className="text-lg md:text-2xl font-semibold text-slate-500 mb-14 leading-relaxed max-w-2xl mx-auto"
           >
             Instantly validate any certificate issued via the Qubit Certify
             platform. Enter the unique ID below to begin the audit.
@@ -83,14 +62,14 @@ export const VerifyPortal: React.FC = () => {
 
           <motion.div
             variants={REVEAL_ITEM}
-            className="flex justify-center p-8 rounded-lg bg-[#0b0f1d]/50 border border-slate-800/80 backdrop-blur-xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] max-w-3xl mx-auto"
+            className="flex justify-center p-8 rounded-lg bg-white border border-slate-200 shadow-xl max-w-3xl mx-auto"
           >
             <VerifySearchWidget variant="large" />
           </motion.div>
         </section>
 
         {/* Global Stats / Trust Indicators */}
-        <section className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto mb-36 p-8 rounded-lg bg-slate-900/10 border border-slate-800/30 backdrop-blur-sm">
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto mb-28 p-8 rounded-lg bg-white border border-slate-200 shadow-sm">
           {[
             { label: 'Verified Claims', value: 'Unlimited', icon: CheckCircle },
             { label: 'Registry Health', value: '100%', icon: Zap },
@@ -98,13 +77,13 @@ export const VerifyPortal: React.FC = () => {
             { label: 'Security', value: 'SSL+AES', icon: Lock },
           ].map((stat, i) => (
             <motion.div key={i} variants={REVEAL_ITEM} className="text-center">
-              <div className="flex justify-center mb-4 text-primary opacity-60">
+              <div className="flex justify-center mb-4 text-primary">
                 <stat.icon size={24} />
               </div>
-              <div className="text-2xl font-black tracking-tighter text-base-content mb-1">
+              <div className="text-2xl font-black tracking-tighter text-slate-900 mb-1">
                 {stat.value}
               </div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-base-content/40">
+              <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">
                 {stat.label}
               </div>
             </motion.div>
@@ -112,7 +91,7 @@ export const VerifyPortal: React.FC = () => {
         </section>
 
         {/* Feature Experience Grid */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-36">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-28">
           {[
             {
               icon: Search,
@@ -124,7 +103,7 @@ export const VerifyPortal: React.FC = () => {
               icon: Lock,
               title: 'Tamper-Proof DNA',
               desc: 'Digital signatures detect even the smallest bit modification in the document.',
-              v: 'bg-accent/10 text-accent border border-accent/20',
+              v: 'bg-indigo-50 text-indigo-600 border border-indigo-100',
             },
             {
               icon: FileCheck,
@@ -136,18 +115,18 @@ export const VerifyPortal: React.FC = () => {
             <motion.div
               key={idx}
               variants={REVEAL_ITEM}
-              whileHover={{ y: -6 }}
-              className="p-10 rounded-lg bg-[#0b0f1d]/35 border border-slate-800/60 backdrop-blur-md group hover:bg-[#0e1327]/60 hover:border-indigo-500/30 transition-all duration-300 shadow-2xl"
+              whileHover={{ y: -4 }}
+              className="p-10 rounded-lg bg-white border border-slate-200 group hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-md"
             >
               <div
                 className={`w-14 h-14 rounded ${feature.v} flex items-center justify-center mb-8 shadow-sm group-hover:scale-105 transition-transform duration-300`}
               >
                 <feature.icon size={26} />
               </div>
-              <h3 className="text-xl font-black text-base-content mb-3 tracking-tight transition-colors">
+              <h3 className="text-xl font-black text-slate-900 mb-3 tracking-tight group-hover:text-primary transition-colors">
                 {feature.title}
               </h3>
-              <p className="font-semibold text-base-content/50 leading-relaxed transition-colors">
+              <p className="font-semibold text-slate-500 leading-relaxed transition-colors">
                 {feature.desc}
               </p>
             </motion.div>
@@ -157,17 +136,17 @@ export const VerifyPortal: React.FC = () => {
         {/* Immersive How-To Section */}
         <motion.section
           variants={REVEAL_ITEM}
-          className="relative max-w-6xl mx-auto p-12 md:p-20 rounded-lg bg-gradient-to-br from-[#0c101f] to-[#04060e] border border-slate-900/80 overflow-hidden shadow-3xl backdrop-blur-sm"
+          className="relative max-w-6xl mx-auto p-12 md:p-20 rounded-lg bg-white border border-slate-200 overflow-hidden shadow-sm backdrop-blur-sm"
         >
-          <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-primary/10 rounded-full blur-[140px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+          <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-primary/5 rounded-full blur-[140px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
           <div className="relative z-10">
             <div className="flex flex-col lg:flex-row gap-16 items-center">
               <div className="flex-1">
-                <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-6 leading-tight">
+                <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-6 leading-tight text-slate-900">
                   Locate your <br /> Certificate ID.
                 </h2>
-                <p className="text-lg text-base-content/60 font-semibold mb-10 leading-relaxed">
+                <p className="text-lg text-slate-500 font-semibold mb-10 leading-relaxed">
                   Every credential carries a unique identifier. This ID is your
                   key to proving authenticity to employers or institutions
                   worldwide.
@@ -192,20 +171,18 @@ export const VerifyPortal: React.FC = () => {
                       <div className="text-primary font-black text-xl">
                         {s.step}
                       </div>
-                      <div className="font-bold text-base-content/80">
-                        {s.text}
-                      </div>
+                      <div className="font-bold text-slate-600">{s.text}</div>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div className="w-full lg:w-[440px] shrink-0">
-                <div className="aspect-[1.414/1] bg-[#0d1123]/30 border border-slate-800/80 rounded-lg p-6 flex flex-col justify-between relative overflow-hidden shadow-2xl group backdrop-blur-sm">
+                <div className="aspect-[1.414/1] bg-slate-50/50 border border-slate-200 rounded-lg p-6 flex flex-col justify-between relative overflow-hidden shadow-sm group backdrop-blur-sm">
                   {/* Decorative Frame */}
-                  <div className="absolute inset-2.5 border border-indigo-500/10 rounded pointer-events-none" />
-                  <div className="absolute inset-3 border border-dashed border-indigo-500/5 rounded pointer-events-none" />
-                  <div className="absolute top-0 right-0 w-[120px] h-[120px] bg-primary/10 rounded-full blur-[30px] pointer-events-none" />
+                  <div className="absolute inset-2.5 border border-indigo-200 rounded pointer-events-none" />
+                  <div className="absolute inset-3 border border-dashed border-indigo-100 rounded pointer-events-none" />
+                  <div className="absolute top-0 right-0 w-[120px] h-[120px] bg-primary/5 rounded-full blur-[30px] pointer-events-none" />
 
                   {/* Top: Header */}
                   <div className="relative z-10 flex justify-between items-start">
@@ -213,7 +190,7 @@ export const VerifyPortal: React.FC = () => {
                       <div className="text-[9px] font-black uppercase tracking-widest text-primary mb-1">
                         Qubit Certify
                       </div>
-                      <div className="text-[12px] font-black text-base-content/90 tracking-tight">
+                      <div className="text-[12px] font-black text-slate-950 tracking-tight">
                         Official Credential
                       </div>
                     </div>
@@ -224,30 +201,30 @@ export const VerifyPortal: React.FC = () => {
 
                   {/* Middle: Content Mock */}
                   <div className="relative z-10 my-2 text-center">
-                    <div className="text-[8px] font-bold uppercase tracking-widest text-base-content/40 mb-1">
+                    <div className="text-[8px] font-bold uppercase tracking-widest text-slate-500 mb-1">
                       This is to certify that
                     </div>
-                    <div className="text-sm font-black text-base-content tracking-tight italic font-serif mb-1">
+                    <div className="text-sm font-black text-slate-900 tracking-tight italic font-serif mb-1">
                       WUNNA AUNG
                     </div>
-                    <div className="text-[7px] font-medium text-base-content/50 max-w-[200px] mx-auto leading-tight">
+                    <div className="text-[7px] font-medium text-slate-500 max-w-[200px] mx-auto leading-tight">
                       has successfully completed all requirements for the
                       official credential verification audit.
                     </div>
                   </div>
 
                   {/* Bottom: Signatures and ID Badge */}
-                  <div className="relative z-10 flex justify-between items-end border-t border-slate-800/40 pt-2.5">
+                  <div className="relative z-10 flex justify-between items-end border-t border-slate-200 pt-2.5">
                     <div className="flex gap-4">
                       <div>
-                        <div className="h-4 w-12 border-b border-base-content/20 opacity-30 mb-1" />
-                        <div className="text-[6px] font-black uppercase tracking-widest text-base-content/40">
+                        <div className="h-4 w-12 border-b border-slate-300 opacity-60 mb-1" />
+                        <div className="text-[6px] font-black uppercase tracking-widest text-slate-500">
                           Registrar
                         </div>
                       </div>
                       <div>
-                        <div className="h-4 w-12 border-b border-base-content/20 opacity-30 mb-1" />
-                        <div className="text-[6px] font-black uppercase tracking-widest text-base-content/40">
+                        <div className="h-4 w-12 border-b border-slate-300 opacity-60 mb-1" />
+                        <div className="text-[6px] font-black uppercase tracking-widest text-slate-500">
                           Authority
                         </div>
                       </div>
@@ -257,7 +234,7 @@ export const VerifyPortal: React.FC = () => {
                       <div className="px-2.5 py-1 rounded bg-primary text-white font-black text-[9px] tracking-wider shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-300 inline-block">
                         CERT-98234-A
                       </div>
-                      <p className="text-[6px] font-black uppercase tracking-widest text-base-content/30 mt-1">
+                      <p className="text-[6px] font-black uppercase tracking-widest text-slate-400 mt-1">
                         Verified ID Position
                       </p>
                     </div>
