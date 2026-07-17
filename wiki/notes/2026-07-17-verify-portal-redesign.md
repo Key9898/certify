@@ -5,34 +5,29 @@ date: 2026-07-17
 tags: [design, verify, frontend, style]
 ---
 
-# Premium Redesign of the Verification Portal
+# International Standard Redesign of the Verification Portal
 
-Redesigned the Qubit Certify Public Document Verification landing page ([VerifyPortal.tsx](file:///c:/Users/keych/Development/Projects/Personal/certify/frontend/src/pages/Verify/VerifyPortal.tsx)) and search widget to deliver a high-contrast, premium, dark enterprise aesthetic ("Indigo & Obsidian").
+Redesigned the Qubit Certify Public Document Verification landing page ([VerifyPortal.tsx](file:///c:/Users/keych/Development/Projects/Personal/certify/frontend/src/pages/Verify/VerifyPortal.tsx)) and search widget to deliver a high-contrast, clean, light-themed digital credential gateway of international standard.
+
+## Gating & Rendering Isolate
+- To prevent gitignored local `.env.local` files from overriding the active state in development environments, `IS_PHASE2` is forced to `false` at the code level in the `phase1` branch. This guarantees that checking out this branch always renders the document verification gateway correctly.
 
 ## Design Improvements
 
-### 1. Immersive Background & Ambient Glow
-- Implemented a smooth background gradient (`from-[#040612] to-[#040612]`) layered with subtle organic blurs (`bg-primary/5` and `bg-accent/5`) pulsing gently to create depth.
+### 1. Light Backdrops & Ambient Accents
+- Replaced the dark neon theme with an authoritative clean background (`bg-[#f8fafc]`) layered with soft ambient indigo/blue blurs (`indigo-50` and `blue-50`) in the corners to create depth without sacrificing clarity.
+- Complies fully with the project's light-mode-only (corporate theme) constraints.
 
-### 2. Scoped CSS Variable Gating
-- Applied local inline overrides for DaisyUI's base colors inside the container:
-  - `--color-base-100: oklch(12% 0.015 256)` (Obsidian black background)
-  - `--color-base-200: oklch(20% 0.025 256)` (Sleek slate borders)
-  - `--color-base-content: oklch(96% 0.005 256)` (Crisp white text)
-  - `--color-primary: oklch(56% 0.18 250)` (Vibrant indigo primary)
-- This local scoping overrides the header, footer, search widget, and stats cards inside this page, preserving the light-based corporate theme for the rest of the application.
+### 2. High-Contrast Search Widget
+- The search widget input container uses `bg-white` and a crisp, light border `border-slate-200` to sit cleanly inside the layout.
+- The disabled state uses a highly visible but understated `bg-slate-50 text-slate-400 border-l border-slate-250/50` style, avoiding any contrast accessibility issues.
+- The active button stands out with solid `bg-primary` (royal indigo).
 
-### 3. High-Contrast Search widget
-- Refactored the search input widget (`VerifySearchWidget.tsx`) to resolve contrast issues and squeezed padding:
-  - Input container background uses `bg-base-100` and `border border-base-200/80` (1px thick soft borders).
-  - Disabled verify button has high contrast: `bg-base-200 text-base-content/20 border-l border-base-200/40`.
-  - Active verify button stands out with `bg-primary text-white hover:bg-primary/90`.
+### 3. Layout Spacing & Landscape Certificate Mock
+- Stats & Features: Presented in structured white cards with fine grey borders (`border-slate-200`) and soft shadows, aligning with official web registries.
+- **Landscape Certificate Mock Card:** Replaced the tall portrait layout (`aspect-[3/4]`) with a standard landscape layout (`aspect-[1.414/1]`). Added an elegant double-border frame, mock credential text for recipient "WUNNA AUNG", mock signatures on the bottom left, and unique verification ID badge positioning on the bottom right.
 
-### 4. Layout Spacing & Landscape Certificate Mock
-- Stats row wrapper: Changed to soft, thin borders `bg-slate-900/10 border border-slate-800/30`.
-- Feature cards: Replaced custom variable opacity borders with browser-safe, soft slate borders `border-slate-800/60` and transparent backgrounds `bg-[#0b0f1d]/35` to avoid wireframe effects.
-- **Landscape Certificate Mock Card:** Replaced the tall portrait layout (`aspect-[3/4]`) with a standard landscape layout (`aspect-[1.414/1]`). Added an elegant double border frame, mock seal, registrar/authority signature lines, and unique verification ID badge positioning on the bottom right.
+### 4. Header Status Badge
+- Scoped status indicator inside [Header.tsx](file:///c:/Users/keych/Development/Projects/Personal/certify/frontend/src/components/layout/Header/Header.tsx): Displays a glowing green "System Active" pulse badge to balance empty navbar space and provide direct user feedback.
 
-### 5. Header Status Badge
-- Scoped status indicator inside [Header.tsx](file:///c:/Users/keych/Development/Projects/Personal/certify/frontend/src/components/layout/Header/Header.tsx): When `IS_PHASE2` is false, it displays a glowing, pulse-dot green "System Active" trust badge, balancing the layout and filling empty navbar space.
 
