@@ -30,6 +30,7 @@ User က အရာတစ်ခုခု (decision, snippet, note, ref) ထည့
 - [notes/2026-07-13-project-restructuring.md](notes/2026-07-13-project-restructuring.md) — Project documentation and IDE rules restructuring log
 - [notes/2026-07-13-branding-rename-and-gating.md](notes/2026-07-13-branding-rename-and-gating.md) — Qubit Certify rename and Phase 2 gating log
 - [notes/2026-07-17-git-branching-strategy.md](notes/2026-07-17-git-branching-strategy.md) — Phase 1 & Phase 2 local/remote git branching setup
+- [notes/2026-07-17-verify-portal-redesign.md](notes/2026-07-17-verify-portal-redesign.md) — Premium Indigo & Obsidian redesign of the verification portal
 
 ## How to add an entry
 

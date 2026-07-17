@@ -34,7 +34,7 @@ export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({
         <div
           className={`
           relative flex items-center transition-all duration-300
-          bg-white border-2 rounded shadow-xl overflow-hidden
+          bg-base-100 border-2 rounded shadow-xl overflow-hidden
           ${variant === 'large' ? 'h-16 md:h-20 border-primary/20' : 'h-14 border-base-200'}
           group-focus-within:border-primary group-focus-within:ring-4 group-focus-within:ring-primary/10
         `}

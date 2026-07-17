@@ -16,13 +16,34 @@ import { REVEAL_ITEM, STAGGER_CONTAINER, VIEWPORT_ONCE } from '@/utils/motion';
 
 export const VerifyPortal: React.FC = () => {
   return (
-    <div className="min-h-screen bg-base-100 flex flex-col">
+    <div
+      className="min-h-screen bg-base-100 flex flex-col relative z-10 selection:bg-primary/30"
+      style={
+        {
+          '--color-base-100': 'oklch(12% 0.015 256)',
+          '--color-base-200': 'oklch(20% 0.025 256)',
+          '--color-base-300': 'oklch(28% 0.03 256)',
+          '--color-base-content': 'oklch(96% 0.005 256)',
+          '--color-primary': 'oklch(56% 0.18 250)', // Rich indigo primary
+          '--color-accent': 'oklch(62% 0.12 200)', // Teal/blue accent
+          '--radius-box': '0.5rem', // Softer rounded corners (0.5rem)
+          '--radius-selector': '0.5rem',
+          '--radius-field': '0.5rem',
+        } as React.CSSProperties
+      }
+    >
       <Header />
 
       {/* Dynamic Background Elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-5%] left-[-5%] w-[50%] h-[50%] bg-primary/5 rounded-full blur-[140px]" />
-        <div className="absolute bottom-[-5%] right-[-5%] w-[40%] h-[40%] bg-accent/5 rounded-full blur-[120px]" />
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 bg-[#040612]">
+        <div
+          className="absolute top-[-10%] left-[-10%] w-[65%] h-[65%] bg-primary/5 rounded-full blur-[140px] animate-pulse"
+          style={{ animationDuration: '10s' }}
+        />
+        <div
+          className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] bg-accent/5 rounded-full blur-[120px] animate-pulse"
+          style={{ animationDuration: '15s' }}
+        />
       </div>
 
       <motion.main
@@ -33,10 +54,10 @@ export const VerifyPortal: React.FC = () => {
         className="container mx-auto px-4 md:px-6 relative z-10 py-24 flex-1"
       >
         {/* Core Verification Hero */}
-        <section className="text-center mb-32 max-w-5xl mx-auto">
+        <section className="text-center mb-28 max-w-5xl mx-auto">
           <motion.div
             variants={REVEAL_ITEM}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded bg-primary/10 text-primary font-black text-xs uppercase tracking-[0.25em] mb-10 shadow-sm border border-primary/5"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded bg-primary/10 text-primary font-black text-xs uppercase tracking-[0.25em] mb-10 shadow-lg shadow-primary/5 border border-primary/10"
           >
             <ShieldCheck size={16} />
             <span>Official Identity Gateway</span>
@@ -44,14 +65,17 @@ export const VerifyPortal: React.FC = () => {
 
           <motion.h1
             variants={REVEAL_ITEM}
-            className="text-6xl md:text-9xl font-black text-base-content leading-[0.85] tracking-tighter mb-12"
+            className="text-6xl md:text-8xl font-black text-base-content leading-[0.9] tracking-tighter mb-10"
           >
-            Verify <br className="hidden md:block" /> Authenticity.
+            Verify <br className="hidden md:block" />{' '}
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Authenticity.
+            </span>
           </motion.h1>
 
           <motion.p
             variants={REVEAL_ITEM}
-            className="text-xl md:text-3xl font-medium text-base-content/60 mb-20 leading-tight max-w-3xl mx-auto"
+            className="text-lg md:text-2xl font-medium text-base-content/60 mb-16 leading-relaxed max-w-2xl mx-auto"
           >
             Instantly validate any certificate issued via the Qubit Certify
             platform. Enter the unique ID below to begin the audit.
@@ -59,14 +83,14 @@ export const VerifyPortal: React.FC = () => {
 
           <motion.div
             variants={REVEAL_ITEM}
-            className="flex justify-center p-6 rounded bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-base-200"
+            className="flex justify-center p-8 rounded-lg bg-base-200/25 border border-base-200/40 backdrop-blur-xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] max-w-3xl mx-auto"
           >
             <VerifySearchWidget variant="large" />
           </motion.div>
         </section>
 
         {/* Global Stats / Trust Indicators */}
-        <section className="grid grid-cols-2 lg:grid-cols-4 gap-12 max-w-6xl mx-auto mb-40">
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto mb-36 p-8 rounded-lg bg-base-200/10 border border-base-200/30 backdrop-blur-sm">
           {[
             { label: 'Verified Claims', value: 'Unlimited', icon: CheckCircle },
             { label: 'Registry Health', value: '100%', icon: Zap },
@@ -74,10 +98,10 @@ export const VerifyPortal: React.FC = () => {
             { label: 'Security', value: 'SSL+AES', icon: Lock },
           ].map((stat, i) => (
             <motion.div key={i} variants={REVEAL_ITEM} className="text-center">
-              <div className="flex justify-center mb-4 text-primary opacity-40">
+              <div className="flex justify-center mb-4 text-primary opacity-60">
                 <stat.icon size={24} />
               </div>
-              <div className="text-3xl font-black tracking-tighter text-base-content mb-1">
+              <div className="text-2xl font-black tracking-tighter text-base-content mb-1">
                 {stat.value}
               </div>
               <div className="text-[10px] font-black uppercase tracking-widest text-base-content/40">
@@ -88,42 +112,42 @@ export const VerifyPortal: React.FC = () => {
         </section>
 
         {/* Feature Experience Grid */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-7xl mx-auto mb-40">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-36">
           {[
             {
               icon: Search,
               title: 'Blockchain-Ready Registry',
               desc: 'Every certificate metadata is optimized for immutable verification.',
-              v: 'bg-blue-50 text-blue-600',
+              v: 'bg-primary/10 text-primary border border-primary/20',
             },
             {
               icon: Lock,
               title: 'Tamper-Proof DNA',
               desc: 'Digital signatures detect even the smallest bit modification in the document.',
-              v: 'bg-amber-50 text-amber-600',
+              v: 'bg-accent/10 text-accent border border-accent/20',
             },
             {
               icon: FileCheck,
               title: 'Official Verification Badge',
               desc: 'Validated records get a public link and an embeddable badge for LinkedIn.',
-              v: 'bg-emerald-50 text-emerald-600',
+              v: 'bg-success/10 text-success border border-success/20',
             },
           ].map((feature, idx) => (
             <motion.div
               key={idx}
               variants={REVEAL_ITEM}
-              whileHover={{ y: -8 }}
-              className="p-10 rounded bg-slate-900/50 border border-white/5 backdrop-blur-xl group hover:bg-white transition-all duration-500 shadow-xl"
+              whileHover={{ y: -6 }}
+              className="p-10 rounded-lg bg-base-200/15 border border-base-200/30 backdrop-blur-md group hover:bg-base-200/30 hover:border-primary/30 transition-all duration-300 shadow-2xl"
             >
               <div
-                className={`w-16 h-16 rounded ${feature.v} flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform duration-500`}
+                className={`w-14 h-14 rounded ${feature.v} flex items-center justify-center mb-8 shadow-sm group-hover:scale-105 transition-transform duration-300`}
               >
-                <feature.icon size={32} />
+                <feature.icon size={26} />
               </div>
-              <h3 className="text-2xl font-black text-white group-hover:text-slate-900 mb-4 tracking-tight leading-tight transition-colors">
+              <h3 className="text-xl font-black text-base-content mb-3 tracking-tight transition-colors">
                 {feature.title}
               </h3>
-              <p className="font-medium text-white/50 group-hover:text-slate-600 leading-relaxed transition-colors">
+              <p className="font-semibold text-base-content/50 leading-relaxed transition-colors">
                 {feature.desc}
               </p>
             </motion.div>
@@ -133,17 +157,17 @@ export const VerifyPortal: React.FC = () => {
         {/* Immersive How-To Section */}
         <motion.section
           variants={REVEAL_ITEM}
-          className="relative max-w-6xl mx-auto p-12 md:p-24 rounded bg-slate-900 text-white overflow-hidden shadow-3xl"
+          className="relative max-w-6xl mx-auto p-12 md:p-20 rounded-lg bg-gradient-to-br from-base-200/40 to-base-100/20 border border-base-200/40 overflow-hidden shadow-3xl backdrop-blur-sm"
         >
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[140px] -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-primary/10 rounded-full blur-[140px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
           <div className="relative z-10">
-            <div className="flex flex-col lg:flex-row gap-20 items-center">
+            <div className="flex flex-col lg:flex-row gap-16 items-center">
               <div className="flex-1">
-                <h2 className="text-5xl md:text-6xl font-black tracking-tighter mb-8 leading-[0.95]">
+                <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-6 leading-tight">
                   Locate your <br /> Certificate ID.
                 </h2>
-                <p className="text-xl opacity-60 font-medium mb-12 leading-relaxed">
+                <p className="text-lg text-base-content/60 font-semibold mb-10 leading-relaxed">
                   Every credential carries a unique identifier. This ID is your
                   key to proving authenticity to employers or institutions
                   worldwide.
@@ -164,35 +188,37 @@ export const VerifyPortal: React.FC = () => {
                       text: 'Paste it here for instant global validation.',
                     },
                   ].map((s, i) => (
-                    <div key={i} className="flex gap-6 items-center">
-                      <div className="text-primary font-black text-2xl">
+                    <div key={i} className="flex gap-5 items-center">
+                      <div className="text-primary font-black text-xl">
                         {s.step}
                       </div>
-                      <div className="font-bold opacity-90">{s.text}</div>
+                      <div className="font-bold text-base-content/80">
+                        {s.text}
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="w-full lg:w-[400px] shrink-0">
-                <div className="aspect-[3/4] bg-white/5 rounded border border-white/10 p-8 flex flex-col justify-between relative overflow-hidden backdrop-blur-sm group">
-                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="w-full lg:w-[380px] shrink-0">
+                <div className="aspect-[3/4] bg-base-100/10 rounded-lg border border-base-200/40 p-8 flex flex-col justify-between relative overflow-hidden backdrop-blur-md group shadow-2xl">
+                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
                   <div className="relative z-10">
-                    <div className="h-6 w-1/3 bg-white/20 rounded mb-4 animate-pulse" />
-                    <div className="h-4 w-2/3 bg-white/10 rounded mb-8 animate-pulse" />
+                    <div className="h-5 w-1/3 bg-base-content/15 rounded mb-4 animate-pulse" />
+                    <div className="h-3 w-2/3 bg-base-content/10 rounded mb-8 animate-pulse" />
                     <div className="space-y-4">
-                      <div className="h-2 w-full bg-white/10 rounded" />
-                      <div className="h-2 w-full bg-white/10 rounded" />
-                      <div className="h-2 w-2/3 bg-white/10 rounded" />
+                      <div className="h-2 w-full bg-base-content/10 rounded" />
+                      <div className="h-2 w-full bg-base-content/10 rounded" />
+                      <div className="h-2 w-2/3 bg-base-content/10 rounded" />
                     </div>
                   </div>
 
                   <div className="relative z-10 pt-12">
-                    <div className="p-4 rounded bg-primary text-white font-black text-center text-sm shadow-xl shadow-primary/20 mb-4">
+                    <div className="p-4 rounded bg-primary text-white font-black text-center text-sm shadow-xl shadow-primary/20 mb-4 transition-transform duration-300 group-hover:scale-[1.03]">
                       CERT-98234-A
                     </div>
-                    <p className="text-[10px] text-center font-black uppercase tracking-widest text-white/40">
+                    <p className="text-[10px] text-center font-black uppercase tracking-widest text-base-content/30">
                       Verified Identifier Position
                     </p>
                   </div>
