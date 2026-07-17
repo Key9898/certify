@@ -119,8 +119,8 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="hidden sm:inline">Verify</span>
             </motion.button>
           )}
-          {IS_PHASE2 &&
-            (isAuthenticated ? (
+          {IS_PHASE2 ? (
+            isAuthenticated ? (
               <>
                 <motion.div
                   whileHover={{ y: -2, transition: SOFT_SPRING }}
@@ -220,7 +220,16 @@ export const Header: React.FC<HeaderProps> = ({
                   Start Free
                 </motion.button>
               </>
-            ))}
+            )
+          ) : (
+            <div className="flex items-center gap-2 rounded-full border border-success/30 bg-success/10 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-success shadow-lg shadow-success/5 select-none">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+              </span>
+              <span>System Active</span>
+            </div>
+          )}
         </div>
       </div>
     </motion.header>

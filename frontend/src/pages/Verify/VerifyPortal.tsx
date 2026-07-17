@@ -83,14 +83,14 @@ export const VerifyPortal: React.FC = () => {
 
           <motion.div
             variants={REVEAL_ITEM}
-            className="flex justify-center p-8 rounded-lg bg-base-200/25 border border-base-200/40 backdrop-blur-xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] max-w-3xl mx-auto"
+            className="flex justify-center p-8 rounded-lg bg-[#0b0f1d]/50 border border-slate-800/80 backdrop-blur-xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] max-w-3xl mx-auto"
           >
             <VerifySearchWidget variant="large" />
           </motion.div>
         </section>
 
         {/* Global Stats / Trust Indicators */}
-        <section className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto mb-36 p-8 rounded-lg bg-base-200/10 border border-base-200/30 backdrop-blur-sm">
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto mb-36 p-8 rounded-lg bg-slate-900/10 border border-slate-800/30 backdrop-blur-sm">
           {[
             { label: 'Verified Claims', value: 'Unlimited', icon: CheckCircle },
             { label: 'Registry Health', value: '100%', icon: Zap },
@@ -137,7 +137,7 @@ export const VerifyPortal: React.FC = () => {
               key={idx}
               variants={REVEAL_ITEM}
               whileHover={{ y: -6 }}
-              className="p-10 rounded-lg bg-base-200/15 border border-base-200/30 backdrop-blur-md group hover:bg-base-200/30 hover:border-primary/30 transition-all duration-300 shadow-2xl"
+              className="p-10 rounded-lg bg-[#0b0f1d]/35 border border-slate-800/60 backdrop-blur-md group hover:bg-[#0e1327]/60 hover:border-indigo-500/30 transition-all duration-300 shadow-2xl"
             >
               <div
                 className={`w-14 h-14 rounded ${feature.v} flex items-center justify-center mb-8 shadow-sm group-hover:scale-105 transition-transform duration-300`}
@@ -157,7 +157,7 @@ export const VerifyPortal: React.FC = () => {
         {/* Immersive How-To Section */}
         <motion.section
           variants={REVEAL_ITEM}
-          className="relative max-w-6xl mx-auto p-12 md:p-20 rounded-lg bg-gradient-to-br from-base-200/40 to-base-100/20 border border-base-200/40 overflow-hidden shadow-3xl backdrop-blur-sm"
+          className="relative max-w-6xl mx-auto p-12 md:p-20 rounded-lg bg-gradient-to-br from-[#0c101f] to-[#04060e] border border-slate-900/80 overflow-hidden shadow-3xl backdrop-blur-sm"
         >
           <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-primary/10 rounded-full blur-[140px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
@@ -200,27 +200,67 @@ export const VerifyPortal: React.FC = () => {
                 </div>
               </div>
 
-              <div className="w-full lg:w-[380px] shrink-0">
-                <div className="aspect-[3/4] bg-base-100/10 rounded-lg border border-base-200/40 p-8 flex flex-col justify-between relative overflow-hidden backdrop-blur-md group shadow-2xl">
-                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              <div className="w-full lg:w-[440px] shrink-0">
+                <div className="aspect-[1.414/1] bg-[#0d1123]/30 border border-slate-800/80 rounded-lg p-6 flex flex-col justify-between relative overflow-hidden shadow-2xl group backdrop-blur-sm">
+                  {/* Decorative Frame */}
+                  <div className="absolute inset-2.5 border border-indigo-500/10 rounded pointer-events-none" />
+                  <div className="absolute inset-3 border border-dashed border-indigo-500/5 rounded pointer-events-none" />
+                  <div className="absolute top-0 right-0 w-[120px] h-[120px] bg-primary/10 rounded-full blur-[30px] pointer-events-none" />
 
-                  <div className="relative z-10">
-                    <div className="h-5 w-1/3 bg-base-content/15 rounded mb-4 animate-pulse" />
-                    <div className="h-3 w-2/3 bg-base-content/10 rounded mb-8 animate-pulse" />
-                    <div className="space-y-4">
-                      <div className="h-2 w-full bg-base-content/10 rounded" />
-                      <div className="h-2 w-full bg-base-content/10 rounded" />
-                      <div className="h-2 w-2/3 bg-base-content/10 rounded" />
+                  {/* Top: Header */}
+                  <div className="relative z-10 flex justify-between items-start">
+                    <div>
+                      <div className="text-[9px] font-black uppercase tracking-widest text-primary mb-1">
+                        Qubit Certify
+                      </div>
+                      <div className="text-[12px] font-black text-base-content/90 tracking-tight">
+                        Official Credential
+                      </div>
+                    </div>
+                    <div className="h-6 w-6 rounded bg-primary/10 border border-primary/20 flex items-center justify-center text-[8px] font-black text-primary">
+                      QC
                     </div>
                   </div>
 
-                  <div className="relative z-10 pt-12">
-                    <div className="p-4 rounded bg-primary text-white font-black text-center text-sm shadow-xl shadow-primary/20 mb-4 transition-transform duration-300 group-hover:scale-[1.03]">
-                      CERT-98234-A
+                  {/* Middle: Content Mock */}
+                  <div className="relative z-10 my-2 text-center">
+                    <div className="text-[8px] font-bold uppercase tracking-widest text-base-content/40 mb-1">
+                      This is to certify that
                     </div>
-                    <p className="text-[10px] text-center font-black uppercase tracking-widest text-base-content/30">
-                      Verified Identifier Position
-                    </p>
+                    <div className="text-sm font-black text-base-content tracking-tight italic font-serif mb-1">
+                      WUNNA AUNG
+                    </div>
+                    <div className="text-[7px] font-medium text-base-content/50 max-w-[200px] mx-auto leading-tight">
+                      has successfully completed all requirements for the
+                      official credential verification audit.
+                    </div>
+                  </div>
+
+                  {/* Bottom: Signatures and ID Badge */}
+                  <div className="relative z-10 flex justify-between items-end border-t border-slate-800/40 pt-2.5">
+                    <div className="flex gap-4">
+                      <div>
+                        <div className="h-4 w-12 border-b border-base-content/20 opacity-30 mb-1" />
+                        <div className="text-[6px] font-black uppercase tracking-widest text-base-content/40">
+                          Registrar
+                        </div>
+                      </div>
+                      <div>
+                        <div className="h-4 w-12 border-b border-base-content/20 opacity-30 mb-1" />
+                        <div className="text-[6px] font-black uppercase tracking-widest text-base-content/40">
+                          Authority
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <div className="px-2.5 py-1 rounded bg-primary text-white font-black text-[9px] tracking-wider shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-300 inline-block">
+                        CERT-98234-A
+                      </div>
+                      <p className="text-[6px] font-black uppercase tracking-widest text-base-content/30 mt-1">
+                        Verified ID Position
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
