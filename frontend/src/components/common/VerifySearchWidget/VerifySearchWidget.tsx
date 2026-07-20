@@ -10,7 +10,7 @@ interface VerifySearchWidgetProps {
 
 export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({
   variant = 'compact',
-  placeholder = 'Enter Certificate ID (e.g., CERT-12345)',
+  placeholder = 'Certificate ID (12 characters)',
 }) => {
   const [id, setId] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -21,11 +21,10 @@ export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({
     if (!id.trim()) return;
 
     setIsSearching(true);
-    // Visual delay to feel like a "verification process"
     setTimeout(() => {
       navigate(`/verify/${encodeURIComponent(id.trim().toUpperCase())}`);
       setIsSearching(false);
-    }, 800);
+    }, 400);
   };
 
   return (
@@ -33,10 +32,9 @@ export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({
       <form onSubmit={handleSearch} className="relative group">
         <div
           className={`
-          relative flex items-center transition-all duration-300
-          bg-white border rounded shadow-md overflow-hidden
-          ${variant === 'large' ? 'h-16 md:h-18 border-slate-200' : 'h-14 border-base-200'}
-          group-focus-within:border-primary group-focus-within:ring-4 group-focus-within:ring-primary/10
+          relative flex items-center overflow-hidden rounded border bg-white transition-all duration-300
+          ${variant === 'large' ? 'h-14 border-slate-200 md:h-16' : 'h-14 border-slate-200'}
+          group-focus-within:border-primary group-focus-within:ring-2 group-focus-within:ring-primary/15
         `}
         >
           <div
@@ -59,8 +57,8 @@ export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({
             disabled={isSearching}
             placeholder={placeholder}
             className={`
-              flex-1 bg-transparent border-none outline-none font-medium text-base-content
-              ${variant === 'large' ? 'text-lg placeholder:text-base-content/40' : 'text-base placeholder:text-base-content/40'}
+              flex-1 border-none bg-transparent font-medium text-slate-900 outline-none
+              ${variant === 'large' ? 'text-base placeholder:text-slate-400 md:text-lg' : 'text-base placeholder:text-slate-400'}
             `}
           />
 
@@ -68,9 +66,9 @@ export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({
             type="submit"
             disabled={isSearching || !id.trim()}
             className={`
-              h-full flex items-center justify-center gap-2 font-black uppercase tracking-wider transition-all
-              ${variant === 'large' ? 'px-8 md:px-10 text-base' : 'px-6 text-sm'}
-              ${id.trim() ? 'bg-primary text-white hover:bg-primary/90' : 'bg-slate-50 text-slate-400 border-l border-slate-250/50 cursor-not-allowed'}
+              flex h-full items-center justify-center gap-2 font-semibold transition-all
+              ${variant === 'large' ? 'px-6 text-sm md:px-8 md:text-base' : 'px-5 text-sm'}
+              ${id.trim() ? 'bg-primary text-white hover:bg-primary/90' : 'cursor-not-allowed border-l border-slate-200 bg-slate-50 text-slate-400'}
             `}
           >
             <span
@@ -82,18 +80,17 @@ export const VerifySearchWidget: React.FC<VerifySearchWidgetProps> = ({
           </button>
         </div>
 
-        {/* Verification Loading Overlay */}
         <AnimatePresence>
           {isSearching && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="absolute -bottom-10 left-0 right-0 text-center"
+              exit={{ opacity: 0, y: -8 }}
+              className="absolute -bottom-9 left-0 right-0 text-center"
             >
-              <div className="flex items-center justify-center gap-2 text-primary font-bold text-sm uppercase tracking-widest">
-                <ShieldCheck size={16} />
-                <span>Scanning global authentication registry...</span>
+              <div className="flex items-center justify-center gap-2 text-sm font-medium text-slate-500">
+                <ShieldCheck size={15} aria-hidden="true" />
+                <span>Looking up credential…</span>
               </div>
             </motion.div>
           )}

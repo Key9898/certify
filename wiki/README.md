@@ -31,6 +31,12 @@ User က အရာတစ်ခုခု (decision, snippet, note, ref) ထည့
 - [notes/2026-07-13-branding-rename-and-gating.md](notes/2026-07-13-branding-rename-and-gating.md) — Qubit Certify rename and Phase 2 gating log
 - [notes/2026-07-17-git-branching-strategy.md](notes/2026-07-17-git-branching-strategy.md) — Phase 1 & Phase 2 local/remote git branching setup
 - [notes/2026-07-17-verify-portal-redesign.md](notes/2026-07-17-verify-portal-redesign.md) — Premium Indigo & Obsidian redesign of the verification portal
+- [notes/2026-07-20-footer-light-theme-align.md](notes/2026-07-20-footer-light-theme-align.md) — Footer aligned to Verify Portal light theme
+- [notes/2026-07-20-verify-portal-soft-stone-redesign.md](notes/2026-07-20-verify-portal-soft-stone-redesign.md) — Soft stone + corporate blue Verify Portal redesign (direction A)
+- [conventions/lark-task-update.md](conventions/lark-task-update.md) — mandatory Lark manual task update block after every task
+- [conventions/verify-portal-design.md](conventions/verify-portal-design.md) — Phase 1 Verify Portal theme + IA convention
+
+
 
 ## How to add an entry
 

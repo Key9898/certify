@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Verify Portal Soft Stone Redesign**: Rebuilt the Phase 1 document verification landing page to an institutional soft-stone + corporate-blue direction — factual IA (verify hero, result fields, find-ID guide, status legend, trust/privacy), removed indigo blurs/fake stats/blockchain copy, calmed the search widget and phase1 header chrome.
+- **Lark Task Update Convention**: Agents must always emit a consolidated copy-paste Lark task block after each completed implementation batch (see `wiki/conventions/lark-task-update.md` and documentation-hygiene rule step 5).
+- **Footer Light Theme Align**: Aligned the public Footer (default + minimal) with the Verify Portal light theme — white surface, slate borders, `z-10` stacking above ambient blurs — while restoring stagger reveal motion on the inner content container. Follow-up contrast fix replaced washed-out `text-base-content*` utilities with explicit `slate-900/600/500/400` tokens so brand, body, and links stay readable on white.
 - **Railway Backend Deployment**: Replaced the Render backend deployment target with Railway config-as-code, added a root-level `railway.json` that builds and starts the backend via `npm --prefix backend ...`, updated the readiness preflight to require Railway deployment configs, and bound the Express server to `0.0.0.0:$PORT` for Railway public networking.
 - **Railway Healthcheck Startup**: Backend now starts the HTTP listener before external dependency initialization so Railway `/health` checks validate process liveness instead of failing when MongoDB or seed data setup is delayed.
 - **Railway Database Recovery**: Backend now reports whether a production MongoDB URI is configured in `/health`, retries MongoDB connection in the background after degraded startup, and seeds default templates once the database becomes available.

@@ -222,12 +222,8 @@ export const Header: React.FC<HeaderProps> = ({
               </>
             )
           ) : (
-            <div className="flex items-center gap-2 rounded-full border border-success/30 bg-success/10 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-success shadow-lg shadow-success/5 select-none">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
-              </span>
-              <span>System Active</span>
+            <div className="select-none rounded border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium tracking-wide text-slate-600">
+              Document verification
             </div>
           )}
         </div>

@@ -2,241 +2,223 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import {
   ShieldCheck,
-  Search,
-  FileCheck,
-  Lock,
-  Globe,
-  Zap,
-  CheckCircle,
+  FileText,
+  Building2,
+  Calendar,
+  BadgeCheck,
+  CircleAlert,
+  CircleX,
+  HelpCircle,
+  Mail,
 } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { VerifySearchWidget } from '@/components/common/VerifySearchWidget/VerifySearchWidget';
+import { ROUTES } from '@/utils/constants';
+import { Link } from 'react-router-dom';
 import { REVEAL_ITEM, STAGGER_CONTAINER, VIEWPORT_ONCE } from '@/utils/motion';
+
+const RESULT_FIELDS = [
+  { icon: BadgeCheck, label: 'Recipient name' },
+  { icon: FileText, label: 'Certificate title' },
+  { icon: Building2, label: 'Issuing organization' },
+  { icon: Calendar, label: 'Issue date' },
+  { icon: ShieldCheck, label: 'Verification status' },
+] as const;
+
+const STATUS_LEGEND = [
+  {
+    icon: BadgeCheck,
+    title: 'Valid',
+    desc: 'The credential is active and matches a record in the registry.',
+    tone: 'text-success bg-success/10 border-success/20',
+  },
+  {
+    icon: CircleAlert,
+    title: 'Revoked',
+    desc: 'The issuer has withdrawn this credential. It is no longer valid.',
+    tone: 'text-warning bg-warning/10 border-warning/25',
+  },
+  {
+    icon: CircleX,
+    title: 'Not found',
+    desc: 'No matching ID was found. Check the ID and try again.',
+    tone: 'text-error bg-error/10 border-error/20',
+  },
+] as const;
 
 export const VerifyPortal: React.FC = () => {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col relative z-10 selection:bg-primary/20">
+    <div className="relative z-10 flex min-h-screen flex-col bg-[#F7F8FA] selection:bg-primary/15">
       <Header />
-
-      {/* Dynamic Background Elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 bg-[#f8fafc]">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-50 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px]" />
-      </div>
 
       <motion.main
         initial="hidden"
         whileInView="visible"
         viewport={VIEWPORT_ONCE}
         variants={STAGGER_CONTAINER}
-        className="container mx-auto px-4 md:px-6 relative z-10 py-20 flex-1"
+        className="relative z-10 mx-auto w-full max-w-6xl flex-1 px-4 py-16 md:px-6 md:py-24"
       >
-        {/* Core Verification Hero */}
-        <section className="text-center mb-24 max-w-5xl mx-auto">
-          <motion.div
+        {/* Hero — one job: verify */}
+        <section className="mb-20 max-w-3xl md:mb-28">
+          <motion.p
             variants={REVEAL_ITEM}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded bg-indigo-50 text-indigo-700 font-black text-xs uppercase tracking-[0.25em] mb-10 shadow-sm border border-indigo-100/80"
+            className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-primary"
           >
-            <ShieldCheck size={16} />
-            <span>Official Identity Gateway</span>
-          </motion.div>
+            Document verification
+          </motion.p>
 
           <motion.h1
             variants={REVEAL_ITEM}
-            className="text-6xl md:text-8xl font-black text-slate-900 leading-[0.9] tracking-tighter mb-8"
+            className="mb-5 text-4xl font-semibold tracking-tight text-slate-900 md:text-5xl lg:text-[3.25rem] lg:leading-[1.1]"
           >
-            Verify <br className="hidden md:block" />{' '}
-            <span className="bg-gradient-to-r from-primary to-indigo-700 bg-clip-text text-transparent">
-              Authenticity.
-            </span>
+            Verify a Qubit Certify credential
           </motion.h1>
 
           <motion.p
             variants={REVEAL_ITEM}
-            className="text-lg md:text-2xl font-semibold text-slate-500 mb-14 leading-relaxed max-w-2xl mx-auto"
+            className="mb-10 max-w-xl text-base leading-relaxed text-slate-600 md:text-lg"
           >
-            Instantly validate any certificate issued via the Qubit Certify
-            platform. Enter the unique ID below to begin the audit.
+            Enter the certificate ID printed on the document or scanned from its
+            QR code. You will see whether the credential is valid, revoked, or
+            not found.
           </motion.p>
+
+          <motion.div variants={REVEAL_ITEM} className="mb-5">
+            <VerifySearchWidget
+              variant="large"
+              placeholder="Certificate ID (12 characters)"
+            />
+          </motion.div>
 
           <motion.div
             variants={REVEAL_ITEM}
-            className="flex justify-center p-8 rounded-lg bg-white border border-slate-200 shadow-xl max-w-3xl mx-auto"
+            className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500"
           >
-            <VerifySearchWidget variant="large" />
+            <span>
+              Example format:{' '}
+              <code className="rounded bg-white px-1.5 py-0.5 font-mono text-slate-700 ring-1 ring-slate-200">
+                AB12CD34EF56
+              </code>
+            </span>
+            <a
+              href="#find-id"
+              className="font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Where is my ID?
+            </a>
           </motion.div>
         </section>
 
-        {/* Global Stats / Trust Indicators */}
-        <section className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto mb-28 p-8 rounded-lg bg-white border border-slate-200 shadow-sm">
-          {[
-            { label: 'Verified Claims', value: 'Unlimited', icon: CheckCircle },
-            { label: 'Registry Health', value: '100%', icon: Zap },
-            { label: 'Global Nodes', value: 'Instant', icon: Globe },
-            { label: 'Security', value: 'SSL+AES', icon: Lock },
-          ].map((stat, i) => (
-            <motion.div key={i} variants={REVEAL_ITEM} className="text-center">
-              <div className="flex justify-center mb-4 text-primary">
-                <stat.icon size={24} />
-              </div>
-              <div className="text-2xl font-black tracking-tighter text-slate-900 mb-1">
-                {stat.value}
-              </div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                {stat.label}
-              </div>
-            </motion.div>
-          ))}
-        </section>
-
-        {/* Feature Experience Grid */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-28">
-          {[
-            {
-              icon: Search,
-              title: 'Blockchain-Ready Registry',
-              desc: 'Every certificate metadata is optimized for immutable verification.',
-              v: 'bg-primary/10 text-primary border border-primary/20',
-            },
-            {
-              icon: Lock,
-              title: 'Tamper-Proof DNA',
-              desc: 'Digital signatures detect even the smallest bit modification in the document.',
-              v: 'bg-indigo-50 text-indigo-600 border border-indigo-100',
-            },
-            {
-              icon: FileCheck,
-              title: 'Official Verification Badge',
-              desc: 'Validated records get a public link and an embeddable badge for LinkedIn.',
-              v: 'bg-success/10 text-success border border-success/20',
-            },
-          ].map((feature, idx) => (
-            <motion.div
-              key={idx}
-              variants={REVEAL_ITEM}
-              whileHover={{ y: -4 }}
-              className="p-10 rounded-lg bg-white border border-slate-200 group hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-md"
-            >
-              <div
-                className={`w-14 h-14 rounded ${feature.v} flex items-center justify-center mb-8 shadow-sm group-hover:scale-105 transition-transform duration-300`}
-              >
-                <feature.icon size={26} />
-              </div>
-              <h3 className="text-xl font-black text-slate-900 mb-3 tracking-tight group-hover:text-primary transition-colors">
-                {feature.title}
-              </h3>
-              <p className="font-semibold text-slate-500 leading-relaxed transition-colors">
-                {feature.desc}
-              </p>
-            </motion.div>
-          ))}
-        </section>
-
-        {/* Immersive How-To Section */}
+        {/* What verification shows */}
         <motion.section
           variants={REVEAL_ITEM}
-          className="relative max-w-6xl mx-auto p-12 md:p-20 rounded-lg bg-white border border-slate-200 overflow-hidden shadow-sm backdrop-blur-sm"
+          className="mb-16 border-t border-slate-200 pt-14 md:mb-20 md:pt-16"
         >
-          <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-primary/5 rounded-full blur-[140px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+          <h2 className="mb-3 text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
+            What you will see
+          </h2>
+          <p className="mb-8 max-w-2xl text-slate-600">
+            A successful lookup returns the public fields needed to confirm the
+            credential — nothing more.
+          </p>
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {RESULT_FIELDS.map(({ icon: Icon, label }) => (
+              <li
+                key={label}
+                className="flex items-center gap-3 rounded border border-slate-200 bg-white px-4 py-3.5"
+              >
+                <Icon
+                  size={18}
+                  className="shrink-0 text-primary"
+                  aria-hidden="true"
+                />
+                <span className="text-sm font-medium text-slate-700">
+                  {label}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </motion.section>
 
-          <div className="relative z-10">
-            <div className="flex flex-col lg:flex-row gap-16 items-center">
-              <div className="flex-1">
-                <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-6 leading-tight text-slate-900">
-                  Locate your <br /> Certificate ID.
+        {/* How to find ID + annotated mock */}
+        <motion.section
+          id="find-id"
+          variants={REVEAL_ITEM}
+          className="mb-16 scroll-mt-24 md:mb-20"
+        >
+          <div className="overflow-hidden rounded border border-slate-200 bg-white">
+            <div className="grid grid-cols-1 lg:grid-cols-2">
+              <div className="border-b border-slate-200 p-8 md:p-10 lg:border-b-0 lg:border-r">
+                <h2 className="mb-3 text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
+                  Where to find your certificate ID
                 </h2>
-                <p className="text-lg text-slate-500 font-semibold mb-10 leading-relaxed">
-                  Every credential carries a unique identifier. This ID is your
-                  key to proving authenticity to employers or institutions
-                  worldwide.
+                <p className="mb-8 text-slate-600 leading-relaxed">
+                  Every issued PDF or PNG includes a unique 12-character ID and
+                  a QR code that opens this verification page.
                 </p>
-
-                <div className="space-y-6">
+                <ol className="space-y-5">
                   {[
-                    {
-                      step: '01',
-                      text: 'Download your official PDF/PNG from Qubit Certify.',
-                    },
-                    {
-                      step: '02',
-                      text: 'Look for the unique ID in the bottom corner.',
-                    },
-                    {
-                      step: '03',
-                      text: 'Paste it here for instant global validation.',
-                    },
-                  ].map((s, i) => (
-                    <div key={i} className="flex gap-5 items-center">
-                      <div className="text-primary font-black text-xl">
-                        {s.step}
-                      </div>
-                      <div className="font-bold text-slate-600">{s.text}</div>
-                    </div>
+                    'Open the official PDF or PNG from the issuer.',
+                    'Find the ID near the bottom of the certificate (or scan the QR).',
+                    'Paste the ID above to check authenticity.',
+                  ].map((text, i) => (
+                    <li key={text} className="flex gap-4">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-primary/10 text-sm font-semibold text-primary">
+                        {i + 1}
+                      </span>
+                      <span className="pt-0.5 font-medium text-slate-700">
+                        {text}
+                      </span>
+                    </li>
                   ))}
-                </div>
+                </ol>
               </div>
 
-              <div className="w-full lg:w-[440px] shrink-0">
-                <div className="aspect-[1.414/1] bg-slate-50/50 border border-slate-200 rounded-lg p-6 flex flex-col justify-between relative overflow-hidden shadow-sm group backdrop-blur-sm">
-                  {/* Decorative Frame */}
-                  <div className="absolute inset-2.5 border border-indigo-200 rounded pointer-events-none" />
-                  <div className="absolute inset-3 border border-dashed border-indigo-100 rounded pointer-events-none" />
-                  <div className="absolute top-0 right-0 w-[120px] h-[120px] bg-primary/5 rounded-full blur-[30px] pointer-events-none" />
-
-                  {/* Top: Header */}
-                  <div className="relative z-10 flex justify-between items-start">
-                    <div>
-                      <div className="text-[9px] font-black uppercase tracking-widest text-primary mb-1">
-                        Qubit Certify
-                      </div>
-                      <div className="text-[12px] font-black text-slate-950 tracking-tight">
-                        Official Credential
-                      </div>
-                    </div>
-                    <div className="h-6 w-6 rounded bg-primary/10 border border-primary/20 flex items-center justify-center text-[8px] font-black text-primary">
-                      QC
-                    </div>
-                  </div>
-
-                  {/* Middle: Content Mock */}
-                  <div className="relative z-10 my-2 text-center">
-                    <div className="text-[8px] font-bold uppercase tracking-widest text-slate-500 mb-1">
-                      This is to certify that
-                    </div>
-                    <div className="text-sm font-black text-slate-900 tracking-tight italic font-serif mb-1">
-                      WUNNA AUNG
-                    </div>
-                    <div className="text-[7px] font-medium text-slate-500 max-w-[200px] mx-auto leading-tight">
-                      has successfully completed all requirements for the
-                      official credential verification audit.
-                    </div>
-                  </div>
-
-                  {/* Bottom: Signatures and ID Badge */}
-                  <div className="relative z-10 flex justify-between items-end border-t border-slate-200 pt-2.5">
-                    <div className="flex gap-4">
+              <div className="flex items-center justify-center bg-[#F7F8FA] p-8 md:p-10">
+                <div className="aspect-[1.414/1] w-full max-w-md rounded border border-slate-200 bg-white p-5 shadow-sm">
+                  <div className="flex h-full flex-col justify-between rounded border border-slate-100 p-4">
+                    <div className="flex items-start justify-between">
                       <div>
-                        <div className="h-4 w-12 border-b border-slate-300 opacity-60 mb-1" />
-                        <div className="text-[6px] font-black uppercase tracking-widest text-slate-500">
-                          Registrar
-                        </div>
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+                          Qubit Certify
+                        </p>
+                        <p className="text-xs font-semibold text-slate-900">
+                          Official credential
+                        </p>
                       </div>
-                      <div>
-                        <div className="h-4 w-12 border-b border-slate-300 opacity-60 mb-1" />
-                        <div className="text-[6px] font-black uppercase tracking-widest text-slate-500">
-                          Authority
-                        </div>
+                      <div className="flex h-8 w-8 items-center justify-center rounded border border-slate-200 bg-slate-50 text-[9px] font-semibold text-slate-500">
+                        QR
                       </div>
                     </div>
 
-                    <div className="text-right">
-                      <div className="px-2.5 py-1 rounded bg-primary text-white font-black text-[9px] tracking-wider shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-300 inline-block">
-                        CERT-98234-A
-                      </div>
-                      <p className="text-[6px] font-black uppercase tracking-widest text-slate-400 mt-1">
-                        Verified ID Position
+                    <div className="py-2 text-center">
+                      <p className="mb-1 text-[9px] font-medium uppercase tracking-wider text-slate-500">
+                        This is to certify that
                       </p>
+                      <p className="font-serif text-base font-semibold italic text-slate-900">
+                        Recipient Name
+                      </p>
+                      <p className="mx-auto mt-1 max-w-[220px] text-[9px] leading-snug text-slate-500">
+                        has completed the requirements for this credential.
+                      </p>
+                    </div>
+
+                    <div className="flex items-end justify-between border-t border-slate-100 pt-3">
+                      <div className="space-y-1">
+                        <div className="h-3 w-14 border-b border-slate-300" />
+                        <p className="text-[8px] font-semibold uppercase tracking-wider text-slate-400">
+                          Signature
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="inline-block rounded bg-primary px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wide text-white ring-2 ring-primary/25 ring-offset-2">
+                          AB12CD34EF56
+                        </div>
+                        <p className="mt-1.5 text-[8px] font-semibold uppercase tracking-wider text-primary">
+                          ← Certificate ID
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -244,7 +226,76 @@ export const VerifyPortal: React.FC = () => {
             </div>
           </div>
         </motion.section>
+
+        {/* Status meanings */}
+        <motion.section
+          variants={REVEAL_ITEM}
+          className="mb-16 md:mb-20"
+        >
+          <h2 className="mb-3 text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
+            Status meanings
+          </h2>
+          <p className="mb-8 max-w-2xl text-slate-600">
+            After you submit an ID, the result page shows one of these outcomes.
+          </p>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {STATUS_LEGEND.map(({ icon: Icon, title, desc, tone }) => (
+              <div
+                key={title}
+                className="rounded border border-slate-200 bg-white p-6"
+              >
+                <div
+                  className={`mb-4 inline-flex items-center gap-2 rounded border px-2.5 py-1 text-xs font-semibold ${tone}`}
+                >
+                  <Icon size={14} aria-hidden="true" />
+                  {title}
+                </div>
+                <p className="text-sm leading-relaxed text-slate-600">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* Trust & privacy */}
+        <motion.section
+          variants={REVEAL_ITEM}
+          className="rounded border border-slate-200 bg-white p-8 md:p-10"
+        >
+          <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+            <div className="max-w-xl">
+              <div className="mb-3 flex items-center gap-2 text-primary">
+                <HelpCircle size={18} aria-hidden="true" />
+                <h2 className="text-lg font-semibold text-slate-900">
+                  Trust & privacy
+                </h2>
+              </div>
+              <p className="mb-4 text-sm leading-relaxed text-slate-600">
+                Qubit Certify publishes only the fields needed to confirm a
+                credential. Private account data is never shown on this public
+                page. Lookups are rate-limited to protect the registry.
+              </p>
+              <p className="text-sm leading-relaxed text-slate-600">
+                Need help or want to report a suspicious document?{' '}
+                <Link
+                  to={ROUTES.FAQ}
+                  className="font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  Read the FAQs
+                </Link>{' '}
+                or contact support.
+              </p>
+            </div>
+            <a
+              href="mailto:support@certify.ink"
+              className="inline-flex shrink-0 items-center gap-2 rounded border border-slate-200 bg-[#F7F8FA] px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:border-primary/30 hover:text-primary"
+            >
+              <Mail size={16} aria-hidden="true" />
+              support@certify.ink
+            </a>
+          </div>
+        </motion.section>
       </motion.main>
+
       <Footer />
     </div>
   );

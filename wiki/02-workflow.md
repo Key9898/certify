@@ -44,6 +44,7 @@ If any check fails, block the push and fix all errors.
 - **Path:** `docs/sessions/YYYY-MM-DD-session-summary.md`
 - **Git status:** Gitignored (`docs/sessions/` added to root `.gitignore`).
 - **Always-on rule:** After any implementation changes, agents must update **both** `wiki/notes/` and `docs/sessions/` using the standard templates.
+- **Lark task block:** After every completed task/batch, agents must also emit one consolidated copy-paste block for manual Lark updates. Template: `wiki/conventions/lark-task-update.md`.
 
 ### Session Template
 
